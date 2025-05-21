@@ -1,0 +1,201 @@
+# Python Tracing
+
+Handit.ai's Python tracing system provides comprehensive monitoring and debugging capabilities for your AI model deployments. This guide will show you how to implement and use tracing in your Python applications.
+
+## Installation
+
+```bash
+pip install handit-sdk
+```
+
+## Basic Setup
+
+First, import and initialize the HanditTracker:
+
+```python
+from handit import HanditTracker
+
+# Initialize the tracker
+tracker = HanditTracker()
+
+# Configure with your API key
+tracker.config(api_key="your-api-key")
+```
+
+## Core Features
+
+### 1. Model Tracking
+
+Track your AI models (LLMs, embedding models, etc.) with automatic input/output logging:
+
+```python
+from langchain.chat_models import ChatOpenAI
+
+# Initialize your model
+model = ChatOpenAI()
+
+# Track the model
+tracked_model = tracker.track_model(model, model_id="your-model-id")
+
+# Use the tracked model as normal
+response = await tracked_model.agenerate([["Hello, how are you?"]])
+```
+
+### 2. Tool Tracking
+
+Monitor your tools (RAG, API calls, functions) with detailed execution tracking:
+
+```python
+from langchain.tools import Tool
+
+# Create your tool
+tool = Tool(
+    name="search",
+    func=lambda x: "search results"
+)
+
+# Track the tool
+tracked_tool = tracker.track_tool(tool, tool_id="your-tool-id")
+
+# Use the tracked tool
+result = await tracked_tool.ainvoke("search query")
+```
+
+### 3. Agent Tracing
+
+Track complete agent execution flows:
+
+```python
+@tracker.start_agent_tracing()
+async def my_agent():
+    # Your agent code here
+    result = await some_operation()
+    return result
+
+# Use the agent
+result = await my_agent()
+```
+
+### 4. Node-Level Tracing
+
+Track individual agent nodes:
+
+```python
+@tracker.trace_agent_node("node-id")
+async def process_node(input_data):
+    # Process the input
+    result = process(input_data)
+    return result
+```
+
+## Advanced Usage
+
+### Custom Function Tracing
+
+Trace any function with detailed input/output logging:
+
+```python
+async def complex_operation(data):
+    # Your complex operation here
+    return processed_data
+
+# Trace the function
+result = await tracker.trace_agent_node_func(
+    complex_operation,
+    input_data,
+    key="custom-operation"
+)
+```
+
+### Error Handling
+
+The tracker automatically captures errors and stack traces:
+
+```python
+@tracker.trace_agent_node("error-prone-node")
+async def risky_operation():
+    try:
+        result = await some_operation()
+        return result
+    except Exception as e:
+        # Error will be automatically tracked
+        raise
+```
+
+### Performance Optimization
+
+Fetch optimized prompts for your models:
+
+```python
+# Get the optimized prompt for a model
+optimized_prompt = tracker.fetch_optimized_prompt("your-model-id")
+```
+
+## Best Practices
+
+1. **Use Meaningful IDs**: Give your models, tools, and nodes descriptive IDs
+2. **Handle Errors**: Let the tracker capture errors automatically
+3. **Clean Data**: The tracker automatically sanitizes sensitive data
+4. **Async Support**: Use async/await for better performance
+5. **Resource Cleanup**: The tracker handles cleanup automatically
+
+## Viewing Traces
+
+Access your traces in the Handit.ai dashboard:
+
+- Model performance metrics
+- Tool execution times
+- Agent flow visualization
+- Error analysis
+- Resource usage statistics
+
+## API Reference
+
+For detailed API documentation, see the [Python SDK Reference](/sdk/python).
+
+## Example Implementation
+
+Here's a complete example showing how to use the tracker in a real application:
+
+```python
+from handit import HanditTracker
+from langchain.chat_models import ChatOpenAI
+from langchain.tools import Tool
+
+# Initialize tracker
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Track a model
+model = ChatOpenAI()
+tracked_model = tracker.track_model(model, model_id="chat-model")
+
+# Track a tool
+search_tool = Tool(
+    name="search",
+    func=lambda x: "search results"
+)
+tracked_tool = tracker.track_tool(search_tool, tool_id="search-tool")
+
+# Create and track an agent
+@tracker.start_agent_tracing()
+async def my_agent():
+    # Use tracked components
+    response = await tracked_model.agenerate([["Hello"]])
+    search_result = await tracked_tool.ainvoke("query")
+    return response, search_result
+
+# Run the agent
+result = await my_agent()
+```
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. **API Key Issues**: Ensure your API key is correctly configured
+2. **Network Errors**: Check your internet connection and API endpoint
+3. **Serialization Errors**: The tracker automatically handles most serialization cases
+4. **Async/Sync Mismatch**: Use the appropriate async/sync methods for your functions
+
+For more help, visit our [Support Page](/support) or join our [Discord Community](https://discord.gg/handit). 
