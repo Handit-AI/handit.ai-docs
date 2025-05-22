@@ -1,0 +1,311 @@
+---
+sidebarTitle: JavaScript
+---
+
+import { Callout } from "nextra/components";
+import { Steps } from "nextra/components";
+import { Tabs } from "nextra/components";
+
+# JavaScript Tracing
+
+Handit.ai's JavaScript tracing system provides comprehensive monitoring and debugging capabilities for your AI applications, supporting both Node.js and browser environments.
+
+<Callout type="info">
+  Tracing helps you monitor and debug your AI applications by tracking model performance, request/response data, and agent flows in real-time.
+</Callout>
+
+## Quick Start
+
+Install the SDK using your preferred package manager:
+
+<Tabs items={["npm", "yarn"]} defaultIndex="0">
+<Tabs.Tab>
+```bash filename="terminal"
+npm install ml-request-tracker
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash filename="terminal"
+yarn add ml-request-tracker
+```
+</Tabs.Tab>
+</Tabs>
+
+## Basic Setup
+
+First, configure the SDK with your API key:
+
+```javascript filename="setup.js"
+const { config, interceptAxiosRequest, interceptFetchRequest } = require('ml-request-tracker');
+
+// Configure with your API key
+config({
+  apiKey: 'your-api-key',
+  // Optional: Custom tracking URLs
+  trackingUrl: 'https://your-tracking-server.com/api/track',
+  performanceUrl: 'https://your-performance-server.com/api'
+});
+
+// Initialize interceptors for automatic tracking
+const axios = require('axios');
+interceptAxiosRequest(axios);
+interceptFetchRequest();
+```
+
+## Core Features
+
+### 1. Automatic Request Tracking
+
+The SDK automatically tracks requests made with Axios or Fetch to configured URLs:
+
+```javascript filename="auto_tracking.js"
+const axios = require('axios');
+
+// This request will be automatically tracked
+const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+  model: 'gpt-4',
+  messages: [{ role: 'user', content: 'Hello!' }]
+});
+
+// Fetch requests are also automatically tracked
+const fetchResponse = await fetch('https://api.another-ai.com/v1/predict', {
+  method: 'POST',
+  body: JSON.stringify({ prompt: 'Hello!' })
+});
+```
+
+### 2. Manual Model Tracking
+
+For more control or custom endpoints, use manual tracking:
+
+```javascript filename="manual_tracking.js"
+const { captureModel } = require('ml-request-tracker');
+
+// Track a specific model interaction
+await captureModel({
+  modelId: 'custom-model',
+  requestBody: {
+    prompt: "Translate: Hello World"
+  },
+  responseBody: {
+    translation: "Bonjour le monde"
+  }
+});
+```
+
+### 3. Agent Tracing
+
+Track complete agent execution flows with automatic error handling:
+
+```javascript filename="agent_tracing.js"
+const { startAgentTracing } = require('ml-request-tracker');
+
+// Create a traced agent
+const customerServiceAgent = startAgentTracing(async (userQuery) => {
+  // Your agent logic here
+  const response = await processQuery(userQuery);
+  return response;
+});
+
+// Use the agent
+try {
+  const result = await customerServiceAgent("How can I help you?");
+  console.log(result);
+} catch (error) {
+  // Errors are automatically tracked
+  console.error("Agent failed:", error);
+}
+```
+
+### 4. Node-level Tracing
+
+Track individual functions or "nodes" within your agent:
+
+```javascript filename="node_tracing.js"
+const { traceAgentNode } = require('ml-request-tracker');
+
+// Create a traced node
+const processQueryNode = traceAgentNode({
+  agentNodeId: 'query-processor',
+  callback: async (query) => {
+    // Process the query
+    return `Processed: ${query}`;
+  }
+});
+
+// Use within an agent
+const agent = startAgentTracing(async (input) => {
+  const processed = await processQueryNode(input);
+  return processed;
+});
+```
+
+## Advanced Features
+
+### Error Handling
+
+The SDK automatically captures and reports errors:
+
+```javascript filename="error_handling.js"
+const { startAgentTracing } = require('ml-request-tracker');
+
+const riskyOperation = startAgentTracing(async () => {
+  try {
+    const result = await someOperation();
+    return result;
+  } catch (error) {
+    // Error is automatically tracked
+    throw error;
+  }
+});
+```
+
+### External ID Tracking
+
+Associate traces with your internal IDs:
+
+```javascript filename="external_tracking.js"
+const { captureAgentNode } = require('ml-request-tracker');
+
+await captureAgentNode({
+  agentNodeSlug: 'payment-processor',
+  externalId: 'user_123',
+  requestBody: { amount: 100 },
+  responseBody: { status: 'success' }
+});
+```
+
+### Optimized Prompts
+
+Fetch optimized prompts for your models:
+
+```javascript filename="optimized_prompts.js"
+const { fetchOptimizedPrompt } = require('ml-request-tracker');
+
+const prompt = await fetchOptimizedPrompt({
+  modelId: 'gpt-4'
+});
+```
+
+## Complete Example
+
+Here's a complete example showing how to use the SDK in a real application:
+
+```javascript filename="complete_example.js"
+const { config, interceptAxiosRequest, startAgentTracing, traceAgentNode } = require('ml-request-tracker');
+const axios = require('axios');
+
+// 1. Initialize SDK
+config({
+  apiKey: 'your-api-key'
+});
+
+// 2. Set up interceptors
+interceptAxiosRequest(axios);
+
+// 3. Create traced nodes
+const formatResponseNode = traceAgentNode({
+  agentNodeId: 'response-formatter',
+  callback: (rawResponse) => {
+    return rawResponse.choices?.[0]?.message?.content || 'No response';
+  }
+});
+
+// 4. Create the main agent
+const customerServiceAgent = startAgentTracing(async (userQuery) => {
+  // Process the query
+  const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: userQuery }]
+  });
+
+  // Format the response
+  return await formatResponseNode(response.data);
+});
+
+// 5. Run the agent
+(async () => {
+  try {
+    const result = await customerServiceAgent("How can I help you?");
+    console.log("Agent response:", result);
+  } catch (error) {
+    console.error("Agent failed:", error);
+  }
+})();
+```
+
+## API Reference
+
+Here's a quick overview of the available functions:
+
+| Function | Purpose | Sync | Async |
+|----------|---------|------|-------|
+| `config` | Configure the SDK | ✔️ | – |
+| `interceptAxiosRequest` | Add tracking to Axios | ✔️ | – |
+| `interceptFetchRequest` | Add tracking to Fetch | ✔️ | – |
+| `captureModel` | Manual model tracking | – | ✔️ |
+| `startAgentTracing` | Agent flow tracking | – | ✔️ |
+| `traceAgentNode` | Node-level tracking | – | ✔️ |
+| `captureAgentNode` | Manual node tracking | – | ✔️ |
+| `fetchOptimizedPrompt` | Get optimized prompts | – | ✔️ |
+
+For detailed API documentation, visit [API › JavaScript SDK](/sdk/javascript) in the sidebar.
+
+## Troubleshooting
+
+<Callout type="warning">
+  Common issues and solutions:
+</Callout>
+
+<details>
+<summary>**Configuration Issues**</summary>
+   - Ensure API key is correctly set
+   - Verify tracking URLs are accessible
+   - Check for console errors during initialization
+</details>
+
+<details>
+<summary>**Network Problems**</summary>
+   - Check internet connectivity
+   - Verify API endpoints
+   - Monitor request timeouts
+</details>
+
+<details>
+<summary>**Interceptor Issues**</summary>
+   - Ensure interceptors are initialized after axios/fetch
+   - Verify URL configuration
+   - Check for conflicting interceptors
+</details>
+
+<details>
+<summary>**Async/Sync Issues**</summary>
+   - Use correct async/await syntax
+   - Handle Promise rejections
+   - Check event loop setup
+</details>
+
+## Viewing Traces
+
+Access your traces in the Handit.ai dashboard:
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+  <div>
+    <h4>📊 Analytics & Insights</h4>
+    - Request/response metrics
+    - Model performance data
+    - Agent flow visualization
+  </div>
+  <div>
+    <h4>🔍 Debugging & Optimization</h4>
+    - Error analysis
+    - Request tracking
+    - Performance optimization
+  </div>
+</div>
+
+For more help, visit our [Support Page](/support) or join our [Discord Community](https://discord.gg/handit).
+
+<Callout type="success">
+  Ready to implement tracing in your JavaScript application? Start with our [Quick Start Guide](/quickstart) or explore the [API Reference](/sdk/javascript) for more details.
+</Callout>

@@ -1,0 +1,133 @@
+---
+title: Quickstart
+description: Handit.ai is an AI-powered platform that helps teams build and deploy intelligent applications at scale.
+sidebarTitle: Quickstart
+---
+
+import { Callout } from "nextra/components";
+import { Steps } from "nextra/components";
+import { Tabs } from "nextra/components";
+
+# Quickstart Guide
+
+Get started with Handit.ai in minutes. This guide will walk you through the basic setup.
+
+<Steps>
+
+### Sign Up
+
+Create an account at [handit.ai](https://handit.ai/signup) to get started with Handit.ai. You'll need to provide your email address and set up a password.
+
+### Install
+
+Install Handit SDK.
+
+<Tabs items={["python", "js"]} defaultIndex="0">
+  <Tabs.Tab>
+    ```bash filename="terminal" 
+    pip install -U "handit-sdk>=1.9.0" 
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash filename="terminal" 
+    npm install @handit.ai/node 
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Configure Your API Key
+
+To use Handit.ai, you'll need to set up your API key. You can find your API key in your [dashboard settings](https://dashboard.handit.ai/settings/integrations).
+
+```bash filename=".env"
+HANDIT_API_KEY=YOUR_API_KEY
+```
+
+<Callout type="warning">
+  Never commit your API key. Use environment variables or a secure configuration
+  management system.
+</Callout>
+
+### Create your Agent Flow
+
+An agent flow is a sequence of connected steps (nodes) that define how your AI agent processes information and performs tasks. Think of it as a flowchart where each node can be either an AI model or a tool, and the connections determine how data moves between them.
+
+<Callout type="important">
+  **Key Concepts to Keep in Mind:**
+  
+  - **Model Node**: Represents any function or endpoint that uses an LLM (Large Language Model) to process or generate content. Examples include text generation, classification, or any AI-powered analysis.
+  
+  - **Tool Node**: Represents any function or endpoint that performs standard operations without LLM involvement. Examples include data processing, API calls, calculations, or any traditional programming logic.
+</Callout>
+
+Follow these steps to create your first agent in Handit.ai:
+
+
+**Access the Dashboard**
+
+    - Log in to your [Handit.ai Dashboard](https://dashboard.handit.ai)
+    - Navigate to "Your Agents" in the sidebar
+    - Click "Create Agent" to begin 
+
+**Add Nodes to Your Agent Flow**
+
+   - Click "Add Node" to create your first step
+   - Choose between two node types:
+     - **Model Node**: For AI tasks like prediction or generation
+     - **Tool Node**: For utility functions or API integrations
+   - Configure each node with:
+     - Name and unique identifier
+     - Description of functionality
+     - Node type and settings
+     - Next steps in the flow
+
+**Connect Your Nodes**
+
+   - Create connections between nodes by dragging from one to another
+   - Define the data flow and execution path
+   - Ensure logical flow between steps
+
+**Finalize Your Agent**
+   - Click "Create" to save your agent
+   - Provide a descriptive name and purpose
+   - Verify your agent appears in the "Your Agents" list
+
+<Callout type='info'>
+  You can always edit your agent's configuration later through the dashboard.
+</Callout>
+
+</Steps>
+
+## Create Your First Project
+
+1. Initialize a new project:
+
+```bash
+handit init my-first-project
+cd my-first-project
+```
+
+2. Configure your project:
+
+```bash
+handit config
+```
+
+3. Deploy your first model:
+
+```bash
+handit deploy
+```
+
+## Next Steps
+
+- Learn about [Model Management](/guides/model-management)
+- Explore [Data Processing](/guides/data-processing)
+- Check out [Deployment Options](/guides/deployment)
+- Read [Best Practices](/guides/best-practices)
+
+## Need Help?
+
+- Join our [Discord Community](https://discord.gg/handit)
+- Check the [FAQ](/faq)
+- Contact [Support](/support)
