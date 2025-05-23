@@ -1,0 +1,734 @@
+---
+title: 'Tool Tracing'
+sidebarTitle: 'Tool Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Tool Tracing
+
+Tool Tracing is the silent guardian of your utility functions. This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools. It's essential for understanding how your tools interact with the rest of your system.
+
+<Callout type="info">
+  Tool Tracing works similarly to Model Tracing but is specifically designed for utility functions, RAGs, and other helper tools. It automatically tracks all inputs, outputs, and execution details.
+</Callout>
+
+## How It Works
+
+Tool Tracing wraps your utility functions to:
+
+- Track all function inputs and outputs
+- Monitor execution time and performance
+- Capture error cases and stack traces
+- Maintain detailed logs of tool interactions
+
+## Implementation
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="tool_tracing.py"
+    from handit_service import tracker
+    import logging
+    from typing import Any, Dict, List, Optional
+
+    # Basic usage with a simple function
+    def temperature_converter(celsius: float) -> float:
+        return celsius * 9/5 + 32
+
+    tracked_converter = tracker.track_tool(
+        temperature_converter,
+        "temp-converter"
+    )
+
+    # Usage with error handling
+    async def process_data(data: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            result = await tracked_converter(data)
+            return result
+        except Exception as e:
+            logging.error(f"Error processing data: {str(e)}")
+            raise
+
+    # Example with multiple tools
+    def text_processor(text: str) -> str:
+        return text.strip().lower()
+
+    def data_validator(data: Dict[str, Any]) -> bool:
+        return all(key in data for key in ["id", "value"])
+
+    # Create tracked versions
+    tracked_processor = tracker.track_tool(text_processor, "text-processor")
+    tracked_validator = tracker.track_tool(data_validator, "data-validator")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="tool_tracing.js"
+    const { trackTool } = require('handit-service');
+    const logger = require('./logger');
+
+    // Basic usage with a simple function
+    const temperatureConverter = (celsius) => {
+        return celsius * 9/5 + 32;
+    };
+
+    const trackedConverter = trackTool(
+        temperatureConverter,
+        'temp-converter'
+    );
+
+    // Usage with error handling
+    const processData = async (data) => {
+        try {
+            const result = await trackedConverter(data);
+            return result;
+        } catch (error) {
+            logger.error(`Error processing data: ${error.message}`);
+            throw error;
+        }
+    };
+
+    // Example with multiple tools
+    const textProcessor = (text) => {
+        return text.trim().toLowerCase();
+    };
+
+    const dataValidator = (data) => {
+        return ['id', 'value'].every(key => key in data);
+    };
+
+    // Create tracked versions
+    const trackedProcessor = trackTool(textProcessor, 'text-processor');
+    const trackedValidator = trackTool(dataValidator, 'data-validator');
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Common Use Cases
+
+### 1. Utility Function Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="utility_tracking.py"
+    from handit_service import tracker
+    from typing import List, Dict, Any
+    import logging
+
+    # Utility function tracking with validation
+    class DataProcessor:
+        def __init__(self):
+            self.cleaner = tracker.track_tool(
+                self._clean_data,
+                "data-cleaner"
+            )
+            self.validator = tracker.track_tool(
+                self._validate_data,
+                "data-validator"
+            )
+            self.transformer = tracker.track_tool(
+                self._transform_data,
+                "data-transformer"
+            )
+
+        def _clean_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            """Clean input data by removing whitespace and normalizing values."""
+            return {
+                k: str(v).strip() if isinstance(v, str) else v
+                for k, v in data.items()
+            }
+
+        def _validate_data(self, data: Dict[str, Any]) -> bool:
+            """Validate data structure and content."""
+            required_fields = ["id", "name", "value"]
+            return all(field in data for field in required_fields)
+
+        def _transform_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            """Transform data into required format."""
+            return {
+                "id": str(data["id"]),
+                "name": data["name"].lower(),
+                "value": float(data["value"])
+            }
+
+        async def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            try:
+                # Clean data
+                cleaned_data = self.cleaner(data)
+                
+                # Validate data
+                if not self.validator(cleaned_data):
+                    raise ValueError("Invalid data structure")
+                
+                # Transform data
+                result = self.transformer(cleaned_data)
+                return result
+            except Exception as e:
+                logging.error(f"Processing error: {str(e)}")
+                raise
+
+    # Usage
+    async def main():
+        processor = DataProcessor()
+        data = {
+            "id": 123,
+            "name": " Test Data ",
+            "value": "42.5"
+        }
+        result = await processor.process(data)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="utility_tracking.js"
+    const { trackTool } = require('handit-service');
+    const logger = require('./logger');
+
+    // Utility function tracking with validation
+    class DataProcessor {
+        constructor() {
+            this.cleaner = trackTool(
+                this._cleanData.bind(this),
+                'data-cleaner'
+            );
+            this.validator = trackTool(
+                this._validateData.bind(this),
+                'data-validator'
+            );
+            this.transformer = trackTool(
+                this._transformData.bind(this),
+                'data-transformer'
+            );
+        }
+
+        _cleanData(data) {
+            // Clean input data by removing whitespace and normalizing values
+            return Object.fromEntries(
+                Object.entries(data).map(([k, v]) => [
+                    k,
+                    typeof v === 'string' ? v.trim() : v
+                ])
+            );
+        }
+
+        _validateData(data) {
+            // Validate data structure and content
+            const requiredFields = ['id', 'name', 'value'];
+            return requiredFields.every(field => field in data);
+        }
+
+        _transformData(data) {
+            // Transform data into required format
+            return {
+                id: String(data.id),
+                name: data.name.toLowerCase(),
+                value: parseFloat(data.value)
+            };
+        }
+
+        async process(data) {
+            try {
+                // Clean data
+                const cleanedData = this.cleaner(data);
+                
+                // Validate data
+                if (!this.validator(cleanedData)) {
+                    throw new Error('Invalid data structure');
+                }
+                
+                // Transform data
+                const result = this.transformer(cleanedData);
+                return result;
+            } catch (error) {
+                logger.error(`Processing error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const processor = new DataProcessor();
+        const data = {
+            id: 123,
+            name: ' Test Data ',
+            value: '42.5'
+        };
+        const result = await processor.process(data);
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 2. RAG Tool Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="rag_tracking.py"
+    from handit_service import tracker
+    from typing import List, Dict, Any
+    import logging
+
+    # RAG tool tracking with vector search
+    class RAGTool:
+        def __init__(self, vector_store):
+            self.vector_store = vector_store
+            self.search = tracker.track_tool(
+                self._search_documents,
+                "vector-search"
+            )
+            self.rank = tracker.track_tool(
+                self._rank_results,
+                "result-ranker"
+            )
+
+        async def _search_documents(
+            self,
+            query: str,
+            top_k: int = 5
+        ) -> List[Dict[str, Any]]:
+            """Search for relevant documents."""
+            try:
+                results = await self.vector_store.similarity_search(
+                    query,
+                    k=top_k
+                )
+                return [
+                    {
+                        "content": doc.page_content,
+                        "metadata": doc.metadata
+                    }
+                    for doc in results
+                ]
+            except Exception as e:
+                logging.error(f"Search error: {str(e)}")
+                raise
+
+        def _rank_results(
+            self,
+            results: List[Dict[str, Any]]
+        ) -> List[Dict[str, Any]]:
+            """Rank search results by relevance."""
+            return sorted(
+                results,
+                key=lambda x: x.get("score", 0),
+                reverse=True
+            )
+
+        async def query(
+            self,
+            query: str,
+            top_k: int = 5
+        ) -> List[Dict[str, Any]]:
+            try:
+                # Search for documents
+                results = await self.search(query, top_k)
+                
+                # Rank results
+                ranked_results = self.rank(results)
+                return ranked_results
+            except Exception as e:
+                logging.error(f"Query error: {str(e)}")
+                raise
+
+    # Usage
+    async def main():
+        rag = RAGTool(vector_store)
+        results = await rag.query("What is machine learning?")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="rag_tracking.js"
+    const { trackTool } = require('handit-service');
+    const logger = require('./logger');
+
+    // RAG tool tracking with vector search
+    class RAGTool {
+        constructor(vectorStore) {
+            this.vectorStore = vectorStore;
+            this.search = trackTool(
+                this._searchDocuments.bind(this),
+                'vector-search'
+            );
+            this.rank = trackTool(
+                this._rankResults.bind(this),
+                'result-ranker'
+            );
+        }
+
+        async _searchDocuments(query, topK = 5) {
+            // Search for relevant documents
+            try {
+                const results = await this.vectorStore.similaritySearch(
+                    query,
+                    topK
+                );
+                return results.map(doc => ({
+                    content: doc.pageContent,
+                    metadata: doc.metadata
+                }));
+            } catch (error) {
+                logger.error(`Search error: ${error.message}`);
+                throw error;
+            }
+        }
+
+        _rankResults(results) {
+            // Rank search results by relevance
+            return results.sort((a, b) => 
+                (b.score || 0) - (a.score || 0)
+            );
+        }
+
+        async query(query, topK = 5) {
+            try {
+                // Search for documents
+                const results = await this.search(query, topK);
+                
+                // Rank results
+                const rankedResults = this.rank(results);
+                return rankedResults;
+            } catch (error) {
+                logger.error(`Query error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const rag = new RAGTool(vectorStore);
+        const results = await rag.query('What is machine learning?');
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 3. API Tool Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="api_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any, Optional
+    import aiohttp
+    import logging
+
+    # API tool tracking with request handling
+    class APITool:
+        def __init__(self, base_url: str):
+            self.base_url = base_url
+            self.request = tracker.track_tool(
+                self._make_request,
+                "api-request"
+            )
+            self.validate = tracker.track_tool(
+                self._validate_response,
+                "response-validator"
+            )
+
+        async def _make_request(
+            self,
+            endpoint: str,
+            method: str = "GET",
+            data: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            """Make HTTP request to API endpoint."""
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.request(
+                        method,
+                        f"{self.base_url}/{endpoint}",
+                        json=data
+                    ) as response:
+                        return await response.json()
+            except Exception as e:
+                logging.error(f"Request error: {str(e)}")
+                raise
+
+        def _validate_response(
+            self,
+            response: Dict[str, Any]
+        ) -> bool:
+            """Validate API response."""
+            return (
+                isinstance(response, dict) and
+                "status" in response and
+                response["status"] == "success"
+            )
+
+        async def call(
+            self,
+            endpoint: str,
+            method: str = "GET",
+            data: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            try:
+                # Make request
+                response = await self.request(endpoint, method, data)
+                
+                # Validate response
+                if not self.validate(response):
+                    raise ValueError("Invalid API response")
+                
+                return response
+            except Exception as e:
+                logging.error(f"API call error: {str(e)}")
+                raise
+
+    # Usage
+    async def main():
+        api = APITool("https://api.example.com")
+        result = await api.call(
+            "users",
+            method="POST",
+            data={"name": "John Doe"}
+        )
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="api_tracking.js"
+    const { trackTool } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // API tool tracking with request handling
+    class APITool {
+        constructor(baseUrl) {
+            this.baseUrl = baseUrl;
+            this.request = trackTool(
+                this._makeRequest.bind(this),
+                'api-request'
+            );
+            this.validate = trackTool(
+                this._validateResponse.bind(this),
+                'response-validator'
+            );
+        }
+
+        async _makeRequest(endpoint, method = 'GET', data = null) {
+            // Make HTTP request to API endpoint
+            try {
+                const response = await axios({
+                    method,
+                    url: `${this.baseUrl}/${endpoint}`,
+                    data
+                });
+                return response.data;
+            } catch (error) {
+                logger.error(`Request error: ${error.message}`);
+                throw error;
+            }
+        }
+
+        _validateResponse(response) {
+            // Validate API response
+            return (
+                typeof response === 'object' &&
+                'status' in response &&
+                response.status === 'success'
+            );
+        }
+
+        async call(endpoint, method = 'GET', data = null) {
+            try {
+                // Make request
+                const response = await this.request(endpoint, method, data);
+                
+                // Validate response
+                if (!this.validate(response)) {
+                    throw new Error('Invalid API response');
+                }
+                
+                return response;
+            } catch (error) {
+                logger.error(`API call error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const api = new APITool('https://api.example.com');
+        const result = await api.call(
+            'users',
+            'POST',
+            { name: 'John Doe' }
+        );
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Best Practices
+
+1. **Tool Configuration**
+   - Use meaningful tool IDs
+   - Include environment information
+   - Track tool parameters
+
+2. **Error Handling**
+   - Implement proper error boundaries
+   - Log detailed error information
+   - Handle tool-specific errors
+
+3. **Performance Monitoring**
+   - Track execution time
+   - Monitor resource usage
+   - Identify bottlenecks
+
+4. **Data Management**
+   - Sanitize sensitive data
+   - Handle large inputs
+   - Manage tool state
+
+<Callout type="warning">
+  Always implement proper error handling and logging when tracking tools to ensure you can debug issues effectively.
+</Callout>
+
+## Advanced Usage
+
+### 1. Tool Performance Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="performance_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any
+    import time
+    import logging
+
+    # Tool performance tracking
+    class PerformanceTracker:
+        def __init__(self, tool, tool_id: str):
+            self.tool = tracker.track_tool(tool, tool_id)
+            self.metrics: Dict[str, Any] = {}
+
+        async def track_performance(
+            self,
+            *args: Any,
+            **kwargs: Any
+        ) -> Any:
+            try:
+                start_time = time.time()
+                result = await self.tool(*args, **kwargs)
+                end_time = time.time()
+
+                # Track metrics
+                self.metrics.update({
+                    "execution_time": end_time - start_time,
+                    "input_size": len(str(args)) + len(str(kwargs)),
+                    "output_size": len(str(result))
+                })
+
+                return result
+            except Exception as e:
+                logging.error(f"Performance tracking error: {str(e)}")
+                raise
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="performance_tracking.js"
+    const { trackTool } = require('handit-service');
+    const logger = require('./logger');
+
+    // Tool performance tracking
+    class PerformanceTracker {
+        constructor(tool, toolId) {
+            this.tool = trackTool(tool, toolId);
+            this.metrics = {};
+        }
+
+        async trackPerformance(...args) {
+            try {
+                const startTime = Date.now();
+                const result = await this.tool(...args);
+                const endTime = Date.now();
+
+                // Track metrics
+                this.metrics = {
+                    executionTime: endTime - startTime,
+                    inputSize: JSON.stringify(args).length,
+                    outputSize: JSON.stringify(result).length
+                };
+
+                return result;
+            } catch (error) {
+                logger.error(`Performance tracking error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 2. Tool Chain Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="chain_tracking.py"
+    from handit_service import tracker
+    from typing import List, Dict, Any
+    import logging
+
+    # Tool chain tracking
+    class ToolChain:
+        def __init__(self, tools: List[Any], chain_id: str):
+            self.tools = [
+                tracker.track_tool(tool, f"{chain_id}-{i}")
+                for i, tool in enumerate(tools)
+            ]
+
+        async def process(
+            self,
+            input_data: Dict[str, Any]
+        ) -> Dict[str, Any]:
+            try:
+                result = input_data
+                for tool in self.tools:
+                    result = await tool(result)
+                return result
+            except Exception as e:
+                logging.error(f"Chain processing error: {str(e)}")
+                raise
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="chain_tracking.js"
+    const { trackTool } = require('handit-service');
+    const logger = require('./logger');
+
+    // Tool chain tracking
+    class ToolChain {
+        constructor(tools, chainId) {
+            this.tools = tools.map((tool, i) => 
+                trackTool(tool, `${chainId}-${i}`)
+            );
+        }
+
+        async process(inputData) {
+            try {
+                let result = inputData;
+                for (const tool of this.tools) {
+                    result = await tool(result);
+                }
+                return result;
+            } catch (error) {
+                logger.error(`Chain processing error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  Tool Tracing provides comprehensive tracking capabilities for all your utility functions and tools, helping you monitor performance and debug issues effectively.
+</Callout>
+
+<Callout type="success">
+  By implementing Tool Tracing in your application, you can gain valuable insights into your tools' behavior and optimize their performance.
+</Callout>

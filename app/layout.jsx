@@ -27,7 +27,7 @@ const banner = <Banner storageKey="some-key">🎉 Welcome to handit.ai Documenta
 const navbar = (
   <Navbar
     logo={<b>Handit.ai</b>}
-    projectLink="https://github.com/shuding/nextra"
+    projectLink="https://github.com/Handit-AI/handit.ai.git"
   />
 );
 const footer = (
@@ -63,7 +63,7 @@ export default async function RootLayout({ children }) {
           banner={banner}
           navbar={navbar}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/shuding/nextra/tree/main/docs"
+          docsRepositoryBase="https://github.com/Handit-AI/handit.ai-docs.git"
           editLink="Edit this page on GitHub"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           footer={footer}

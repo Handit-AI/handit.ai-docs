@@ -1,0 +1,428 @@
+---
+title: 'Agent Tracing'
+sidebarTitle: 'Agent Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Agent Tracing
+
+This powerful tool gives you complete visibility into your entire workflow, from start to finish. It acts as the root of your tracing tree, important to automatically collecting and correlating all operations within your application.
+
+Agent Tracing is The main API endpoint processing requests. (The endpoint or the main function that executes the entire workflow)
+
+<Callout type="warning">
+  Golden Rule: Every request that enters your system must start with Agent Tracing. Without this wrapper, the root context won't be created and inner nodes won't be linked together.
+</Callout>
+
+## How It Works
+
+Agent Tracing creates a root context for your entire workflow, allowing you to:
+
+- Track the complete lifecycle of your application
+- Correlate all operations within a single request
+- Monitor performance and errors across the entire flow
+- Maintain a hierarchical view of your system's behavior
+
+## Implementation
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="agent.py"
+    from handit_service import tracker
+
+    # Async version
+    @tracker.start_agent_tracing(key="invoice-assistant")
+    async def process_invoice(user_input: str) -> str:
+        """
+        Main function of your agent.
+        Everything that happens inside will be linked to the same trace.
+        """
+        # Your agent logic here
+        answer = await generate_answer(user_input)
+        return answer
+
+    # Sync version
+    @tracker.start_agent_tracing(key="invoice-assistant")
+    def process_invoice_sync(user_input: str) -> str:
+        """
+        Synchronous version of the agent.
+        Same tracing capabilities, just without async/await.
+        """
+        # Your agent logic here
+        answer = generate_answer_sync(user_input)
+        return answer
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="agent.js"
+    const { startAgentTracing } = require('handit-service');
+
+    // Async version
+    const processInvoice = startAgentTracing(async (userInput) => {
+        // Your agent logic here
+        const answer = await generateAnswer(userInput);
+        return answer;
+    });
+
+    // Usage
+    const result = await processInvoice("Process invoice #123");
+
+    // Sync version
+    const processInvoiceSync = startAgentTracing((userInput) => {
+        // Your agent logic here
+        const answer = generateAnswerSync(userInput);
+        return answer;
+    });
+
+    // Usage
+    const result = processInvoiceSync("Process invoice #123");
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Key Features
+
+1. **Automatic Context Creation**
+   - Creates a unique trace ID for each request
+   - Maintains context throughout the entire execution
+   - Links all child operations together
+
+2. **Error Handling**
+   - Automatically captures and reports errors
+   - Includes stack traces and error context
+   - Maintains error information in the trace
+
+3. **Performance Monitoring**
+   - Tracks total execution time
+   - Monitors individual operation durations
+   - Identifies bottlenecks in the workflow
+
+4. **Operation Correlation**
+   - Links all operations within a request
+   - Maintains parent-child relationships
+   - Provides end-to-end visibility
+
+## Best Practices
+
+1. **Always Start with Agent Tracing**
+   - Wrap your main entry points
+   - Include API endpoints and webhooks
+   - Cover scheduled tasks and background jobs
+
+2. **Use Meaningful Keys**
+   - Choose descriptive names for your agents
+   - Include version information if applicable
+   - Make keys consistent across environments
+
+3. **Handle Errors Properly**
+   - Let errors propagate naturally
+   - Don't suppress exceptions
+   - Use try-catch blocks when needed
+
+4. **Keep Traces Clean**
+   - Avoid unnecessary nesting
+   - Use appropriate granularity
+   - Remove sensitive information
+
+<Callout type="info">
+  Agent Tracing is the foundation of your observability strategy. It provides the context needed to understand your application's behavior and performance.
+</Callout>
+
+## Common Use Cases
+
+Agent Tracing is essential for any entry point that processes requests or executes workflows. Here are the most common scenarios:
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="chat_agent.py"
+    # Chat Agent - Entry point for conversational AI
+    @app.post("/api/v1/chat")
+    @tracker.start_agent_tracing(key="chat-agent-v1")
+    async def handle_chat(request: ChatRequest):
+        """
+        Main entry point for chat interactions.
+        Tracks the entire conversation flow, including:
+        - User messages and context
+        - AI model responses
+        - Tool executions
+        - Conversation state
+        """
+        try:
+            # Process the chat request
+            response = await chat_agent.process(
+                message=request.message,
+                context=request.context,
+                user_id=request.user_id
+            )
+            return response
+        except Exception as e:
+            logger.error(f"Chat processing error: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    ```
+
+    ```python filename="scheduler_agent.py"
+    # Agentic Scheduler - Entry point for AI-powered scheduling
+    @app.post("/api/v1/schedule")
+    @tracker.start_agent_tracing(key="scheduler-agent-v1")
+    async def handle_scheduling(request: ScheduleRequest):
+        """
+        Main entry point for AI scheduling operations.
+        Tracks the entire scheduling workflow:
+        - Calendar analysis
+        - Conflict resolution
+        - Meeting optimization
+        - Notification handling
+        """
+        try:
+            schedule = await scheduler_agent.process(
+                participants=request.participants,
+                preferences=request.preferences,
+                constraints=request.constraints
+            )
+            return schedule
+        except Exception as e:
+            logger.error(f"Scheduling error: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    ```
+
+    ```python filename="call_agent.py"
+    # Call Agent - Entry point for AI call handling
+    @app.post("/api/v1/call")
+    @tracker.start_agent_tracing(key="call-agent-v1")
+    async def handle_call(request: CallRequest):
+        """
+        Main entry point for AI call processing.
+        Tracks the entire call workflow:
+        - Call initialization
+        - Real-time transcription
+        - Intent recognition
+        - Response generation
+        - Call summary
+        """
+        try:
+            call_result = await call_agent.process(
+                audio_stream=request.audio,
+                call_metadata=request.metadata,
+                user_context=request.context
+            )
+            return call_result
+        except Exception as e:
+            logger.error(f"Call processing error: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    ```
+
+    ```python filename="document_agent.py"
+    # Document Processing Agent - Entry point for document analysis
+    @app.post("/api/v1/process-document")
+    @tracker.start_agent_tracing(key="document-agent-v1")
+    async def handle_document(request: DocumentRequest):
+        """
+        Main entry point for document processing.
+        Tracks the entire document workflow:
+        - Document parsing
+        - Content extraction
+        - Analysis and classification
+        - Summary generation
+        """
+        try:
+            result = await document_agent.process(
+                document=request.document,
+                processing_type=request.type,
+                options=request.options
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Document processing error: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="chat_agent.js"
+    // Chat Agent - Entry point for conversational AI
+    app.post('/api/v1/chat', startAgentTracing(async (req, res) => {
+        try {
+            // Process the chat request
+            const response = await chatAgent.process({
+                message: req.body.message,
+                context: req.body.context,
+                userId: req.body.userId
+            });
+            res.json(response);
+        } catch (error) {
+            logger.error(`Chat processing error: ${error}`);
+            res.status(500).json({ error: error.message });
+        }
+    }));
+    ```
+
+    ```javascript filename="scheduler_agent.js"
+    // Agentic Scheduler - Entry point for AI-powered scheduling
+    app.post('/api/v1/schedule', startAgentTracing(async (req, res) => {
+        try {
+            const schedule = await schedulerAgent.process({
+                participants: req.body.participants,
+                preferences: req.body.preferences,
+                constraints: req.body.constraints
+            });
+            res.json(schedule);
+        } catch (error) {
+            logger.error(`Scheduling error: ${error}`);
+            res.status(500).json({ error: error.message });
+        }
+    }));
+    ```
+
+    ```javascript filename="call_agent.js"
+    // Call Agent - Entry point for AI call handling
+    app.post('/api/v1/call', startAgentTracing(async (req, res) => {
+        try {
+            const callResult = await callAgent.process({
+                audioStream: req.body.audio,
+                callMetadata: req.body.metadata,
+                userContext: req.body.context
+            });
+            res.json(callResult);
+        } catch (error) {
+            logger.error(`Call processing error: ${error}`);
+            res.status(500).json({ error: error.message });
+        }
+    }));
+    ```
+
+    ```javascript filename="document_agent.js"
+    // Document Processing Agent - Entry point for document analysis
+    app.post('/api/v1/process-document', startAgentTracing(async (req, res) => {
+        try {
+            const result = await documentAgent.process({
+                document: req.body.document,
+                processingType: req.body.type,
+                options: req.body.options
+            });
+            res.json(result);
+        } catch (error) {
+            logger.error(`Document processing error: ${error}`);
+            res.status(500).json({ error: error.message });
+        }
+    }));
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Real-World Agent Examples
+
+1. **Chat Agent**
+   - Customer service chatbot
+   - AI assistant for user support
+   - Interactive knowledge base
+   - Multi-turn conversation handling
+
+2. **Scheduler Agent**
+   - Meeting scheduling and optimization
+   - Resource allocation
+   - Calendar management
+   - Conflict resolution
+
+3. **Call Agent**
+   - Voice call processing
+   - Real-time transcription
+   - Intent recognition
+   - Call summarization
+
+4. **Document Agent**
+   - Document analysis
+   - Content extraction
+   - Classification and tagging
+   - Summary generation
+
+<Callout type="info">
+  Each agent type has specific tracking needs. Agent Tracing helps you understand how these complex workflows behave and perform in production.
+</Callout>
+
+### Agent-Specific Best Practices
+
+1. **Chat Agents**
+   - Track conversation context
+   - Monitor response times
+   - Log user interactions
+   - Track model performance
+
+2. **Scheduler Agents**
+   - Monitor optimization time
+   - Track constraint satisfaction
+   - Log scheduling conflicts
+   - Measure user satisfaction
+
+3. **Call Agents**
+   - Track audio processing
+   - Monitor transcription accuracy
+   - Log intent recognition
+   - Measure response latency
+
+4. **Document Agents**
+   - Track processing time
+   - Monitor extraction accuracy
+   - Log classification results
+   - Measure summary quality
+
+<Callout type="warning">
+  Remember to track agent-specific metrics and context to get the most value from your tracing implementation.
+</Callout>
+
+### Key Characteristics of Entry Points
+
+1. **Request Processing**
+   - Handles incoming requests or commands
+   - Creates a new tracing context
+   - Manages the entire workflow lifecycle
+
+2. **Context Creation**
+   - Establishes the root trace
+   - Sets up correlation IDs
+   - Initializes tracking metadata
+
+3. **Workflow Management**
+   - Orchestrates the execution flow
+   - Coordinates between components
+   - Handles error propagation
+
+4. **Resource Management**
+   - Manages request lifecycle
+   - Handles cleanup and teardown
+   - Ensures proper resource allocation
+
+<Callout type="warning">
+  Remember: Agent Tracing should be applied at the entry point of your application, where requests or commands first enter your system. This ensures proper tracking of the entire workflow.
+</Callout>
+
+### Best Practices for Entry Points
+
+1. **Consistent Implementation**
+   - Apply Agent Tracing to all entry points
+   - Use meaningful tracing keys
+   - Maintain consistent error handling
+
+2. **Context Management**
+   - Capture relevant request metadata
+   - Include user and session information
+   - Track request parameters and headers
+
+3. **Error Handling**
+   - Implement proper error boundaries
+   - Capture and propagate errors
+   - Include error context in traces
+
+4. **Performance Monitoring**
+   - Track request duration
+   - Monitor resource usage
+   - Identify bottlenecks
+
+<Callout type="info">
+  Each entry point in your application should be wrapped with Agent Tracing to ensure complete visibility into your system's behavior and performance.
+</Callout>
+
+<Callout type="success">
+  With Agent Tracing in place, you'll have complete visibility into your application's behavior, making it easier to debug issues and optimize performance.
+</Callout>

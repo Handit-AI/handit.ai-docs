@@ -1,0 +1,637 @@
+---
+title: 'HTTP Tracing'
+sidebarTitle: 'HTTP Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# HTTP Tracing
+
+HTTP Tracing is your network traffic's watchful eye. This crucial component keeps track of all external API calls, helping you monitor performance and debug issues with third-party services. It's essential for maintaining reliable external integrations.
+
+<Callout type="info">
+  HTTP Tracing automatically intercepts and tracks all external API calls, providing detailed insights into request/response cycles, performance metrics, and error cases.
+</Callout>
+
+## How It Works
+
+HTTP Tracing intercepts network requests to:
+
+- Track all API requests and responses
+- Monitor response times and performance
+- Capture error cases and status codes
+- Maintain detailed logs of external service interactions
+
+## Implementation
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="http_tracing.py"
+    import requests
+    from handit_service import tracker
+    import logging
+    from typing import Dict, Any, Optional
+
+    # Basic usage with requests
+    requests.post = tracker.intercept_requests(requests.post)
+    requests.get = tracker.intercept_requests(requests.get)
+    requests.put = tracker.intercept_requests(requests.put)
+    requests.delete = tracker.intercept_requests(requests.delete)
+
+    # Usage with error handling
+    async def make_api_call(
+        url: str,
+        method: str = "GET",
+        data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        try:
+            response = requests.request(
+                method,
+                url,
+                json=data
+            )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            logging.error(f"API call error: {str(e)}")
+            raise
+
+    # Example with custom headers
+    def make_authenticated_call(
+        url: str,
+        token: str,
+        data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        headers = {"Authorization": f"Bearer {token}"}
+        response = requests.post(url, json=data, headers=headers)
+        return response.json()
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="http_tracing.js"
+    const { interceptAxiosRequest, interceptFetchRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // Basic usage with Axios
+    interceptAxiosRequest(axios);
+
+    // Usage with error handling
+    const makeApiCall = async (url, method = 'GET', data = null) => {
+        try {
+            const response = await axios({
+                method,
+                url,
+                data
+            });
+            return response.data;
+        } catch (error) {
+            logger.error(`API call error: ${error.message}`);
+            throw error;
+        }
+    };
+
+    // Example with custom headers
+    const makeAuthenticatedCall = async (url, token, data = null) => {
+        const headers = { Authorization: `Bearer ${token}` };
+        const response = await axios.post(url, data, { headers });
+        return response.data;
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Common Use Cases
+
+### 1. API Client Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="api_client_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any, Optional
+    import requests
+    import logging
+
+    # API client tracking with request handling
+    class APIClient:
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+            self.session = requests.Session()
+            
+            # Intercept all request methods
+            self.session.post = tracker.intercept_requests(self.session.post)
+            self.session.get = tracker.intercept_requests(self.session.get)
+            self.session.put = tracker.intercept_requests(self.session.put)
+            self.session.delete = tracker.intercept_requests(self.session.delete)
+
+        def _get_headers(self) -> Dict[str, str]:
+            """Get default headers with authentication."""
+            return {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+        async def request(
+            self,
+            endpoint: str,
+            method: str = "GET",
+            data: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            """Make authenticated API request."""
+            try:
+                url = f"{self.base_url}/{endpoint}"
+                response = self.session.request(
+                    method,
+                    url,
+                    json=data,
+                    headers=self._get_headers()
+                )
+                response.raise_for_status()
+                return response.json()
+            except Exception as e:
+                logging.error(f"API request error: {str(e)}")
+                raise
+
+        async def get_resource(self, resource_id: str) -> Dict[str, Any]:
+            """Get resource by ID."""
+            return await self.request(f"resources/{resource_id}")
+
+        async def create_resource(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            """Create new resource."""
+            return await self.request("resources", method="POST", data=data)
+
+    # Usage
+    async def main():
+        client = APIClient(
+            base_url="https://api.example.com",
+            api_key="your-api-key"
+        )
+        resource = await client.get_resource("123")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="api_client_tracking.js"
+    const { interceptAxiosRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // API client tracking with request handling
+    class APIClient {
+        constructor(baseUrl, apiKey) {
+            this.baseUrl = baseUrl;
+            this.apiKey = apiKey;
+            this.client = axios.create();
+            
+            // Intercept all requests
+            interceptAxiosRequest(this.client);
+        }
+
+        _getHeaders() {
+            // Get default headers with authentication
+            return {
+                Authorization: `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        async request(endpoint, method = 'GET', data = null) {
+            // Make authenticated API request
+            try {
+                const url = `${this.baseUrl}/${endpoint}`;
+                const response = await this.client({
+                    method,
+                    url,
+                    data,
+                    headers: this._getHeaders()
+                });
+                return response.data;
+            } catch (error) {
+                logger.error(`API request error: ${error.message}`);
+                throw error;
+            }
+        }
+
+        async getResource(resourceId) {
+            // Get resource by ID
+            return this.request(`resources/${resourceId}`);
+        }
+
+        async createResource(data) {
+            // Create new resource
+            return this.request('resources', 'POST', data);
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const client = new APIClient(
+            'https://api.example.com',
+            'your-api-key'
+        );
+        const resource = await client.getResource('123');
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 2. Webhook Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="webhook_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any, Optional
+    import requests
+    import logging
+
+    # Webhook tracking with retry logic
+    class WebhookClient:
+        def __init__(self, webhook_url: str):
+            self.webhook_url = webhook_url
+            self.session = requests.Session()
+            
+            # Intercept webhook requests
+            self.session.post = tracker.intercept_requests(self.session.post)
+
+        async def send_webhook(
+            self,
+            payload: Dict[str, Any],
+            max_retries: int = 3
+        ) -> Dict[str, Any]:
+            """Send webhook with retry logic."""
+            for attempt in range(max_retries):
+                try:
+                    response = self.session.post(
+                        self.webhook_url,
+                        json=payload
+                    )
+                    response.raise_for_status()
+                    return response.json()
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        logging.error(f"Webhook error after {max_retries} attempts: {str(e)}")
+                        raise
+                    logging.warning(f"Webhook attempt {attempt + 1} failed: {str(e)}")
+
+    # Usage
+    async def main():
+        client = WebhookClient("https://webhook.example.com")
+        await client.send_webhook({
+            "event": "user.created",
+            "data": {"id": "123", "name": "John Doe"}
+        })
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="webhook_tracking.js"
+    const { interceptAxiosRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // Webhook tracking with retry logic
+    class WebhookClient {
+        constructor(webhookUrl) {
+            this.webhookUrl = webhookUrl;
+            this.client = axios.create();
+            
+            // Intercept webhook requests
+            interceptAxiosRequest(this.client);
+        }
+
+        async sendWebhook(payload, maxRetries = 3) {
+            // Send webhook with retry logic
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await this.client.post(
+                        this.webhookUrl,
+                        payload
+                    );
+                    return response.data;
+                } catch (error) {
+                    if (attempt === maxRetries - 1) {
+                        logger.error(`Webhook error after ${maxRetries} attempts: ${error.message}`);
+                        throw error;
+                    }
+                    logger.warning(`Webhook attempt ${attempt + 1} failed: ${error.message}`);
+                }
+            }
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const client = new WebhookClient('https://webhook.example.com');
+        await client.sendWebhook({
+            event: 'user.created',
+            data: { id: '123', name: 'John Doe' }
+        });
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 3. Service Integration Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="service_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any, Optional
+    import requests
+    import logging
+
+    # Service integration tracking with circuit breaker
+    class ServiceClient:
+        def __init__(self, service_url: str):
+            self.service_url = service_url
+            self.session = requests.Session()
+            
+            # Intercept all service requests
+            self.session.post = tracker.intercept_requests(self.session.post)
+            self.session.get = tracker.intercept_requests(self.session.get)
+
+        async def call_service(
+            self,
+            endpoint: str,
+            method: str = "GET",
+            data: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            """Call external service with error handling."""
+            try:
+                url = f"{self.service_url}/{endpoint}"
+                response = self.session.request(
+                    method,
+                    url,
+                    json=data
+                )
+                response.raise_for_status()
+                return response.json()
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Service call error: {str(e)}")
+                raise
+
+        async def get_service_status(self) -> Dict[str, Any]:
+            """Check service health status."""
+            return await self.call_service("health")
+
+        async def process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+            """Process data through service."""
+            return await self.call_service(
+                "process",
+                method="POST",
+                data=data
+            )
+
+    # Usage
+    async def main():
+        client = ServiceClient("https://service.example.com")
+        status = await client.get_service_status()
+        result = await client.process_data({"input": "test"})
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="service_tracking.js"
+    const { interceptAxiosRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // Service integration tracking with circuit breaker
+    class ServiceClient {
+        constructor(serviceUrl) {
+            this.serviceUrl = serviceUrl;
+            this.client = axios.create();
+            
+            // Intercept all service requests
+            interceptAxiosRequest(this.client);
+        }
+
+        async callService(endpoint, method = 'GET', data = null) {
+            // Call external service with error handling
+            try {
+                const url = `${this.serviceUrl}/${endpoint}`;
+                const response = await this.client({
+                    method,
+                    url,
+                    data
+                });
+                return response.data;
+            } catch (error) {
+                logger.error(`Service call error: ${error.message}`);
+                throw error;
+            }
+        }
+
+        async getServiceStatus() {
+            // Check service health status
+            return this.callService('health');
+        }
+
+        async processData(data) {
+            // Process data through service
+            return this.callService('process', 'POST', data);
+        }
+    }
+
+    // Usage
+    const main = async () => {
+        const client = new ServiceClient('https://service.example.com');
+        const status = await client.getServiceStatus();
+        const result = await client.processData({ input: 'test' });
+    };
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Best Practices
+
+1. **Request Configuration**
+   - Use meaningful endpoint IDs
+   - Include environment information
+   - Track request parameters
+
+2. **Error Handling**
+   - Implement proper error boundaries
+   - Log detailed error information
+   - Handle service-specific errors
+
+3. **Performance Monitoring**
+   - Track response times
+   - Monitor request rates
+   - Identify bottlenecks
+
+4. **Data Management**
+   - Sanitize sensitive data
+   - Handle large payloads
+   - Manage request/response state
+
+<Callout type="warning">
+  Always implement proper error handling and logging when tracking HTTP requests to ensure you can debug issues effectively.
+</Callout>
+
+## Advanced Usage
+
+### 1. Request Performance Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="performance_tracking.py"
+    from handit_service import tracker
+    from typing import Dict, Any
+    import time
+    import logging
+
+    # Request performance tracking
+    class PerformanceTracker:
+        def __init__(self, session):
+            self.session = session
+            self.metrics: Dict[str, Any] = {}
+
+        async def track_request(
+            self,
+            url: str,
+            method: str = "GET",
+            data: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
+            try:
+                start_time = time.time()
+                response = self.session.request(
+                    method,
+                    url,
+                    json=data
+                )
+                end_time = time.time()
+
+                # Track metrics
+                self.metrics.update({
+                    "execution_time": end_time - start_time,
+                    "status_code": response.status_code,
+                    "response_size": len(response.content)
+                })
+
+                return response.json()
+            except Exception as e:
+                logging.error(f"Request error: {str(e)}")
+                raise
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="performance_tracking.js"
+    const { interceptAxiosRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // Request performance tracking
+    class PerformanceTracker {
+        constructor(client) {
+            this.client = client;
+            this.metrics = {};
+        }
+
+        async trackRequest(url, method = 'GET', data = null) {
+            try {
+                const startTime = Date.now();
+                const response = await this.client({
+                    method,
+                    url,
+                    data
+                });
+                const endTime = Date.now();
+
+                // Track metrics
+                this.metrics = {
+                    executionTime: endTime - startTime,
+                    statusCode: response.status,
+                    responseSize: JSON.stringify(response.data).length
+                };
+
+                return response.data;
+            } catch (error) {
+                logger.error(`Request error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### 2. Request Chain Tracking
+
+<Tabs items={['Python', 'JavaScript']}>
+  <Tabs.Tab>
+    ```python filename="chain_tracking.py"
+    from handit_service import tracker
+    from typing import List, Dict, Any
+    import logging
+
+    # Request chain tracking
+    class RequestChain:
+        def __init__(self, session):
+            self.session = session
+            self.requests: List[Dict[str, Any]] = []
+
+        async def process_chain(
+            self,
+            requests: List[Dict[str, Any]]
+        ) -> List[Dict[str, Any]]:
+            try:
+                results = []
+                for req in requests:
+                    response = self.session.request(
+                        req["method"],
+                        req["url"],
+                        json=req.get("data")
+                    )
+                    results.append(response.json())
+                return results
+            except Exception as e:
+                logging.error(f"Chain processing error: {str(e)}")
+                raise
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript filename="chain_tracking.js"
+    const { interceptAxiosRequest } = require('handit-service');
+    const axios = require('axios');
+    const logger = require('./logger');
+
+    // Request chain tracking
+    class RequestChain {
+        constructor(client) {
+            this.client = client;
+            this.requests = [];
+        }
+
+        async processChain(requests) {
+            try {
+                const results = [];
+                for (const req of requests) {
+                    const response = await this.client({
+                        method: req.method,
+                        url: req.url,
+                        data: req.data
+                    });
+                    results.push(response.data);
+                }
+                return results;
+            } catch (error) {
+                logger.error(`Chain processing error: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  HTTP Tracing provides comprehensive tracking capabilities for all your external API calls, helping you monitor performance and debug issues effectively.
+</Callout>
+
+<Callout type="success">
+  By implementing HTTP Tracing in your application, you can gain valuable insights into your external service interactions and optimize their performance.
+</Callout>
