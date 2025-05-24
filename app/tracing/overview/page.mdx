@@ -6,10 +6,14 @@ sidebarTitle: 'Tracing'
 import { Callout } from "nextra/components"
 import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
+import { Cards } from 'nextra/components'
 
 # Tracing
 
-Tracing is an observability technique that allows you to follow the execution flow of your AI Application. It's like mounting an action camera on each method to chronicle exactly what happened. Handit Tracing records:
+Tracing is an observability technique that allows you to follow the execution flow of your AI application. It's like mounting an action camera on each method to chronicle exactly what happened.
+
+<details>
+<summary>**What Handit Tracing records?**</summary>
 
 - **What ran** - Every operation, LLM call, or function
   - LLM invocations and their parameters
@@ -35,55 +39,62 @@ Tracing is an observability technique that allows you to follow the execution fl
   - Retry attempts and results
   - Recovery actions taken
 
+</details>  
+
 <Callout type="info">
   Tracing is essential for understanding how your AI application behaves, identifying bottlenecks, and debugging issues.
 </Callout>
 
-## Why You Need Tracing
 
-1. **Visibility** - See exactly what's happening in your AI Application
+<details>
+<summary>**Why You Need Tracing?**</summary>
+
+- **Visibility** - See exactly what's happening in your AI application
    - Track every LLM call, tool execution, and function
    - Monitor prompt engineering in real-time
    - Understand the full context of each operation
    - Get insights into your application's behavior
 
-2. **Debugging** - Quickly identify where and why something fails
+- **Debugging** - Quickly identify where and why something fails
    - Pinpoint exact failure points in complex chains
    - Access detailed error logs and stack traces
    - See the exact inputs that caused issues
    - Reduce time-to-resolution for problems
 
-3. **Optimization** - Find and improve parts of your system
+- **Optimization** - Find and improve parts of your system
    - Identify slow operations and bottlenecks
    - Track token usage and costs
    - Measure response times and latency
    - Optimize prompts and model parameters
 
-4. **Monitoring** - Keep an eye on real-time performance
+- **Monitoring** - Keep an eye on real-time performance
    - Track system health and reliability
    - Monitor resource usage and costs
    - Get alerts for anomalies
    - Make data-driven decisions
+
+</details>  
 
 <Callout type="warning">
   Without tracing, you're flying blind. Every production AI system needs observability to ensure reliability and performance.
 </Callout>
 
 
-## Core Components
+## Main Components
 
 | Component | Description | Example |
 |-----------|-------------|---------|
 | **Agent Tracing** | The main orchestrator, the root | The main API endpoint processing requests. (The endpoint or the main function that executes the entire workflow) |
-| **Node Tracing** | An individual step | Vector search |
-| **Model Tracing** | An AI model | GPT-4, Claude, your custom LLM model |
-| **Tool Tracing** | Monitors the execution of helper functions and utilities that support your Al application | Custom utility, data processing functions |
-| **HTTP Tracing** | Tracks external API calls | Third party service intregrations |
+| **LLM Node Tracing** | This essential component keeps a detailed record of every interaction with your LLM | GPT-4, Claude, your custom LLM model |
+| **Tool Tracing** | This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools | Custom utility, API Tool, RAG Tool, data processing functions |
 
 ## Tracing Functions
 
 ### Agent Tracing
-This powerful tool gives you complete visibility into your entire workflow, from start to finish. It acts as the root of your tracing tree, important to automatically collecting and correlating all operations within your application.
+This powerful tool gives you complete visibility into your entire workflow, from start to finish. It acts as the root of your tracing tree, important to automatically collecting and correlating all operations within your Application.
+
+<details>
+<summary>**Details**</summary>
 
 - Tracks the entire agent execution flow
   - Captures the complete sequence of operations
@@ -102,44 +113,13 @@ This powerful tool gives you complete visibility into your entire workflow, from
   - Enables end-to-end request tracking
   - Helps identify bottlenecks and dependencies
 
-### Node Tracing (decorator)
-The elegant solution for function-level tracing. When you control the function definition ―like a method that calls a model― this decorator provides a clean and explicit way to track operations. It's perfect for wrapping individual functions with minimal code changes.
+</details>
 
-- Provides automatic function wrapping
-  - Decorates functions with tracing capabilities
-  - Preserves original function signature
-  - Maintains clean, readable code
-- Captures detailed execution context
-  - Records function arguments and return values
-  - Tracks execution time and resource usage
-  - Monitors function-specific metrics
-- Enables custom metadata
-  - Allows adding custom tags and labels
-  - Supports context-specific attributes
-  - Facilitates better organization of traces
+### LLM Node Tracing
+This essential component keeps a detailed record of every interaction with your LLM models (GPT-4, Claude, etc.), helping you understand their behavior and optimize their performance.
 
-### Node Tracing (wrapper)
-Your flexible friend for tracking individual operations. This versatile wrapper lets you monitor any step in your workflow, whether it's a model call, data processing, or custom logic. It's ideal for tracking operations where you can't modify the function definition.
-
-- Tracks individual steps within an agent
-  - Monitors operation execution in real-time
-  - Records operation-specific metrics
-  - Provides detailed operation context
-- Records input/output data
-  - Captures all input parameters
-  - Stores operation results
-  - Tracks data transformations
-- Captures execution time
-  - Measures precise operation duration
-  - Tracks time spent in sub-operations
-  - Identifies performance bottlenecks
-- Handles errors gracefully
-  - Captures detailed error information
-  - Supports error recovery strategies
-  - Provides error context for debugging
-
-### Model Tracing (AI models)
-This essential component keeps a detailed record of every interaction with your models, helping you understand their behavior and optimize their performance.
+<details>
+<summary>**Details**</summary>
 
 - Wraps AI models (LLMs, embeddings)
   - Supports all major model providers
@@ -158,8 +138,13 @@ This essential component keeps a detailed record of every interaction with your 
   - Tracks model version information
   - Stores custom model configurations
 
+</details>
+
 ### Tool Tracing
-The silent guardian of your utility functions. This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools. It's essential for understanding how your tools interact with the rest of your system.
+The silent guardian of your utility functions. This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools. It's essential for understanding how your tools interact with the rest of your AI application.
+
+<details>
+<summary>**Details**</summary>
 
 - Monitors tool execution
   - Tracks tool lifecycle events
@@ -178,45 +163,7 @@ The silent guardian of your utility functions. This powerful tracker ensures you
   - Manages retry attempts
   - Provides error context
 
-### HTTP Tracing
-Your network traffic's watchful eye. This crucial component keeps track of all external API calls, helping you monitor performance and debug issues with third-party services. It's essential for maintaining reliable external integrations.
-
-- Tracks external API calls and responses
-  - Records complete request/response cycle
-  - Captures HTTP method and endpoint
-  - Stores request and response headers
-- Monitors response times and status codes
-  - Measures network latency
-  - Tracks HTTP status codes
-  - Identifies slow endpoints
-- Records request and response payloads
-  - Captures request body
-  - Stores response data
-  - Tracks payload sizes
-- Helps identify network-related issues
-  - Detects connection problems
-  - Monitors timeout occurrences
-  - Tracks retry attempts
-
-### Manual Capture
-Your Swiss Army knife for custom tracking needs. When you need complete control over what and how you track, this flexible tool has got you covered. It's perfect for scenarios where automatic tracing isn't possible or sufficient.
-
-- For custom tracking needs
-  - Supports arbitrary data capture
-  - Allows manual trace creation
-  - Enables custom metric collection
-- Perfect for CRON jobs
-  - Tracks scheduled task execution
-  - Monitors job completion status
-  - Records job-specific metrics
-- Works with webhooks
-  - Captures incoming webhook data
-  - Tracks webhook processing
-  - Monitors webhook reliability
-- Handles any data format
-  - Supports JSON, XML, and custom formats
-  - Allows structured and unstructured data
-  - Enables custom data transformations
+</details>
 
 <Callout type="info">
   Each tracing function is designed to work seamlessly together, giving you a complete picture of your AI application's behavior. Choose the right tool for each part of your workflow, and combine them to create a comprehensive tracing solution.
@@ -226,3 +173,6 @@ Your Swiss Army knife for custom tracking needs. When you need complete control 
   With Handit.ai, you can implement tracing in minutes and start getting valuable insights about your AI application.
 </Callout>
 
+
+**Integrate into your stack in minutes:**
+<Cards.Card title="Quickstart" href="/tracing/quickstart" arrow />
