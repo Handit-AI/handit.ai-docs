@@ -1,0 +1,826 @@
+---
+title: 'JavaScript SDK'
+sidebarTitle: 'JavaScript SDK'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+import { Table } from "nextra/components"
+
+# JavaScript SDK
+
+The Handit.ai JavaScript SDK provides comprehensive tracking and monitoring capabilities for your AI applications. This guide will help you integrate and use the SDK effectively in your Node.js applications.
+
+<Callout type="info">
+  The SDK automatically tracks HTTP requests, agent executions, and custom events, providing detailed insights into your AI application's behavior.
+</Callout>
+
+## Installation
+
+```bash filename="terminal"
+npm install handit-sdk
+```
+
+## Quick Start
+
+```javascript filename="app.js"
+const handit = require('handit-sdk');
+
+// Configure the SDK
+handit.config({
+  apiKey: 'your-api-key',
+  trackingUrl: 'https://handit-api-299768392189.us-central1.run.app/api/track',
+  performanceUrl: 'https://handit-api-299768392189.us-central1.run.app/api'
+});
+
+// Start tracking your agent
+const myAgent = handit.startAgentTracing(async (input) => {
+  // Your agent logic here
+  return result;
+});
+
+// Use the agent
+await myAgent({ query: "Hello" });
+```
+
+
+## Method Reference
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>Method</Table.Th>
+      <Table.Th>Purpose</Table.Th>
+      <Table.Th>Minimal Example</Table.Th>
+      <Table.Th>Step-by-Step Explanation</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td>`config({ apiKey, trackingUrl, performanceUrl })`</Table.Td>
+      <Table.Td>Initialize the SDK with your API key and optional custom URLs</Table.Td>
+      <Table.Td>
+        ```javascript
+        handit.config({
+          apiKey: 'your-api-key',
+          trackingUrl: 'custom-url'
+        });
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Validates API key presence.<br/>
+        2) Sets up tracking and performance URLs.<br/>
+        3) Initializes internal state.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`startAgentTracing(callback)`</Table.Td>
+      <Table.Td>Root trace for each agent request (inputs, outputs, errors, duration)</Table.Td>
+      <Table.Td>
+        ```javascript
+        const agent = handit.startAgentTracing(async (input) => {
+          // Agent logic
+        });
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Creates agentLogId in AsyncLocalStorage.<br/>
+        2) Executes callback with context.<br/>
+        3) Sends start/end events automatically.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`traceAgentNode({ agentNodeId, callback })`</Table.Td>
+      <Table.Td>Track individual agent nodes (functions, tools, etc.)</Table.Td>
+      <Table.Td>
+        ```javascript
+        const node = handit.traceAgentNode({
+          agentNodeId: 'search',
+          callback: async (query) => {
+            // Node logic
+          }
+        });
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Links to active agentLogId.<br/>
+        2) Tracks input/output.<br/>
+        3) Handles errors automatically.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`captureModel({ modelId, requestBody, responseBody })`</Table.Td>
+      <Table.Td>Manually track model calls or custom events</Table.Td>
+      <Table.Td>
+        ```javascript
+        await handit.captureModel({
+          modelId: 'gpt4',
+          requestBody: { prompt: 'Hello' },
+          responseBody: { text: 'Hi' }
+        });
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Sends tracking data to server.<br/>
+        2) Links to current agentLogId.<br/>
+        3) Handles response data.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`interceptAxiosRequest(axiosInstance)`</Table.Td>
+      <Table.Td>Automatically track Axios HTTP requests</Table.Td>
+      <Table.Td>
+        ```javascript
+        const axios = require('axios');
+        handit.interceptAxiosRequest(axios);
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Adds request/response interceptors.<br/>
+        2) Tracks matching URLs.<br/>
+        3) Preserves original functionality.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`interceptFetchRequest()`</Table.Td>
+      <Table.Td>Automatically track Fetch API requests</Table.Td>
+      <Table.Td>
+        ```javascript
+        handit.interceptFetchRequest();
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Overrides global fetch.<br/>
+        2) Tracks matching URLs.<br/>
+        3) Maintains original behavior.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`fetchOptimizedPrompt({ modelId })`</Table.Td>
+      <Table.Td>Get optimized prompts for models</Table.Td>
+      <Table.Td>
+        ```javascript
+        const prompt = await handit.fetchOptimizedPrompt({
+          modelId: 'gpt4'
+        });
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Queries performance endpoint.<br/>
+        2) Returns best prompt.<br/>
+        3) Requires API key.
+      </Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+
+## Detailed Function Reference
+
+### Configuration
+
+#### `config({ apiKey, trackingUrl, performanceUrl })`
+Initializes the SDK with your API key and optional custom URLs.
+
+```javascript filename="config.js"
+/**
+ * Configure the Handit.ai SDK
+ * @param {Object} options - Configuration options
+ * @param {string} options.apiKey - Your Handit.ai API key (required)
+ * @param {string} [options.trackingUrl] - Custom tracking server URL
+ * @param {string} [options.performanceUrl] - Custom performance server URL
+ * @throws {Error} If API key is not provided
+ */
+handit.config({
+  apiKey: 'your-api-key',
+  trackingUrl: 'https://custom-tracking-url.com',
+  performanceUrl: 'https://custom-performance-url.com'
+});
+```
+
+**Internal State:**
+- Sets `apiKey` for authentication
+- Updates `trackingServerUrl` if provided
+- Updates `performanceServerUrl` if provided
+- Initializes `urlsToTrack` array
+- Sets `isInitialized` flag
+
+### Agent Tracing
+
+#### `startAgentTracing(callback)`
+Creates a traced version of an agent function, supporting both async and sync callbacks.
+
+```javascript filename="agent.js"
+/**
+ * Create a traced version of an agent function
+ * @param {Function} callback - The agent function to trace
+ * @returns {Function} Traced version of the callback
+ * 
+ * @example
+ * const agent = handit.startAgentTracing(async (input) => {
+ *   // Agent logic here
+ *   return result;
+ * });
+ */
+const agent = handit.startAgentTracing(async (input) => {
+  // Your agent logic here
+  return result;
+});
+```
+
+**Key Features:**
+- Creates new `agentLogId` in AsyncLocalStorage
+- Handles both async and sync functions
+- Automatically tracks start/end events
+- Captures errors and stack traces
+- Maintains context throughout execution
+
+**Internal Flow:**
+1. Creates new AsyncLocalStorage context
+2. Generates unique `agentLogId`
+3. Executes callback with context
+4. Sends start event
+5. Handles result or error
+6. Sends end event
+7. Cleans up context
+
+### Node Tracing
+
+#### `traceAgentNode({ agentNodeId, callback, externalId })`
+Creates a traced version of a node function (tool, model, etc.).
+
+```javascript filename="node.js"
+/**
+ * Create a traced version of a node function
+ * @param {Object} options - Node configuration
+ * @param {string} options.agentNodeId - Unique identifier for the node
+ * @param {Function} options.callback - The node function to trace
+ * @param {string} [options.externalId] - Optional external ID for the node
+ * @returns {Function} Traced version of the callback
+ * 
+ * @example
+ * const node = handit.traceAgentNode({
+ *   agentNodeId: 'search',
+ *   callback: async (query) => {
+ *     // Node logic here
+ *     return results;
+ *   }
+ * });
+ */
+const node = handit.traceAgentNode({
+  agentNodeId: 'search',
+  callback: async (query) => {
+    // Node logic here
+    return results;
+  }
+});
+```
+
+**Key Features:**
+- Links to parent agent context
+- Tracks input/output
+- Handles errors automatically
+- Supports external IDs
+- Preserves function signature
+
+**Internal Flow:**
+1. Captures input arguments
+2. Executes callback
+3. Captures output or error
+4. Sends tracking data
+5. Returns result or throws error
+
+### Model Tracking
+
+#### `captureModel({ modelId, requestBody, responseBody })`
+Manually track model calls or custom events.
+
+```javascript filename="model.js"
+/**
+ * Track a model call or custom event
+ * @param {Object} options - Tracking options
+ * @param {string} options.modelId - Identifier for the model/event
+ * @param {any} options.requestBody - Input data
+ * @param {any} options.responseBody - Output data
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * await handit.captureModel({
+ *   modelId: 'gpt4',
+ *   requestBody: { prompt: 'Hello' },
+ *   responseBody: { text: 'Hi' }
+ * });
+ */
+await handit.captureModel({
+  modelId: 'gpt4',
+  requestBody: { prompt: 'Hello' },
+  responseBody: { text: 'Hi' }
+});
+```
+
+**Key Features:**
+- Manual event tracking
+- Links to current agent context
+- Handles Axios responses
+- Supports custom events
+- Error handling
+
+**Internal Flow:**
+1. Sanitizes input/output
+2. Links to agent context
+3. Sends tracking data
+4. Updates agent context if needed
+
+### Request Interception
+
+#### `interceptAxiosRequest(axiosInstance)`
+Adds tracking to Axios HTTP requests.
+
+```javascript filename="axios.js"
+/**
+ * Add tracking to Axios requests
+ * @param {Object} axiosInstance - Axios instance to intercept
+ * @returns {void}
+ * 
+ * @example
+ * const axios = require('axios');
+ * handit.interceptAxiosRequest(axios);
+ */
+const axios = require('axios');
+handit.interceptAxiosRequest(axios);
+```
+
+**Key Features:**
+- Request/response interceptors
+- URL-based tracking
+- Automatic context linking
+- Error handling
+- Preserves original functionality
+
+**Internal Flow:**
+1. Adds request interceptor
+2. Checks URL against tracked list
+3. Captures request data
+4. Adds response interceptor
+5. Captures response data
+6. Sends tracking data
+
+#### `interceptFetchRequest()`
+Adds tracking to Fetch API requests.
+
+```javascript filename="fetch.js"
+/**
+ * Add tracking to Fetch API requests
+ * @returns {void}
+ * 
+ * @example
+ * handit.interceptFetchRequest();
+ */
+handit.interceptFetchRequest();
+```
+
+**Key Features:**
+- Global fetch override
+- URL-based tracking
+- Automatic context linking
+- Error handling
+- Maintains original behavior
+
+**Internal Flow:**
+1. Stores original fetch
+2. Overrides global fetch
+3. Checks URL against tracked list
+4. Captures request/response
+5. Sends tracking data
+
+### Performance Optimization
+
+#### `fetchOptimizedPrompt({ modelId })`
+Fetches optimized prompts for models.
+
+```javascript filename="optimization.js"
+/**
+ * Fetch optimized prompt for a model
+ * @param {Object} options - Options
+ * @param {string} options.modelId - Model identifier
+ * @returns {Promise<Object>} Optimized prompt data
+ * 
+ * @example
+ * const prompt = await handit.fetchOptimizedPrompt({
+ *   modelId: 'gpt4'
+ * });
+ */
+const prompt = await handit.fetchOptimizedPrompt({
+  modelId: 'gpt4'
+});
+```
+
+**Key Features:**
+- Performance data retrieval
+- API key authentication
+- Error handling
+- Response parsing
+
+**Internal Flow:**
+1. Validates modelId
+2. Makes API request
+3. Handles response
+4. Returns prompt data
+
+### Internal Utilities
+
+#### `getCurrentAgentLogId()`
+Gets the current agent log ID from AsyncLocalStorage.
+
+```javascript filename="utils.js"
+/**
+ * Get current agent log ID
+ * @returns {string|null} Current agent log ID or null
+ */
+const agentLogId = handit.getCurrentAgentLogId();
+```
+
+#### `setAgentLogId(agentLogId)`
+Sets the agent log ID in AsyncLocalStorage.
+
+```javascript filename="utils.js"
+/**
+ * Set agent log ID
+ * @param {string} agentLogId - Agent log ID to set
+ */
+handit.setAgentLogId('agent-123');
+```
+
+#### `updateTrackedUrls()`
+Updates the list of URLs to track from the server.
+
+```javascript filename="utils.js"
+/**
+ * Update tracked URLs list
+ * @returns {Promise<void>}
+ */
+await handit.updateTrackedUrls();
+```
+
+#### `sendTrackedData({ modelId, requestBody, responseBody, error, externalId })`
+Sends tracking data to the server.
+
+```javascript filename="utils.js"
+/**
+ * Send tracking data
+ * @param {Object} options - Tracking options
+ * @param {string} options.modelId - Model/event identifier
+ * @param {any} options.requestBody - Input data
+ * @param {any} options.responseBody - Output data
+ * @param {boolean} [options.error] - Error flag
+ * @param {string} [options.externalId] - External ID
+ * @returns {Promise<Object>} Server response
+ */
+await handit.sendTrackedData({
+  modelId: 'model-123',
+  requestBody: { input: 'data' },
+  responseBody: { output: 'result' }
+});
+```
+
+## Use Cases
+
+### 1. Chatbot with Axios Integration
+
+```javascript filename="chatbot.js"
+const handit = require('handit-sdk');
+const axios = require('axios');
+
+// Configure SDK
+handit.config({
+  apiKey: 'your-api-key'
+});
+
+// Intercept Axios requests
+handit.interceptAxiosRequest(axios);
+
+// Main chatbot function
+const chatbot = handit.startAgentTracing(async (message) => {
+  try {
+    // Process message
+    const processedMessage = await processMessage(message);
+    
+    // Get response from AI
+    const response = await getAIResponse(processedMessage);
+    
+    return response;
+  } catch (error) {
+    // Errors are automatically tracked
+    throw error;
+  }
+});
+
+// Process message node
+const processMessage = handit.traceAgentNode({
+  agentNodeId: 'message-processor',
+  callback: async (message) => {
+    // Message processing logic
+    return processedMessage;
+  }
+});
+
+// Get AI response node
+const getAIResponse = handit.traceAgentNode({
+  agentNodeId: 'ai-response',
+  callback: async (message) => {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: message }]
+    });
+    return response.data;
+  }
+});
+```
+
+### 2. Document Processing Pipeline
+
+```javascript filename="document_processor.js"
+const handit = require('handit-sdk');
+const axios = require('axios');
+
+// Configure SDK
+handit.config({
+  apiKey: 'your-api-key'
+});
+
+// Main document processor
+const processDocument = handit.startAgentTracing(async (document) => {
+  try {
+    // Process document in parallel
+    const [entities, summary, classification] = await Promise.all([
+      extractEntities(document),
+      generateSummary(document),
+      classifyDocument(document)
+    ]);
+    
+    // Combine results
+    const result = await combineResults({
+      entities,
+      summary,
+      classification
+    });
+    
+    return result;
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Extract entities node
+const extractEntities = handit.traceAgentNode({
+  agentNodeId: 'entity-extractor',
+  callback: async (document) => {
+    // Entity extraction logic
+    return entities;
+  }
+});
+
+// Generate summary node
+const generateSummary = handit.traceAgentNode({
+  agentNodeId: 'summary-generator',
+  callback: async (document) => {
+    // Summary generation logic
+    return summary;
+  }
+});
+
+// Classify document node
+const classifyDocument = handit.traceAgentNode({
+  agentNodeId: 'document-classifier',
+  callback: async (document) => {
+    // Classification logic
+    return classification;
+  }
+});
+
+// Combine results node
+const combineResults = handit.traceAgentNode({
+  agentNodeId: 'result-combiner',
+  callback: async (results) => {
+    // Result combination logic
+    return combinedResults;
+  }
+});
+```
+
+### 3. API Client with Request Tracking
+
+```javascript filename="api_client.js"
+const handit = require('handit-sdk');
+const axios = require('axios');
+
+// Configure SDK
+handit.config({
+  apiKey: 'your-api-key'
+});
+
+// Intercept Axios requests
+handit.interceptAxiosRequest(axios);
+
+class APIClient {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+    this.client = axios.create({
+      baseURL: baseUrl
+    });
+  }
+  
+  // Make request with tracking
+  async makeRequest(endpoint, method, data = null) {
+    return handit.traceAgentNode({
+      agentNodeId: 'api-request',
+      callback: async () => {
+        try {
+          const response = await this.client({
+            method,
+            url: endpoint,
+            data
+          });
+          return response.data;
+        } catch (error) {
+          // Errors are automatically tracked
+          throw error;
+        }
+      }
+    })();
+  }
+  
+  // Example methods
+  async get(endpoint) {
+    return this.makeRequest(endpoint, 'GET');
+  }
+  
+  async post(endpoint, data) {
+    return this.makeRequest(endpoint, 'POST', data);
+  }
+}
+```
+
+### 4. Performance Monitoring
+
+```javascript filename="performance_monitor.js"
+const handit = require('handit-sdk');
+
+class PerformanceMonitor {
+  constructor(monitorId) {
+    this.monitorId = monitorId;
+    this.metrics = [];
+  }
+  
+  // Track operation performance
+  async trackOperation(operation, data) {
+    return handit.traceAgentNode({
+      agentNodeId: 'performance-monitor',
+      callback: async () => {
+        const startTime = Date.now();
+        try {
+          // Execute operation
+          const result = await this._executeOperation(operation, data);
+          
+          // Calculate metrics
+          const executionTime = Date.now() - startTime;
+          this.metrics.push(executionTime);
+          
+          // Calculate statistics
+          const stats = {
+            current: executionTime,
+            average: this._calculateAverage(),
+            median: this._calculateMedian(),
+            min: Math.min(...this.metrics),
+            max: Math.max(...this.metrics)
+          };
+          
+          // Track metrics
+          await handit.captureModel({
+            modelId: `${this.monitorId}-metrics`,
+            requestBody: {
+              operation,
+              data
+            },
+            responseBody: {
+              executionTime,
+              statistics: stats,
+              status: 'success'
+            }
+          });
+          
+          return result;
+        } catch (error) {
+          const executionTime = Date.now() - startTime;
+          this.metrics.push(executionTime);
+          
+          // Track error metrics
+          await handit.captureModel({
+            modelId: `${this.monitorId}-error`,
+            requestBody: {
+              operation,
+              data
+            },
+            responseBody: {
+              executionTime,
+              error: error.message,
+              status: 'error'
+            }
+          });
+          
+          throw error;
+        }
+      }
+    })();
+  }
+  
+  // Helper methods
+  _calculateAverage() {
+    return this.metrics.reduce((a, b) => a + b, 0) / this.metrics.length;
+  }
+  
+  _calculateMedian() {
+    const sorted = [...this.metrics].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+      ? (sorted[middle - 1] + sorted[middle]) / 2
+      : sorted[middle];
+  }
+  
+  async _executeOperation(operation, data) {
+    // Implementation details...
+    return result;
+  }
+}
+```
+
+### 5. Custom Event Tracking
+
+```javascript filename="event_tracker.js"
+const handit = require('handit-sdk');
+
+class EventTracker {
+  constructor(trackerId) {
+    this.trackerId = trackerId;
+  }
+  
+  // Track custom event
+  async trackEvent(eventType, data) {
+    return handit.traceAgentNode({
+      agentNodeId: 'event-tracker',
+      callback: async () => {
+        try {
+          // Process event
+          const processedData = await this._processEvent(eventType, data);
+          
+          // Track event
+          await handit.captureModel({
+            modelId: `${this.trackerId}-${eventType}`,
+            requestBody: {
+              eventType,
+              data
+            },
+            responseBody: {
+              processedData,
+              timestamp: new Date().toISOString(),
+              status: 'success'
+            }
+          });
+          
+          return processedData;
+        } catch (error) {
+          // Track error
+          await handit.captureModel({
+            modelId: `${this.trackerId}-error`,
+            requestBody: {
+              eventType,
+              data
+            },
+            responseBody: {
+              error: error.message,
+              timestamp: new Date().toISOString(),
+              status: 'error'
+            }
+          });
+          
+          throw error;
+        }
+      }
+    })();
+  }
+  
+  async _processEvent(eventType, data) {
+    // Implementation details...
+    return processedData;
+  }
+}
+```
+
+<Callout type="info">
+  These examples demonstrate real-world use cases of the Handit.ai JavaScript SDK, showing how to effectively track and monitor AI applications in production environments.
+</Callout>
+
+<Callout type="warning">
+  Remember to replace "your-api-key" with your actual Handit.ai API key in production code.
+</Callout>

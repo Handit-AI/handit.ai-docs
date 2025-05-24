@@ -1,0 +1,893 @@
+---
+title: 'Python SDK'
+sidebarTitle: 'Python SDK'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+import { Table } from "nextra/components"
+
+# Python SDK
+
+The Handit.ai Python SDK provides comprehensive tracking and monitoring capabilities for your AI applications. This guide will help you integrate and use the SDK effectively.
+
+<Callout type="info">
+  The SDK automatically tracks function executions, model calls, and tool usage, providing detailed insights into your AI application's behavior.
+</Callout>
+
+## Installation
+
+```bash filename="terminal"
+pip install -U "handit-sdk>=1.9.0"
+```
+
+## Quick Start
+
+```python filename="app.py"
+from handit_service import tracker
+
+# Configure the tracker
+tracker.config(api_key="your-api-key")
+
+# Start tracking your agent
+@tracker.start_agent_tracing(key="my-agent")
+async def my_agent(input_data):
+    # Your agent logic here
+    pass
+```
+
+## Method Reference
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>Method</Table.Th>
+      <Table.Th>Purpose</Table.Th>
+      <Table.Th>Minimal Example</Table.Th>
+      <Table.Th>Step-by-Step Explanation</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td>`@tracker.start_agent_tracing(key=…)`</Table.Td>
+      <Table.Td>Root trace for each agent request (inputs, outputs, errors, total duration)</Table.Td>
+      <Table.Td>
+        ```python
+        @tracker.start_agent_tracing(key="invoice-assistant")
+        async def process(msg):
+            ...
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Creates an agentLogId and stores it in a global ContextVar.<br/>
+        2) Any subsequent node/call inherits this ID.<br/>
+        3) Sends a start event and, upon completion or failure, sends an end event with success/error status.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`@tracker.trace_agent_node("slug")`</Table.Td>
+      <Table.Td>Internal step (model, tool, RAG...) when you control the function definition</Table.Td>
+      <Table.Td>
+        ```python
+        @tracker.trace_agent_node("vector-search")
+        def fetch(q):
+            ...
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Links the call to the active agentLogId.<br/>
+        2) Serializes arguments and return value (or exception).<br/>
+        3) Publishes a node event with duration metric.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.trace_agent_node_func(func, *args, key=…)`</Table.Td>
+      <Table.Td>Same as above but without decorating the function (useful for external code or one-off calls)</Table.Td>
+      <Table.Td>
+        ```python
+        docs = await tracker.trace_agent_node_func(
+            fetch_docs, query,
+            key="vector-search")
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Executes the function (sync or async).<br/>
+        2) Sends node event with input/output.<br/>
+        3) Keeps your stack clean (no need to modify fetch_docs).
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.trace_agent_node_func_sync(…)`</Table.Td>
+      <Table.Td>Strictly synchronous version (faster by avoiding asyncio)</Table.Td>
+      <Table.Td>
+        ```python
+        result = tracker.trace_agent_node_func_sync(
+            heavy_calc, data,
+            key="feature-engineering")
+        ```
+      </Table.Td>
+      <Table.Td>Identical to async version but without await; designed for CPU-bound helpers.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.track_model(model, "slug")`</Table.Td>
+      <Table.Td>Intercepts all model calls (__call__) and tracks them</Table.Td>
+      <Table.Td>
+        ```python
+        llm = ChatOpenAI(model="gpt-4")
+        llm = tracker.track_model(llm, "gpt4-prod")
+        await llm.invoke("Hello")
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Monkey-patches model.__call__.<br/>
+        2) Before execution, publishes model_call event (prompt, params).<br/>
+        3) After execution, publishes model_response event (text, tokens, etc.).
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.track_tool(tool, "slug")`</Table.Td>
+      <Table.Td>Same as track_model but for non-LLM functions or classes (scrapers, translators, etc.)</Table.Td>
+      <Table.Td>
+        ```python
+        def add(a,b): return a+b
+        add = tracker.track_tool(add, "adder")
+        await add(2,3)
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Sends tool_call with args/kwargs.<br/>
+        2) Executes original logic.<br/>
+        3) Sends tool_response with result or captured exception.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.intercept_requests(requests.<method>)`</Table.Td>
+      <Table.Td>Tracks outgoing HTTP requests made with requests when the URL matches Handit's remote list</Table.Td>
+      <Table.Td>
+        ```python
+        requests.post = tracker.intercept_requests(requests.post)
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Downloads urls_to_track from backend.<br/>
+        2) If URL matches, publishes input/output of the call.<br/>
+        3) Transparent to the rest of the code.
+      </Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.capture_model(model_id, req, res)`</Table.Td>
+      <Table.Td>Fires a manual event; useful in batch pipelines or when receiving data via webhook</Table.Td>
+      <Table.Td>
+        ```python
+        tracker.capture_model("daily-batch",
+            {"date":"2025-05-22"},
+            {"rows":1234})
+        ```
+      </Table.Td>
+      <Table.Td>Sends an arbitrary input/output object to the /track endpoint, linking it (if it exists) to the current agentLogId.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.update_tracked_urls()` (internal)</Table.Td>
+      <Table.Td>Synchronizes "trackable" URLs for intercept_requests</Table.Td>
+      <Table.Td>Called automatically from intercept_requests</Table.Td>
+      <Table.Td>Ensures you don't need to redeploy if you add a new API to monitor tomorrow.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td>`tracker.fetch_optimized_prompt(model_id)`</Table.Td>
+      <Table.Td>Doesn't track, but reads performance data: returns the winning prompt for the specified model/node</Table.Td>
+      <Table.Td>
+        ```python
+        best = tracker.fetch_optimized_prompt("gpt4-prod")
+        print(best["prompt"])
+        ```
+      </Table.Td>
+      <Table.Td>
+        1) Queries /performance/model/{"{id}"}/optimized-prompt.<br/>
+        2) Use it for continuous A/B testing or self-optimization.
+      </Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+## Detailed Function Documentation
+
+### Configuration and Setup
+
+#### `config(api_key: str, tracking_url: Optional[str] = None)`
+Initializes the tracker with your API key and optional custom tracking URL.
+
+```python filename="tracker.py"
+def config(self, api_key: str, tracking_url: Optional[str] = None):
+    """
+    Configure the tracker with API key and optional custom tracking URL.
+    
+    Args:
+        api_key (str): Your Handit.ai API key
+        tracking_url (str, optional): Custom tracking server URL
+        
+    Raises:
+        ValueError: If API key is not provided
+    """
+```
+
+**Internal State:**
+- Sets `self.api_key` for authentication
+- Optionally updates `self.tracking_server_url` if provided
+- Required before using any other tracking functions
+
+### Agent Tracing
+
+#### `start_agent_tracing()`
+Decorator for tracing complete agent execution, supporting both async and sync functions.
+
+```python filename="agent.py"
+def start_agent_tracing(self):
+    """
+    Decorator to trace full agent execution.
+    Supports both async and sync functions.
+    
+    Usage:
+        @tracker.start_agent_tracing(key="agent-name")
+        async def my_agent(input_data):
+            # Agent logic here
+            pass
+    """
+```
+
+**Key Features:**
+- Creates and manages `agent_log_id` using `ContextVar`
+- Handles both async and sync functions automatically
+- Tracks start/end events and errors
+- Maintains context throughout the agent's execution
+
+**Internal Flow:**
+1. Creates new `agent_log_id` context
+2. Executes wrapped function
+3. Sends end event with success/error status
+4. Cleans up context
+
+### Node Tracing
+
+#### `trace_agent_node(agent_node_id: str)`
+Decorator for tracing individual agent nodes (functions, tools, etc.).
+
+```python filename="node.py"
+def trace_agent_node(self, agent_node_id: str):
+    """
+    Decorator to trace individual agent node execution.
+    Supports both async and sync functions.
+    
+    Args:
+        agent_node_id (str): Unique identifier for the node
+    """
+```
+
+**Key Features:**
+- Tracks input/output for each node
+- Handles both async and sync functions
+- Captures and reports errors
+- Links to parent agent context
+
+**Internal Flow:**
+1. Captures input arguments
+2. Executes function
+3. Captures output or error
+4. Sends tracking data
+
+### Function Tracing
+
+#### `trace_agent_node_func(func: Callable, *args, key: str = None, **kwargs)`
+Async function to trace any function call without decorating.
+
+```python filename="function.py"
+async def trace_agent_node_func(self, func: Callable, *args, key: str = None, **kwargs):
+    """
+    Async function to trace any function call, supporting both sync and async functions.
+    
+    Args:
+        func (Callable): The function to trace
+        *args: Positional arguments
+        key (str, optional): Tracking key (defaults to function name)
+        **kwargs: Keyword arguments
+    """
+```
+
+**Key Features:**
+- Works with both sync and async functions
+- No need to modify original function
+- Captures arguments and return values
+- Handles errors gracefully
+
+#### `trace_agent_node_func_sync(func: Callable, *args, key: str = None, **kwargs)`
+Synchronous version of `trace_agent_node_func`.
+
+```python filename="function_sync.py"
+def trace_agent_node_func_sync(self, func: Callable, *args, key: str = None, **kwargs):
+    """
+    Synchronous version of trace_agent_node_func.
+    Optimized for CPU-bound operations.
+    """
+```
+
+### Model Tracking
+
+#### `track_model(model, model_id: str)`
+Creates a tracked version of an AI model.
+
+```python filename="model.py"
+def track_model(self, model, model_id: str):
+    """
+    Creates a tracked version of an AI model (LLM, embedding model, etc.)
+    
+    Args:
+        model: The model to track (ChatOpenAI, OpenAIEmbeddings, etc.)
+        model_id (str): The ID of the model to track
+    """
+```
+
+**Key Features:**
+- Monkey-patches model's `__call__` method
+- Tracks all model calls automatically
+- Captures prompts and responses
+- Maintains original model functionality
+
+### Tool Tracking
+
+#### `track_tool(tool, tool_id: str)`
+Creates a tracked version of any tool or function.
+
+```python filename="tool.py"
+def track_tool(self, tool, tool_id: str):
+    """
+    Creates a tracked version of a tool (RAG, API call, function, etc.)
+    
+    Args:
+        tool: The tool to track
+        tool_id (str): The ID of the tool to track
+    """
+```
+
+**Key Features:**
+- Works with any callable object
+- Tracks input/output for each call
+- Handles both sync and async tools
+- Preserves original tool functionality
+
+### Request Interception
+
+#### `intercept_requests(func)`
+Decorator to intercept and track HTTP requests.
+
+```python filename="requests.py"
+def intercept_requests(self, func):
+    """
+    Decorator to intercept and track HTTP requests.
+    
+    Args:
+        func: The request function to intercept (e.g., requests.post)
+    """
+```
+
+**Key Features:**
+- Automatically tracks matching URLs
+- Updates URL list from server
+- Captures request/response data
+- Transparent to application code
+
+### Custom Event Tracking
+
+#### `capture_model(model_id: str, request_body: Any, response_body: Any)`
+Manually track custom events and operations.
+
+```python filename="events.py"
+def capture_model(self, model_id: str, request_body: Any, response_body: Any):
+    """
+    Track custom events and operations.
+    
+    Args:
+        model_id (str): Identifier for the event
+        request_body (Any): Input data
+        response_body (Any): Output data
+    """
+```
+
+**Key Features:**
+- Manual event tracking
+- Flexible input/output format
+- Links to current agent context
+- Useful for batch operations
+
+### Performance Optimization
+
+#### `fetch_optimized_prompt(model_id: str)`
+Fetches optimized prompts for models.
+
+```python filename="optimization.py"
+def fetch_optimized_prompt(self, model_id: str):
+    """
+    Fetches the most optimized prompt for a given model ID.
+    
+    Args:
+        model_id (str): The ID of the model to fetch the optimized prompt for
+        
+    Returns:
+        dict: The optimized prompt data
+    """
+```
+
+**Key Features:**
+- Retrieves best-performing prompts
+- Supports A/B testing
+- Enables self-optimization
+- Requires API key configuration
+
+### Internal Utilities
+
+#### `_sanitize_and_serialize(obj: Any)`
+Internal method for data sanitization and serialization.
+
+```python filename="utils.py"
+def _sanitize_and_serialize(self, obj: Any) -> Any:
+    """
+    Sanitize sensitive data and serialize objects.
+    Handles special cases like Pinecone results.
+    """
+```
+
+#### `_send_tracked_data(model_id, request_body, response_body)`
+Internal method for sending tracking data.
+
+```python filename="tracking.py"
+async def _send_tracked_data(self, model_id, request_body, response_body):
+    """
+    Sends tracking data to the server.
+    Updates agent_log_id if provided in response.
+    """
+```
+
+#### `_end_agent_tracing(error: Optional[Exception] = None)`
+Internal method for ending agent tracing.
+
+```python filename="tracing.py"
+async def _end_agent_tracing(self, error: Optional[Exception] = None):
+    """
+    Ends agent tracing and optionally reports error.
+    Cleans up context variables.
+    """
+```
+
+<Callout type="info">
+  All tracking functions automatically handle errors and maintain context, ensuring reliable operation even when exceptions occur.
+</Callout>
+
+<Callout type="warning">
+  Always configure the tracker with your API key before using any tracking functions.
+</Callout>
+
+## Use Cases
+
+### 1. Invoice Processing Agent
+
+```python filename="invoice_agent.py"
+from handit_service import tracker
+from langchain.chat_models import ChatOpenAI
+from langchain.embeddings import OpenAIEmbeddings
+import json
+
+# Configure the tracker with your API key
+tracker.config(api_key="your-api-key")
+
+# Initialize and track models
+llm = tracker.track_model(
+    ChatOpenAI(model="gpt-4"),
+    model_id="invoice-gpt4"
+)
+embeddings = tracker.track_model(
+    OpenAIEmbeddings(),
+    model_id="invoice-embeddings"
+)
+
+# Main agent function with tracing
+@tracker.start_agent_tracing(key="invoice-processor")
+async def process_invoice(invoice_data: dict) -> dict:
+    """
+    Process an invoice document and extract key information.
+    
+    Args:
+        invoice_data (dict): Raw invoice data including text and metadata
+        
+    Returns:
+        dict: Structured invoice information
+    """
+    try:
+        # Extract text from invoice
+        text = await extract_text(invoice_data)
+        
+        # Search for relevant information
+        info = await search_invoice_info(text)
+        
+        # Generate structured output
+        result = await generate_invoice_output(info)
+        
+        return result
+    except Exception as e:
+        # Errors are automatically tracked
+        raise
+
+# Track individual processing steps
+@tracker.trace_agent_node("text-extractor")
+async def extract_text(data: dict) -> str:
+    """
+    Extract text content from invoice data.
+    
+    Args:
+        data (dict): Raw invoice data
+        
+    Returns:
+        str: Extracted text content
+    """
+    # Implementation details...
+    return text
+
+@tracker.trace_agent_node("info-searcher")
+async def search_invoice_info(text: str) -> dict:
+    """
+    Search for relevant information in invoice text.
+    
+    Args:
+        text (str): Invoice text content
+        
+    Returns:
+        dict: Found information
+    """
+    # Implementation details...
+    return info
+
+@tracker.trace_agent_node("output-generator")
+async def generate_invoice_output(info: dict) -> dict:
+    """
+    Generate structured output from found information.
+    
+    Args:
+        info (dict): Found invoice information
+        
+    Returns:
+        dict: Structured output
+    """
+    # Implementation details...
+    return output
+```
+
+### 2. Customer Support Chatbot
+
+```python filename="support_bot.py"
+from handit_service import tracker
+from langchain.chat_models import ChatOpenAI
+from langchain.vectorstores import Pinecone
+import pinecone
+
+# Configure the tracker
+tracker.config(api_key="your-api-key")
+
+# Initialize and track the chat model
+chat_model = tracker.track_model(
+    ChatOpenAI(model="gpt-4"),
+    model_id="support-gpt4"
+)
+
+# Track the vector store
+@tracker.trace_agent_node("knowledge-base")
+async def search_knowledge_base(query: str) -> list:
+    """
+    Search the knowledge base for relevant information.
+    
+    Args:
+        query (str): User's question
+        
+    Returns:
+        list: Relevant documents
+    """
+    # Implementation details...
+    return results
+
+# Main support agent
+@tracker.start_agent_tracing(key="support-agent")
+async def handle_support_request(user_message: str, user_context: dict) -> str:
+    """
+    Handle a customer support request.
+    
+    Args:
+        user_message (str): User's message
+        user_context (dict): User's context and history
+        
+    Returns:
+        str: Support agent's response
+    """
+    try:
+        # Search knowledge base
+        docs = await search_knowledge_base(user_message)
+        
+        # Generate response
+        response = await generate_response(user_message, docs, user_context)
+        
+        return response
+    except Exception as e:
+        # Errors are automatically tracked
+        raise
+
+@tracker.trace_agent_node("response-generator")
+async def generate_response(message: str, docs: list, context: dict) -> str:
+    """
+    Generate a support response based on knowledge base results.
+    
+    Args:
+        message (str): User's message
+        docs (list): Relevant documents
+        context (dict): User context
+        
+    Returns:
+        str: Generated response
+    """
+    # Implementation details...
+    return response
+```
+
+### 3. Document Analysis Pipeline
+
+```python filename="document_analyzer.py"
+from handit_service import tracker
+from langchain.chat_models import ChatOpenAI
+from langchain.embeddings import OpenAIEmbeddings
+import asyncio
+
+# Configure the tracker
+tracker.config(api_key="your-api-key")
+
+# Initialize and track models
+llm = tracker.track_model(
+    ChatOpenAI(model="gpt-4"),
+    model_id="document-gpt4"
+)
+embeddings = tracker.track_model(
+    OpenAIEmbeddings(),
+    model_id="document-embeddings"
+)
+
+# Main document analysis pipeline
+@tracker.start_agent_tracing(key="document-analyzer")
+async def analyze_document(document: dict) -> dict:
+    """
+    Analyze a document using multiple steps.
+    
+    Args:
+        document (dict): Document data including content and metadata
+        
+    Returns:
+        dict: Analysis results
+    """
+    try:
+        # Process document in parallel
+        tasks = [
+            extract_entities(document),
+            classify_document(document),
+            summarize_content(document)
+        ]
+        
+        # Wait for all tasks to complete
+        results = await asyncio.gather(*tasks)
+        
+        # Combine results
+        analysis = combine_results(results)
+        
+        return analysis
+    except Exception as e:
+        # Errors are automatically tracked
+        raise
+
+@tracker.trace_agent_node("entity-extractor")
+async def extract_entities(document: dict) -> dict:
+    """
+    Extract named entities from document.
+    
+    Args:
+        document (dict): Document data
+        
+    Returns:
+        dict: Extracted entities
+    """
+    # Implementation details...
+    return entities
+
+@tracker.trace_agent_node("document-classifier")
+async def classify_document(document: dict) -> dict:
+    """
+    Classify document type and category.
+    
+    Args:
+        document (dict): Document data
+        
+    Returns:
+        dict: Classification results
+    """
+    # Implementation details...
+    return classification
+
+@tracker.trace_agent_node("content-summarizer")
+async def summarize_content(document: dict) -> dict:
+    """
+    Generate document summary.
+    
+    Args:
+        document (dict): Document data
+        
+    Returns:
+        dict: Summary information
+    """
+    # Implementation details...
+    return summary
+
+@tracker.trace_agent_node("result-combiner")
+def combine_results(results: list) -> dict:
+    """
+    Combine results from all analysis steps.
+    
+    Args:
+        results (list): Results from all analysis steps
+        
+    Returns:
+        dict: Combined analysis results
+    """
+    # Implementation details...
+    return combined_results
+```
+
+### 4. API Request Tracking
+
+```python filename="api_tracker.py"
+from handit_service import tracker
+import requests
+
+# Configure the tracker
+tracker.config(api_key="your-api-key")
+
+# Intercept and track API requests
+requests.post = tracker.intercept_requests(requests.post)
+requests.get = tracker.intercept_requests(requests.get)
+
+# Example API client
+class APIClient:
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+    
+    @tracker.trace_agent_node("api-client")
+    async def make_request(self, endpoint: str, method: str, data: dict = None) -> dict:
+        """
+        Make an API request with tracking.
+        
+        Args:
+            endpoint (str): API endpoint
+            method (str): HTTP method
+            data (dict, optional): Request data
+            
+        Returns:
+            dict: API response
+        """
+        url = f"{self.base_url}/{endpoint}"
+        
+        try:
+            if method.upper() == "POST":
+                response = requests.post(url, json=data)
+            else:
+                response = requests.get(url)
+                
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            # Errors are automatically tracked
+            raise
+```
+
+### 5. Performance Monitoring
+
+```python filename="performance_monitor.py"
+from handit_service import tracker
+import time
+import statistics
+from typing import Dict, List, Any
+
+class PerformanceMonitor:
+    def __init__(self, monitor_id: str):
+        self.monitor_id = monitor_id
+        self.metrics: List[float] = []
+    
+    @tracker.trace_agent_node("performance-monitor")
+    async def track_operation(
+        self,
+        operation: str,
+        data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Track operation performance.
+        
+        Args:
+            operation (str): Operation name
+            data (dict): Operation data
+            
+        Returns:
+            dict: Operation results
+        """
+        start_time = time.time()
+        try:
+            # Execute operation
+            result = await self._execute_operation(operation, data)
+            
+            # Calculate metrics
+            execution_time = time.time() - start_time
+            self.metrics.append(execution_time)
+            
+            # Calculate statistics
+            stats = {
+                "current": execution_time,
+                "average": statistics.mean(self.metrics),
+                "median": statistics.median(self.metrics),
+                "min": min(self.metrics),
+                "max": max(self.metrics)
+            }
+            
+            # Track performance metrics
+            tracker.capture_model(
+                model_id=f"{self.monitor_id}-metrics",
+                request_body={
+                    "operation": operation,
+                    "data": data
+                },
+                response_body={
+                    "execution_time": execution_time,
+                    "statistics": stats,
+                    "status": "success"
+                }
+            )
+            
+            return result
+        except Exception as e:
+            execution_time = time.time() - start_time
+            self.metrics.append(execution_time)
+            
+            # Track error metrics
+            tracker.capture_model(
+                model_id=f"{self.monitor_id}-error",
+                request_body={
+                    "operation": operation,
+                    "data": data
+                },
+                response_body={
+                    "execution_time": execution_time,
+                    "error": str(e),
+                    "status": "error"
+                }
+            )
+            raise
+    
+    async def _execute_operation(self, operation: str, data: dict) -> dict:
+        """
+        Execute the monitored operation.
+        
+        Args:
+            operation (str): Operation name
+            data (dict): Operation data
+            
+        Returns:
+            dict: Operation results
+        """
+        # Implementation details...
+        return result
+```
+
+<Callout type="info">
+  These examples demonstrate real-world use cases of the Handit.ai SDK, showing how to effectively track and monitor AI applications in production environments.
+</Callout>
+
+<Callout type="warning">
+  Remember to replace "your-api-key" with your actual Handit.ai API key in production code.
+</Callout>
