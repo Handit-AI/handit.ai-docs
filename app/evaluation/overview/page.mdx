@@ -1,0 +1,188 @@
+---
+title: Handit.ai Evaluation
+description: Automated AI model evaluation and quality assessment with LLM-as-Judge technology.
+sidebarTitle: Overview
+---
+
+import { Callout } from "nextra/components";
+import { Cards } from 'nextra/components'
+
+# Evaluation
+
+> **Automated AI quality control at scale.** Handit.ai's evaluation system provides comprehensive quality assessment for your AI models using advanced LLM-as-Judge technology, delivering instant feedback on model performance through our intuitive platform interface.
+
+Transform your AI quality control from reactive spot-checking to proactive, comprehensive monitoring.
+
+## The Manual Review Challenge
+
+Picture this: Your AI chatbot handles thousands of customer inquiries daily. You suspect quality is declining, but manually reviewing responses is overwhelming. You randomly check 50 conversations and find issues—but what about the other 4,950 interactions?
+
+**Manual evaluation doesn't scale.** You need:
+- **Consistency** - Different reviewers have different standards
+- **Coverage** - You can't manually check every interaction  
+- **Speed** - By the time you review, the damage is done
+- **Objectivity** - Human reviewers bring unconscious bias
+- **Specificity** - Understanding exactly what needs improvement
+
+<Callout type="info">
+  Handit.ai solves this by using AI to evaluate AI—at scale, consistently, and with focused insights. All setup and monitoring happens through our platform interface with no API integration required.
+</Callout>
+
+*[Image placeholder: Manual vs automated evaluation comparison]*
+
+## Why AI Evaluation Matters
+
+<details>
+<summary>**Scale Quality Control Across Your AI Systems**</summary>
+
+- **Automated assessment** - Evaluate thousands of AI responses automatically
+- **Consistent standards** - Remove human bias and subjectivity from evaluation
+- **Real-time feedback** - Get immediate quality scores on live production data
+- **Focused insights** - Single-purpose evaluators provide actionable feedback
+- **Performance tracking** - Monitor model quality trends over time
+- **Streamlined workflow** - Reduce manual review burden while maintaining high standards
+
+**Ready to upgrade from spot-checking to comprehensive quality control?**
+
+</details>
+
+## LLM-as-Judge Technology
+
+Leverage powerful language models to assess the quality, accuracy, and relevance of your AI outputs with human-level understanding.
+
+**How it works:**
+- **Model integration** - Connect GPT models and Llama (via Together AI) through the platform
+- **Automated evaluation** - Run on specified percentage of your production traffic
+- **Real-time insights** - Get quality scores within seconds through the dashboard
+- **Historical tracking** - Monitor quality trends and improvements over time
+
+*[Image placeholder: LLM-as-Judge evaluation process diagram]*
+
+## Single-Purpose Evaluator Framework
+
+The key to effective AI evaluation is **focus**. Each evaluator should assess one specific quality dimension for maximum clarity and actionable insights.
+
+<Callout type="warning">
+  **Critical Best Practice**: Never combine multiple quality checks in one evaluator. Create separate evaluators for completeness, accuracy, format, empathy, etc. This provides actionable insights and reliable scoring.
+</Callout>
+
+### Why Single-Purpose Works Better
+
+**❌ What Doesn't Work:**
+```
+One evaluator checking: helpfulness + accuracy + tone + format + compliance
+Result: Vague scores, unclear what needs improvement
+```
+
+**✅ What Works:**
+```
+Completeness Evaluator: Does the response address all parts of the question?
+Accuracy Evaluator: Is the information factually correct?
+Format Evaluator: Does it follow the required structure?
+Empathy Evaluator: Does it show understanding for the user's situation?
+```
+
+**Result**: Clear, actionable insights on exactly what to improve
+
+*[Image placeholder: Comparison showing single-purpose vs multi-purpose evaluator results]*
+
+## Platform Workflow
+
+Everything happens through the intuitive Handit.ai platform interface:
+
+### 1. Connect Model Tokens
+Add your evaluation models and test connections:
+- **GPT-4o models** (OpenAI) 
+- **Llama v4 models** (Together AI)
+- Test connections and save configurations
+
+*[Image placeholder: Model token configuration screen]*
+
+### 2. Create Focused Evaluators
+Build single-purpose evaluators in the Evaluation Suite:
+- Define specific evaluation prompts
+- Associate with appropriate model tokens
+- Focus on one quality dimension per evaluator
+
+*[Image placeholder: Evaluator creation interface]*
+
+### 3. Associate to LLM Nodes
+Connect evaluators to your AI functions:
+- Link evaluators to specific AI functions
+- Set evaluation percentages (5-15% recommended to start)
+- Configure priorities for different quality aspects
+
+*[Image placeholder: Evaluator association configuration]*
+
+### 4. Monitor & Analyze
+View comprehensive quality insights:
+- Real-time evaluation results
+- Quality trends across different aspects
+- Actionable insights and patterns
+
+*[Image placeholder: Results dashboard showing multiple evaluator scores]*
+
+## Quality Dimensions
+
+### Customer Service Evaluators
+- **Completeness** - Does the response address all parts of the question?
+- **Empathy** - Does it show understanding and care?
+- **Solution Clarity** - Are instructions clear and actionable?
+- **Policy Compliance** - Does it follow company guidelines?
+- **Escalation Appropriateness** - When should it suggest human help?
+
+### Technical Support Evaluators
+- **Technical Accuracy** - Is the technical information correct?
+- **Safety Check** - Are suggested actions safe?
+- **Troubleshooting Flow** - Does it follow logical diagnostic steps?
+- **Solution Completeness** - Does it provide a full resolution path?
+- **Risk Assessment** - Are there potential negative consequences?
+
+### Content Generation Evaluators
+- **Brand Alignment** - Does it match company voice and values?
+- **Factual Accuracy** - Is information correct and current?
+- **Format Compliance** - Does it follow required structure?
+- **Engagement Level** - Is it compelling and interesting?
+- **Target Audience** - Is it appropriate for intended readers?
+
+*[Image placeholder: Examples of different evaluator types and their scores]*
+
+## Business Impact Tracking
+
+Connect evaluation results to real business outcomes:
+
+- **Quality measurement** - Track specific quality dimensions with precision  
+- **Business metric correlation** - Link evaluator scores to customer satisfaction and conversions
+- **Data-driven insights** - Understand which quality aspects matter most for your business
+- **Trend analysis** - Monitor quality patterns over time for each dimension
+- **Optimization foundation** - Evaluation data provides the foundation for AI system optimization
+
+*[Image placeholder: Business impact correlation dashboard]*
+
+## Supported Models
+
+### OpenAI Models
+- **GPT-4o** - Highest accuracy for complex evaluations
+- **GPT-3.5-turbo** - High-volume evaluation with good performance
+- **GPT-4-turbo** - Balanced performance and speed
+
+### Together AI (Llama Models)
+- **Llama v4 Scout** - High-quality open source alternative
+- **Llama v4 Maverick** - Faster processing for high-volume needs
+- **CodeLlama** - Specialized for technical/code evaluation
+
+*[Image placeholder: Model selection interface showing available options]*
+
+## Next Steps
+
+Ready to implement automated quality control for your AI systems?
+
+- [Get Started with Evaluation Quickstart](/evaluation/quickstart)
+- [Learn about Evaluation Features](/evaluation/features)
+- [Explore Integration Options](/evaluation/integration)
+
+*[Image placeholder: Getting started workflow preview]*
+
+<Callout type="success">
+  Need help setting up evaluations? Check out our [Support Guide](/support) or [Contact Us](/contact).
+</Callout> 

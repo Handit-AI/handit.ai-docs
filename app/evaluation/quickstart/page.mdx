@@ -1,0 +1,315 @@
+---
+title: 'Evaluation Quickstart'
+sidebarTitle: 'Quickstart'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+
+# Evaluation Quickstart
+
+> **Get automated AI evaluation running in under 10 minutes.** This guide walks you through setting up comprehensive quality assessment for your AI models using the Handit.ai platform.
+
+<Callout type="info">
+  **Prerequisites**: You need an active Handit.ai account with tracing configured. If you haven't set up tracing yet, start with our [Tracing Quickstart](/tracing/quickstart).
+</Callout>
+
+## What You'll Accomplish
+
+<Steps>
+### Connect Model Tokens
+Add your evaluation models (GPT-4, Llama, etc.) to the platform
+
+### Create Single-Purpose Evaluators  
+Design focused evaluators that check ONE specific quality aspect
+
+### Associate Evaluators to LLM Nodes
+Connect your evaluators to the AI functions you want to assess
+
+### Monitor Results
+View evaluation results and quality insights in real-time
+</Steps>
+
+<Callout type="warning">
+  **Critical Best Practice**: Create separate evaluators for each quality aspect (completeness, accuracy, format, etc.). Don't try to evaluate multiple things in one prompt—this reduces effectiveness and clarity.
+</Callout>
+
+## Step 1: Connect Model Tokens
+
+Connect the AI models that will act as "judges" to evaluate your LLM responses.
+
+### Navigate to Model Tokens
+- Go to your Handit.ai dashboard
+- Click **Settings** → **Model Tokens**
+- Click **Add New Token**
+
+*[Image placeholder: Model Tokens page with "Add New Token" button highlighted]*
+
+### Configure Your Judge Model
+
+Add your OpenAI or Together AI credentials to connect evaluation models.
+
+*[Image placeholder: Model token configuration form showing OpenAI setup]*
+
+<Callout type="success">
+  **Recommended Models**: GPT-4o (highest accuracy), GPT-3.5-turbo (cost-effective), Llama v4 Scout (open source alternative)
+</Callout>
+
+## Step 2: Create Single-Purpose Evaluators
+
+Create focused evaluators in the Evaluation Suite. Remember: **one evaluator = one quality aspect**.
+
+### Navigate to Evaluation Suite
+- Go to **Evaluation** → **Evaluation Suite**
+- Click **Create New Evaluator**
+
+*[Image placeholder: Evaluation Suite main page with "Create New Evaluator" button]*
+
+### Example 1: Completeness Evaluator
+
+**Evaluation Prompt:**
+```
+You are evaluating whether an AI response completely addresses the user's question.
+
+Focus ONLY on completeness - ignore other quality aspects.
+
+User Question: {input}
+AI Response: {output}
+
+Rate on a scale of 1-10:
+1-2 = Missing major parts of the question
+3-4 = Addresses some parts but incomplete
+5-6 = Addresses most parts adequately  
+7-8 = Addresses all parts well
+9-10 = Thoroughly addresses every aspect
+
+Provide your score and brief reasoning.
+
+Output format:
+Score: [1-10]
+Reasoning: [Brief explanation]
+```
+
+*[Image placeholder: Evaluator creation form showing the completeness evaluator setup]*
+
+### Example 2: Hallucination Detection Evaluator
+
+**Evaluation Prompt:**
+```
+You are checking if an AI response contains hallucinations or made-up information.
+
+Focus ONLY on factual accuracy - ignore other aspects like tone or completeness.
+
+User Question: {input}
+AI Response: {output}
+
+Rate on a scale of 1-10:
+1-2 = Contains obvious false information
+3-4 = Contains questionable claims
+5-6 = Mostly accurate with minor concerns
+7-8 = Accurate information
+9-10 = Completely accurate and verifiable
+
+Output format:
+Score: [1-10]
+Reasoning: [Brief explanation of any concerns]
+```
+
+*[Image placeholder: Second evaluator creation showing hallucination detection setup]*
+
+### Example 3: Format Compliance Evaluator
+
+**Evaluation Prompt:**
+```
+You are checking if an AI response follows the required format guidelines.
+
+Focus ONLY on format compliance - ignore content quality.
+
+User Question: {input}
+AI Response: {output}
+Expected Format: [Professional tone, structured paragraphs, proper punctuation]
+
+Rate on a scale of 1-10:
+1-2 = Poor formatting, unprofessional
+3-4 = Some format issues
+5-6 = Acceptable formatting
+7-8 = Good formatting
+9-10 = Perfect format compliance
+
+Output format:
+Score: [1-10]
+Reasoning: [Brief format assessment]
+```
+
+*[Image placeholder: Third evaluator showing format compliance setup]*
+
+<Callout type="info">
+  **Why Separate Evaluators?** Each evaluator focuses on one aspect, making evaluation more reliable and providing clear insights. You can see exactly which quality dimensions are performing well or need attention.
+</Callout>
+
+## Step 3: Associate Evaluators to LLM Nodes
+
+Connect your evaluators to the specific LLM nodes you want to monitor.
+
+### Find Your LLM Nodes
+- Go to **Tracing** → **Nodes**
+- Identify the LLM nodes you want to evaluate (e.g., "customer-response-generation")
+
+*[Image placeholder: Tracing nodes page showing available LLM nodes]*
+
+### Associate Evaluators
+- Click on your target LLM node
+- Navigate to **Evaluation** tab
+- Click **Add Evaluator**
+
+*[Image placeholder: LLM node page with Evaluation tab and "Add Evaluator" button]*
+
+### Configure Evaluation Settings
+
+For each evaluator you want to associate:
+
+```
+Evaluator: "Response Completeness Check"
+Evaluation Percentage: 10% (start small)
+Priority: Normal
+```
+
+```
+Evaluator: "Hallucination Detection"  
+Evaluation Percentage: 15% (higher for critical accuracy)
+Priority: High
+```
+
+```
+Evaluator: "Format Compliance"
+Evaluation Percentage: 5% (lower for less critical aspects)
+Priority: Normal
+```
+
+*[Image placeholder: Evaluator association configuration showing multiple evaluators being added]*
+
+<Callout type="tip">
+  **Sampling Strategy**: Start with 5-15% evaluation percentage. You can always increase it later. Use higher percentages for critical quality aspects.
+</Callout>
+
+### Save Configuration
+- Review your evaluator associations
+- Click **Save** to activate evaluation
+
+*[Image placeholder: Final configuration summary showing all evaluators associated]*
+
+## Step 4: Monitor Evaluation Results
+
+Your evaluation system is now active! Here's how to monitor the results.
+
+### Real-Time Monitoring
+- Go to **Tracing** tab in your dashboard
+- View evaluation scores as they happen
+- Monitor quality trends across different aspects
+
+*[Image placeholder: Live evaluation dashboard showing real-time results]*
+
+### Quality Analytics
+- Access **Agent Performance** tab in your dashboard
+- View trends for each agent with their associated evaluators
+- Understand which quality aspects are performing well or need attention for each agent
+
+*[Image placeholder: Analytics dashboard showing trends for different evaluators]*
+
+### Sample Result Display
+
+*[Image placeholder: Detailed evaluation result showing scores for each aspect]*
+
+## Additional Evaluator Examples
+
+### Customer Service Evaluators
+
+**Empathy Evaluator:**
+```
+Focus: Does the response show understanding and care for the customer's situation?
+Scale: 1-10 (1-2=cold/robotic, 9-10=highly empathetic)
+```
+
+**Solution Clarity Evaluator:**
+```
+Focus: Are the solution steps clear and easy to follow?
+Scale: 1-10 (1-2=confusing steps, 9-10=crystal clear instructions)
+```
+
+**Policy Compliance Evaluator:**
+```
+Focus: Does the response follow company policies and guidelines?
+Scale: 1-10 (1-2=policy violations, 9-10=perfect compliance)
+```
+
+### Technical Support Evaluators
+
+**Technical Accuracy Evaluator:**
+```
+Focus: Is the technical information provided correct?
+Scale: 1-10 (1-2=incorrect technical details, 9-10=completely accurate)
+```
+
+**Safety Check Evaluator:**
+```
+Focus: Are the suggested actions safe and won't cause system damage?
+Scale: 1-10 (1-2=potentially dangerous, 9-10=completely safe)
+```
+
+**Troubleshooting Flow Evaluator:**
+```
+Focus: Does the response follow logical troubleshooting steps?
+Scale: 1-10 (1-2=illogical flow, 9-10=perfect troubleshooting sequence)
+```
+
+*[Image placeholder: Examples of different evaluator types in the platform]*
+
+## Best Practices
+
+<div className="grid grid-cols-2 gap-4 mt-4">
+  <div>
+    <h4>✅ Do's</h4>
+    - Create one evaluator per quality aspect
+    - Use clear, specific evaluation criteria
+    - Start with lower evaluation percentages
+    - Focus on business-critical quality dimensions
+    - Test evaluators before deploying
+  </div>
+  <div>
+    <h4>❌ Don'ts</h4>
+    - Combine multiple quality checks in one evaluator
+    - Use vague evaluation criteria
+    - Evaluate 100% of traffic initially
+    - Ignore the results without taking action
+    - Create overly complex evaluation prompts
+  </div>
+</div>
+
+## Next Steps
+
+Ready to dive deeper into evaluation? Learn more about advanced evaluation techniques and best practices:
+
+- [LLM as Judges - Advanced Evaluation Techniques](/evaluation/llm-as-judges)
+
+<Callout type="success">
+  **Congratulations!** You now have automated AI evaluation running on your production data. Each evaluator will help you understand specific quality aspects. This evaluation data provides the foundation for AI optimization (covered in our Optimization guides).
+</Callout>
+
+## Troubleshooting
+
+**Evaluations Not Running?**
+- Check your model tokens are valid and have sufficient credits
+- Verify the LLM node is actively receiving traffic
+- Ensure evaluation percentage is > 0%
+- Confirm evaluators are properly associated
+
+**Inconsistent Evaluation Scores?**
+- Review evaluator prompts for clarity and specificity
+- Consider if evaluation criteria are too subjective
+- Test evaluators with known good/bad examples
+- Focus on single quality aspects per evaluator
+
+**Need Help?**
+- Check our [detailed evaluation guides](/evaluation/evaluation_features/overview)
+- Visit [Support](/support) for assistance
+- Join our [Discord community](https://discord.gg/handit-ai) 

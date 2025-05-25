@@ -3,13 +3,248 @@ import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
 import { Cards } from 'nextra/components'
 
-# Quickstart Guide: Tracing with Handit.ai
+# Get Started with AI Agent Tracing
 
-This guide will help you get started with Handit.ai's tracing capabilities for monitoring your AI application. Handit.ai automatically tracks and monitors all function executions (sync and async) for your LLM nodes and tools, capturing inputs, outputs, errors, and context.
+> **See inside your AI agents in under 5 minutes.** Add comprehensive tracing to understand what your agents are doing, why they're failing, and how to make them better.
 
+This guide walks you through adding Handit.ai tracing to your AI agents. You'll capture every LLM call, tool execution, and operation with complete inputs, outputs, timing, and error details.
 
+<Callout type="info">
+  **What you'll build:** Complete observability for your AI agent with automatic tracking of all LLM nodes and tools, capturing the full execution flow from user request to final response.
+</Callout>
 
-## Install
+## Quick Overview
+
+Here's what we'll accomplish:
+
+<Steps>
+### Create Your Agent
+Set up your agent structure in the Handit.ai Dashboard and get your configuration file
+
+### Get Your Integration Token
+Obtain your API key from Settings > Integrations to connect your code to Handit.ai
+
+### Install & Configure
+Set up the SDK and connect to Handit.ai with your integration token
+
+### Add Tracing
+Wrap your agent functions to automatically capture execution details
+
+### See Results
+View complete traces, debug issues, and optimize performance
+</Steps>
+
+## Create Your Agent in Handit Dashboard
+
+**Start here first!** Before writing any code, you need to define your agent's structure in the Handit.ai Dashboard. This creates the blueprint that your tracing code will follow.
+
+### Step 1: Navigate to Your Agents
+
+1. Log into your [Handit.ai Dashboard](https://app.handit.ai)
+2. Go to **"My Agents"** in the navigation menu
+3. Click **"Create New Agent"**
+
+*[Image placeholder: Screenshot of Handit.ai Dashboard showing the "My Agents" section with the "Create New Agent" button highlighted]*
+
+### Step 2: Choose Your Creation Method
+
+You have two powerful options to create your agent:
+
+<Tabs items={['🤖 AI-Powered Creation', '🎨 Visual Builder']}>
+<Tabs.Tab>
+**Upload JSON & Let AI Do the Work**
+
+Perfect if you already have your agent structure documented or want to quickly import an existing setup.
+
+**How it works:**
+1. **Prepare your JSON file** with your agent's structure (see example below)
+2. **Upload the file** in the dashboard
+3. **Handit's AI analyzes** your structure and normalizes it
+4. **Review and confirm** the generated agent configuration
+5. **Download your config** with proper slugs and IDs
+
+*[Image placeholder: Screenshot of the JSON upload interface showing the file upload area and "Upload & Analyze" button]*
+
+**Example JSON structure to upload:**
+```json filename="my-agent-structure.json"
+{
+  "name": "Customer Support Agent",
+  "description": "Handles customer inquiries with RAG and LLM",
+  "workflow": [
+    {
+      "name": "Intent Classification",
+      "type": "llm",
+      "model": "gpt-4",
+      "purpose": "Classify user intent from support request"
+    },
+    {
+      "name": "Knowledge Search", 
+      "type": "tool",
+      "function": "vector_search",
+      "purpose": "Search knowledge base for relevant information"
+    },
+    {
+      "name": "Response Generation",
+      "type": "llm", 
+      "model": "gpt-4",
+      "purpose": "Generate helpful response using context"
+    }
+  ]
+}
+```
+
+*[Image placeholder: Screenshot showing the AI analysis results with the normalized agent structure and confirmation dialog]*
+
+<Callout type="tip">
+  **Pro tip:** Your JSON doesn't need to be perfect! Handit's AI will understand various formats and structures, then normalize everything into the proper configuration format.
+</Callout>
+</Tabs.Tab>
+<Tabs.Tab>
+**Drag & Drop Visual Builder**
+
+Perfect for building your agent structure visually and understanding the relationships between components.
+
+**How it works:**
+1. **Start with a blank canvas** in the visual builder
+2. **Drag LLM nodes** from the component library
+3. **Add tool nodes** for your custom functions and APIs
+4. **Connect the nodes** to show your workflow
+5. **Configure each node** with required information:
+   - **LLM Nodes:** Model type, purpose, parameters
+   - **Tool Nodes:** Function name, description, input/output types
+6. **Download your config** when complete
+
+*[Image placeholder: Screenshot of the visual builder interface showing the drag-and-drop canvas with component library on the left and a sample agent workflow]*
+
+**What you'll configure for each node:**
+
+| **Node Type** | **Required Info** | **Example** |
+|---------------|------------------|-------------|
+| **LLM Node** | Model, purpose, temperature | GPT-4 for intent classification |
+| **Tool Node** | Function name, description, I/O | `search_knowledge_base()` for RAG |
+| **API Node** | Endpoint, method, purpose | External service integration |
+
+*[Image placeholder: Screenshot of a node configuration panel showing the form fields for configuring an LLM node with model selection, purpose, and parameters]*
+
+**Visual Builder Benefits:**
+- See your agent's flow visually
+- Understand node relationships
+- Validate your architecture before coding
+- Easy to modify and iterate
+
+<Callout type="info">
+  **Visual learner?** The drag-and-drop builder helps you understand how your agent's components work together before you start coding.
+</Callout>
+</Tabs.Tab>
+</Tabs>
+
+### Step 3: Download Your Configuration
+
+Once your agent is created (either method), you'll get a `handit.config.json` file that looks like this:
+
+*[Image placeholder: Screenshot showing the completed agent overview page with the "Download Config" button and a preview of the generated configuration]*
+
+```json filename="handit.config.json"
+{
+  "agent": {
+    "name": "Customer Support Agent",           // Your agent's display name
+    "slug": "customer-support-agent",          // Unique identifier for your agent
+    "description": "Handles customer inquiries with RAG and LLM"
+  },
+  "nodes": [
+    {
+      "name": "Intent Classification",          // Display name for the node
+      "slug": "intent-classifier",             // 🔑 This slug is what you'll use in code
+      "type": "model",                        // Node type (model, tool, etc.)
+      "problem_type": "classification",       // Type of problem it solves
+      "description": "Classifies user intent from support request",
+      "next_nodes": ["knowledge-search"]      // Connected nodes in workflow
+    },
+    {
+      "name": "Knowledge Search",
+      "slug": "knowledge-search",              // 🔑 This slug is what you'll use in code
+      "type": "tool",
+      "problem_type": "retrieval",
+      "description": "Searches knowledge base for relevant information",
+      "next_nodes": ["response-generator"]
+    },
+    {
+      "name": "Response Generator",
+      "slug": "response-generator",            // 🔑 This slug is what you'll use in code
+      "type": "model",
+      "problem_type": "generation",
+      "description": "Generates helpful response using context",
+      "next_nodes": []
+    }
+  ]
+}
+```
+
+<Callout type="warning">
+  **Important:** Save this config file in your project! The `slug` values are what you'll use to identify nodes in your tracing code. Keep this file version-controlled with your code.
+</Callout>
+
+**Using slugs in your code:**
+The `slug` values become the identifiers in your tracing implementation:
+
+```python
+# Using the intent-classifier slug from config
+@tracker.trace_agent_node("intent-classifier")
+async def classify_intent(user_message: str):
+    # Your intent classification logic here
+    return intent
+
+# Using the knowledge-search slug from config  
+@tracker.trace_agent_node("knowledge-search")
+async def search_knowledge_base(intent: str, query: str):
+    # Your knowledge search logic here
+    return relevant_docs
+
+# Using the response-generator slug from config
+@tracker.trace_agent_node("response-generator") 
+async def generate_response(context: str, user_query: str):
+    # Your response generation logic here
+    return response
+```
+
+<Callout type="success">
+  **Ready to code?** Now that you have your agent structure defined and your config file downloaded, let's set up the SDK and add tracing to your code.
+</Callout>
+
+## Get Your Integration Token
+
+Before installing the SDK, you need to get your integration token to connect your code to Handit.ai.
+
+### Step 1: Navigate to Settings
+
+1. In your [Handit.ai Dashboard](https://app.handit.ai), click on **"Settings"** in the navigation menu
+2. Go to the **"Integrations"** section
+
+*[Image placeholder: Screenshot of the Handit.ai Dashboard showing the Settings menu expanded with "Integrations" highlighted]*
+
+### Step 2: Generate Your Token
+
+1. **Find the SDK Integration** section
+2. **Copy your integration token** - this is your API key for the SDK
+3. **Keep it secure** - treat this like a password
+
+*[Image placeholder: Screenshot of the Integrations page showing the SDK Integration section with the integration token field and copy button]*
+
+<Callout type="warning">
+  **Security Note:** Your integration token gives access to your Handit.ai account. Never commit it to version control or share it publicly. Always use environment variables in production.
+</Callout>
+
+**What you'll use this token for:**
+- Authenticating your SDK with Handit.ai
+- Sending trace data from your application
+- Connecting your agent runs to your dashboard
+
+<Callout type="tip">
+  **Pro tip:** Copy this token now and save it as an environment variable. You'll need it in the next step when configuring the SDK.
+</Callout>
+
+## Install the SDK
+
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
 ```bash filename="terminal"
@@ -23,9 +258,14 @@ npm install @handit.ai/node
 </Tabs.Tab>
 </Tabs>
 
-## Setup API Key
+## Configure Your Integration Token
+
+Now let's configure the SDK with the integration token you obtained from the dashboard.
+
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
+**Best Practice:** Create a dedicated service file to centralize your tracker configuration.
+
 First, create a `handit_service.py` file to initialize the tracker:
 
 ```python filename="handit_service.py"
@@ -33,22 +273,28 @@ First, create a `handit_service.py` file to initialize the tracker:
 from handit import HanditTracker
 
 tracker = HanditTracker()
-tracker.config(api_key="your-api-key")
+tracker.config(api_key="your-integration-token-here")
 ```
 
-Import the tracker in your agent code:
+Then import the tracker in your agent code:
 
 ```python filename="agent_code.py"
 from handit_service import tracker
 ```
+
+<Callout type="tip">
+  **Pro tip:** Use environment variables for your integration token: `tracker.config(api_key=os.getenv("HANDIT_INTEGRATION_TOKEN"))`
+</Callout>
 </Tabs.Tab>
 <Tabs.Tab>
+**Best Practice:** Initialize Handit.ai once in your application's entry point.
+
 Initialize Handit.ai in your entry file (e.g., `index.js` or `server.js`):
 
 ```javascript filename="index.js"
 import { config } from '@handit.ai/node';
 
-config({ apiKey: "your-api-key" });
+config({ apiKey: "your-integration-token-here" });
 ```
 
 Import the required functions in your agent code:
@@ -56,71 +302,24 @@ Import the required functions in your agent code:
 ```javascript filename="agent.js"
 import { startAgentTracing, traceAgentNode } from '@handit.ai/node';
 ```
+
+<Callout type="tip">
+  **Pro tip:** Use environment variables for your integration token: `config({ apiKey: process.env.HANDIT_INTEGRATION_TOKEN })`
+</Callout>
 </Tabs.Tab>
 </Tabs>
 
+## Add Tracing to Your Agent
 
-## Configuration File
+Now for the fun part! Let's add tracing to capture everything your agent does.
 
-Before implementing tracing, you need to set up your configuration in the Handit.ai Dashboard:
+### Step 1: Trace Your Main Agent Function
 
-1. Create a new agent in the Dashboard
-2. Define your nodes (LLMs, tools, etc.)
-3. Download the `handit.config.json` file
-
-The `handit.config.json` file defines your agent's structure and its components. Each node needs a unique `slug` that you'll use when implementing tracing in your code.
-
-Here's an example configuration:
-
-```json filename="handit.config.json"
-{
-  "agent": {
-    "name": "My AI Agent",          // Display name for your agent
-    "slug": "my-ai-id",            // Unique identifier for your agent
-    "description": "Main orchestration logic"
-  },
-  "nodes": [
-    {
-      "name": "Vector Search",      // Display name for the node
-      "slug": "vector-search",      // Unique identifier used in tracing
-      "type": "model",             // Node type (model, tool, etc.)
-      "problem_type": "retrieval",  // Type of problem it solves
-      "description": "Searches similar documents",
-      "next_nodes": ["llm-generator"]  // Connected nodes in the workflow
-    },
-    {
-      "name": "LLM Generator",
-      "slug": "llm-generator",
-      "type": "model",
-      "problem_type": "generation",
-      "description": "Generates responses using LLM",
-      "next_nodes": []
-    }
-  ]
-}
-```
-
-When implementing tracing, you'll use these `slug` values to identify your nodes:
-
-```python
-# Using the vector-search slug from config
-@tracker.trace_agent_node("vector-search")
-async def search_documents(query: str):
-    # Your search logic here
-    return results
-
-# Using the llm-generator slug from config
-@tracker.trace_agent_node("llm-generator")
-async def generate_response(context: str):
-    # Your generation logic here
-    return response
-```
-
-## Tracing Your Agent
+Start by wrapping your main agent function—this is the entry point that handles user requests and orchestrates the entire workflow.
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
-1. Wrap your main agent function (The main API endpoint processing requests or the main function that executes the entire workflow) with the `@tracker.start_agent_tracing()` decorator:
+Use the `@tracker.start_agent_tracing()` decorator on your main agent function:
 
 ```python {3} filename="agent_function.py"
 from handit_service import tracker
@@ -147,7 +346,51 @@ async def process_message(self, user_message: str, conversation_history: list):
         }
 ```
 
-2. Wrap individual nodes (tools/LLMs) using one of these methods:
+<Callout type="info">
+  This decorator automatically captures the complete execution flow, timing, inputs, outputs, and any errors that occur during your agent's execution.
+</Callout>
+</Tabs.Tab>
+<Tabs.Tab>
+Wrap your main agent function with `startAgentTracing`:
+
+```javascript filename="agent_function.js"
+const { startAgentTracing } = require('@handit.ai/node');
+
+const processMessage = startAgentTracing(async (userMessage, conversationHistory) => {
+    try {
+        // Analyze the message intent
+        const intent = await analyzeIntent(userMessage);
+        
+        // Generate response based on intent
+        const response = await generateResponse(intent, conversationHistory);
+        
+        return {
+            response,
+            intent,
+            status: "success"
+        };
+    } catch (error) {
+        return {
+            error: error.message,
+            status: "error"
+        };
+    }
+});
+```
+
+<Callout type="info">
+  This wrapper automatically captures the complete execution flow, timing, inputs, outputs, and any errors that occur during your agent's execution.
+</Callout>
+</Tabs.Tab>
+</Tabs>
+
+### Step 2: Trace Individual Components
+
+Next, add tracing to your individual LLM calls, tools, and functions. Choose the method that best fits your use case:
+
+<Tabs items={['Python', 'JavaScript']}>
+<Tabs.Tab>
+**Choose the right method for your use case:**
 
 ```python filename="node_tracing.py"
 # Method 1: Using trace_agent_node_func for async functions
@@ -213,44 +456,19 @@ tracked_tool = tracker.track_tool(
 )
 ```
 
-Each method has its use case:
-- `trace_agent_node_func`: For one-off async function calls
-- `trace_agent_node_func_sync`: For one-off sync function calls
-- `trace_agent_node` decorator: For reusable async/sync functions
-- `track_model`: For tracking LLM models and their interactions
-- `track_tool`: For tracking tools, RAG systems, and API calls
+**When to use each method:**
+- **`trace_agent_node_func`** - One-off async function calls you need to trace
+- **`trace_agent_node_func_sync`** - One-off sync function calls you need to trace  
+- **`trace_agent_node` decorator** - Reusable functions you want to trace every time
+- **`track_model`** - LLM models where you want to capture all interactions
+- **`track_tool`** - Tools, RAG systems, and API calls you want to monitor
 
-The `key` parameter is used to identify the node in your configuration and analytics.
+<Callout type="tip">
+  **Key principle:** The `key` parameter should match the `slug` from your `handit.config.json` file for proper dashboard visualization.
+</Callout>
 </Tabs.Tab>
 <Tabs.Tab>
-1. Wrap your main agent function (the main API endpoint processing requests or the main function that executes the entire workflow) with `startAgentTracing`:
-
-```javascript filename="agent_function.js"
-const { startAgentTracing } = require('@handit.ai/node');
-
-const processMessage = startAgentTracing(async (userMessage, conversationHistory) => {
-    try {
-        // Analyze the message intent
-        const intent = await analyzeIntent(userMessage);
-        
-        // Generate response based on intent
-        const response = await generateResponse(intent, conversationHistory);
-        
-        return {
-            response,
-            intent,
-            status: "success"
-        };
-    } catch (error) {
-        return {
-            error: error.message,
-            status: "error"
-        };
-    }
-});
-```
-
-2. Wrap individual nodes using one of these methods:
+**Choose the right method for your use case:**
 
 ```javascript filename="node_tracing.js"
 const { traceAgentNode, captureModel } = require('@handit.ai/node');
@@ -318,43 +536,53 @@ const trackedTool = traceAgentNode({
 });
 ```
 
-Each method has its use case:
-- `traceAgentNode`: For wrapping reusable functions (both async and sync)
-- `captureModel`: For tracking individual LLM model interactions
-- `startAgentTracing`: For wrapping the main agent function
+**When to use each method:**
+- **`traceAgentNode`** - For wrapping reusable functions (both async and sync)
+- **`captureModel`** - For tracking individual LLM model interactions
+- **`startAgentTracing`** - For wrapping the main agent function
 
-The `agentNodeId` parameter must match the `slug` in your `handit.config.json` file.
+<Callout type="tip">
+  **Key principle:** The `agentNodeId` parameter must match the `slug` in your `handit.config.json` file for proper dashboard visualization.
+</Callout>
 </Tabs.Tab>
 </Tabs>
 
-
-## Best Practices
+## Best Practices for Production
 
 <Steps>
- ### Centralize Configuration
-   - Keep your API key in a secure environment variable
-   - Use a single initialization point for the tracker
+### Secure Configuration
+- Store your API key as an environment variable, never in code
+- Use a single initialization point for the tracker across your application
+- Keep your `handit.config.json` file version controlled with your code
 
-### Proper Wrapping
-   - Always wrap the main agent function
-   - Wrap all nodes in your agent pipeline
-   - Don't wrap library functions or setup code
+### Smart Wrapping Strategy
+- **Always wrap** your main agent function (the entry point)
+- **Wrap all important nodes** in your agent pipeline (LLMs, tools, key functions)
+- **Don't wrap** library functions, setup code, or utility functions
+- **Focus on business logic** that you want to observe and debug
 
 ### Error Handling
-   - Let errors propagate naturally
-   - Handit.ai will automatically capture error details
+- Let errors propagate naturally through your code
+- Handit.ai automatically captures error details, stack traces, and context
+- Don't try to handle tracing errors - the SDK is designed to be fail-safe
 
-### Performance
-   - Use async/await for better performance
-   - Keep node functions focused and efficient
-
+### Performance Considerations
+- Use async/await patterns for better performance
+- Keep your node functions focused and efficient
+- The tracing overhead is minimal but measure if you have high-throughput requirements
 </Steps>
 
-## Example: Complete Agent
+<Callout type="warning">
+  **Production tip:** Start with tracing your main workflows, then gradually add more detailed tracing as needed. Too much tracing can create noise—focus on what matters most for debugging and optimization.
+</Callout>
+
+## Complete Example: Invoice Processing Agent
+
+Let's see how this all comes together with a real-world example. This invoice processing agent demonstrates all the concepts in action.
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
-First, set up your environment and API key:
+**Step 1:** Set up your environment and API key:
 
 ```python filename="setup.py"
 # setup.py
@@ -373,7 +601,7 @@ tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
 __all__ = ['tracker']
 ```
 
-Create your `handit.config.json` file for this example:
+**Step 2:** Create your `handit.config.json` file for this example:
 
 ```json filename="handit.config.json"
 {
@@ -416,7 +644,7 @@ Create your `handit.config.json` file for this example:
 }
 ```
 
-Now, here's the complete invoice processing agent:
+**Step 3:** Here's the complete invoice processing agent:
 
 ```python filename="invoice_agent.py"
 from typing import Dict, List, Optional
@@ -584,7 +812,7 @@ class InvoiceProcessor:
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-First, set up your environment and API key:
+**Step 1:** Set up your environment and API key:
 
 ```javascript filename="setup.js"
 // setup.js
@@ -602,7 +830,7 @@ config({
 module.exports = { config };
 ```
 
-The `handit.config.json` file for this example:
+**Step 2:** The `handit.config.json` file for this example:
 
 ```json filename="handit.config.json"
 {
@@ -645,7 +873,7 @@ The `handit.config.json` file for this example:
 }
 ```
 
-Now, here's the complete invoice processing agent:
+**Step 3:** Here's the complete invoice processing agent:
 
 ```javascript filename="invoice_agent.js"
 const { startAgentTracing, traceAgentNode } = require('@handit.ai/node');
@@ -808,6 +1036,22 @@ const result = await processor.processInvoice({
 </Tabs.Tab>
 </Tabs>
 
-## Next Steps
+## What's Next?
 
-For more detailed information, check out our [full features](/tracing/tracing_features/overview).
+<Callout type="success">
+  **Congratulations!** 🎉 You now have complete observability into your AI agent. Every LLM call, tool execution, and operation is being captured with full context.
+</Callout>
+
+**Now you can:**
+- **Debug issues faster** - See exactly where and why your agent fails
+- **Optimize performance** - Identify slow operations and bottlenecks  
+- **Understand behavior** - View complete execution flows and decision paths
+- **Monitor production** - Get alerts when things go wrong
+
+**Ready to explore more?**
+
+- Learn about [Advanced Tracing Features](/tracing/tracing_features/overview) for comprehensive monitoring
+- Explore [Agent Tracing](/tracing/tracing_features/agent) for end-to-end workflow tracking
+- Check [LLM Node Tracing](/tracing/tracing_features/llm_node) for AI model optimization
+
+*Your AI agents are no longer black boxes—they're fully observable, debuggable, and optimizable systems.*

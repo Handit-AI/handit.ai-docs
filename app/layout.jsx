@@ -39,7 +39,7 @@ const banner = <Banner storageKey="some-key">🎉 Welcome to handit.ai Documenta
 
 const navbar = (
   <Navbar
-    logo={<b>Handit.ai</b>}
+    logo={<img src="/assets/logo.png" alt="Handit.ai" style={{ width: '50px', height: 'auto' }} />}
     projectLink="https://github.com/Handit-AI/handit.ai.git"
     chatLink="https://discord.gg/handit"
     chatIcon={
@@ -111,7 +111,7 @@ export default async function RootLayout({ children }) {
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/Handit-AI/handit.ai-docs.git"
           editLink="Edit this page on GitHub"
-          sidebar={{ defaultMenuCollapseLevel: 1 }}
+          sidebar={{ defaultMenuCollapseLevel: 2 }}
           footer={footer}
           // ...Your additional theme config options
         >

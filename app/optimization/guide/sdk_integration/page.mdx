@@ -1,0 +1,555 @@
+---
+title: 'SDK Integration'
+sidebarTitle: 'SDK Integration'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# SDK Integration
+
+Integrate optimized prompts directly into your application code using the Handit.ai SDK. Fetch the latest optimized prompts automatically and ensure your application always uses the best-performing prompt versions.
+
+<Callout type="info">
+  The SDK provides seamless integration with your existing codebase. Simply replace static prompts with SDK calls to automatically receive optimized versions as they become available.
+</Callout>
+
+## Overview
+
+The optimization SDK enables:
+
+<Steps>
+### Automatic Prompt Fetching
+Retrieve the latest optimized prompts for any LLM node using simple function calls
+
+### Fallback Support  
+Gracefully handle cases where optimizations aren't available with default prompts
+
+### Caching & Performance
+Built-in intelligent caching to minimize API calls and improve response times
+
+### Version Control
+Access specific prompt versions or always get the latest optimized version
+</Steps>
+
+*[Image placeholder: SDK integration workflow showing prompt fetching and fallback]*
+
+## Installation & Setup
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+
+**Install the Handit SDK:**
+
+```bash
+pip install handit
+```
+
+**Basic Configuration:**
+
+```python
+from handit import HanditTracker
+
+# Initialize the tracker (same as for tracing)
+tracker = HanditTracker(
+    api_key="your-api-key",
+    project_id="your-project"
+)
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Install the Handit SDK:**
+
+```bash
+npm install @handit/sdk
+# or
+yarn add @handit/sdk
+```
+
+**Basic Configuration:**
+
+```javascript
+import { HanditClient } from '@handit/sdk';
+
+// Initialize the client (same as for tracing)
+const handit = new HanditClient({
+  apiKey: 'your-api-key',
+  projectId: 'your-project'
+});
+```
+
+</Tabs.Tab>
+</Tabs>
+
+## Core Function
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+
+**Primary Optimization Function:**
+
+```python
+def fetch_optimized_prompt(model_id: str) -> str:
+    """
+    Fetch the latest optimized prompt for the given model ID.
+    
+    Args:
+        model_id (str): The slug/ID of the LLM node (e.g., "customer-support-llm")
+        
+    Returns:
+        str: The optimized prompt text
+        
+    Raises:
+        OptimizationError: If no optimization is available
+        NetworkError: If unable to connect to the service
+    """
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Primary Optimization Function:**
+
+```javascript
+async function fetchOptimizedPrompt({ modelId }) {
+  /**
+   * Fetch the latest optimized prompt for the given model ID.
+   * 
+   * @param {Object} params - Parameters object
+   * @param {string} params.modelId - The slug/ID of the LLM node
+   * @returns {Promise<string>} The optimized prompt text
+   * @throws {OptimizationError} If no optimization is available
+   */
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
+## Basic Implementation
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+
+**Simple Integration Example:**
+
+```python
+from handit import HanditTracker
+import openai
+
+# Initialize Handit tracker
+tracker = HanditTracker(api_key="your-api-key", project_id="your-project")
+
+def generate_customer_response(user_query: str, context: dict = None) -> str:
+    """Generate customer service response with optimized prompt."""
+    
+    # Fetch the latest optimized prompt
+    try:
+        system_prompt = tracker.fetch_optimized_prompt("customer-support-llm")
+        print("Using optimized prompt")
+    except Exception as e:
+        # Fallback to default prompt
+        system_prompt = """You are a helpful customer service assistant. 
+        Respond to customer inquiries with accurate information and clear solutions.
+        Always be professional and empathetic."""
+        print(f"Using fallback prompt: {e}")
+    
+    # Use with your LLM
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_query}
+        ],
+        temperature=0.7
+    )
+    
+    return response.choices[0].message.content
+
+# Usage
+customer_query = "I'm having trouble with my order delivery"
+response = generate_customer_response(customer_query)
+print(response)
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Simple Integration Example:**
+
+```javascript
+import { HanditClient } from '@handit/sdk';
+import OpenAI from 'openai';
+
+// Initialize clients
+const handit = new HanditClient({ 
+  apiKey: 'your-api-key',
+  projectId: 'your-project' 
+});
+
+const openai = new OpenAI({ apiKey: 'your-openai-key' });
+
+async function generateCustomerResponse(userQuery, context = {}) {
+  // Fetch the latest optimized prompt
+  let systemPrompt;
+  try {
+    systemPrompt = await handit.fetchOptimizedPrompt({ 
+      modelId: 'customer-support-llm' 
+    });
+    console.log('Using optimized prompt');
+  } catch (error) {
+    // Fallback to default prompt
+    systemPrompt = `You are a helpful customer service assistant. 
+    Respond to customer inquiries with accurate information and clear solutions.
+    Always be professional and empathetic.`;
+    console.warn('Using fallback prompt:', error.message);
+  }
+  
+  // Use with your LLM
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userQuery }
+    ],
+    temperature: 0.7
+  });
+  
+  return response.choices[0].message.content;
+}
+
+// Usage
+const customerQuery = "I'm having trouble with my order delivery";
+const response = await generateCustomerResponse(customerQuery);
+console.log(response);
+```
+
+</Tabs.Tab>
+</Tabs>
+
+## Production-Ready Implementation
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+
+**Advanced Implementation with Caching and Error Handling:**
+
+```python
+from handit import HanditTracker, OptimizationError
+import logging
+import time
+from functools import lru_cache
+from typing import Optional, Dict, Any
+
+class OptimizedPromptManager:
+    """Production-ready prompt management with caching and error handling."""
+    
+    def __init__(self, api_key: str, project_id: str):
+        self.tracker = HanditTracker(api_key=api_key, project_id=project_id)
+        self.logger = logging.getLogger(__name__)
+        self.default_prompts = {}
+        self._cache_ttl = 300  # 5 minutes
+        
+    def set_default_prompt(self, model_id: str, prompt: str):
+        """Set fallback prompt for a model."""
+        self.default_prompts[model_id] = prompt
+        
+    @lru_cache(maxsize=128)
+    def _get_cached_prompt(self, model_id: str, cache_key: str) -> str:
+        """Internal cached prompt fetching."""
+        return self.tracker.fetch_optimized_prompt(model_id=model_id)
+    
+    def get_optimized_prompt(self, model_id: str) -> tuple[str, bool]:
+        """
+        Get optimized prompt with caching and fallback.
+        
+        Returns:
+            tuple: (prompt_text, is_optimized)
+        """
+        # Create cache key with TTL
+        cache_key = f"{model_id}_{int(time.time() // self._cache_ttl)}"
+        
+        try:
+            prompt = self._get_cached_prompt(model_id, cache_key)
+            self.logger.info(f"Using optimized prompt for {model_id}")
+            return prompt, True
+            
+        except OptimizationError.NotFound:
+            self.logger.info(f"No optimization available for {model_id}")
+            return self._get_fallback_prompt(model_id), False
+            
+        except OptimizationError.NetworkError:
+            self.logger.warning(f"Network error fetching optimization for {model_id}")
+            return self._get_fallback_prompt(model_id), False
+            
+        except Exception as e:
+            self.logger.error(f"Unexpected error: {e}")
+            return self._get_fallback_prompt(model_id), False
+    
+    def _get_fallback_prompt(self, model_id: str) -> str:
+        """Get fallback prompt for model."""
+        return self.default_prompts.get(
+            model_id, 
+            "You are a helpful AI assistant."
+        )
+
+# Usage example
+prompt_manager = OptimizedPromptManager(
+    api_key="your-api-key",
+    project_id="your-project"
+)
+
+# Set fallback prompts
+prompt_manager.set_default_prompt(
+    "customer-support-llm",
+    "You are a helpful customer service assistant..."
+)
+
+def generate_response(model_id: str, user_query: str) -> str:
+    # Get optimized prompt
+    prompt, is_optimized = prompt_manager.get_optimized_prompt(model_id)
+    
+    # Generate response with optimized prompt
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_query}
+        ]
+    )
+    
+    return response.choices[0].message.content
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Advanced Implementation with Caching and Error Handling:**
+
+```javascript
+import { HanditClient } from '@handit/sdk';
+
+class OptimizedPromptManager {
+  constructor(apiKey, projectId) {
+    this.handit = new HanditClient({ apiKey, projectId });
+    this.cache = new Map();
+    this.cacheTTL = 5 * 60 * 1000; // 5 minutes
+    this.defaultPrompts = new Map();
+  }
+  
+  setDefaultPrompt(modelId, prompt) {
+    this.defaultPrompts.set(modelId, prompt);
+  }
+  
+  async getCachedPrompt(modelId) {
+    const cacheKey = `${modelId}_${Math.floor(Date.now() / this.cacheTTL)}`;
+    
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+    
+    try {
+      const prompt = await this.handit.fetchOptimizedPrompt({ modelId });
+      this.cache.set(cacheKey, { prompt, isOptimized: true });
+      
+      // Clean old cache entries
+      setTimeout(() => this.cache.delete(cacheKey), this.cacheTTL);
+      
+      return { prompt, isOptimized: true };
+    } catch (error) {
+      const fallback = this.getFallbackPrompt(modelId);
+      this.cache.set(cacheKey, { prompt: fallback, isOptimized: false });
+      return { prompt: fallback, isOptimized: false };
+    }
+  }
+  
+  getFallbackPrompt(modelId) {
+    return this.defaultPrompts.get(modelId) || 'You are a helpful AI assistant.';
+  }
+}
+
+// Usage example
+const promptManager = new OptimizedPromptManager('api-key', 'project-id');
+
+// Set fallback prompts
+promptManager.setDefaultPrompt(
+  'customer-support-llm',
+  'You are a helpful customer service assistant...'
+);
+
+async function generateResponse(modelId, userQuery) {
+  // Get optimized prompt
+  const { prompt, isOptimized } = await promptManager.getCachedPrompt(modelId);
+  
+  // Generate response with optimized prompt
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: prompt },
+      { role: 'user', content: userQuery }
+    ]
+  });
+  
+  return response.choices[0].message.content;
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
+## Framework-Specific Integrations
+
+### React Integration
+
+**React Hook for Optimized Prompts:**
+
+```javascript
+import { useState, useEffect } from 'react';
+import { HanditClient } from '@handit/sdk';
+
+const handit = new HanditClient({ 
+  apiKey: process.env.REACT_APP_HANDIT_API_KEY,
+  projectId: process.env.REACT_APP_HANDIT_PROJECT_ID 
+});
+
+export function useOptimizedPrompt(modelId, fallbackPrompt = '') {
+  const [prompt, setPrompt] = useState(fallbackPrompt);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isOptimized, setIsOptimized] = useState(false);
+  
+  useEffect(() => {
+    let isMounted = true;
+    
+    async function fetchPrompt() {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const optimizedPrompt = await handit.fetchOptimizedPrompt({ modelId });
+        
+        if (isMounted) {
+          setPrompt(optimizedPrompt);
+          setIsOptimized(true);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setPrompt(fallbackPrompt);
+          setIsOptimized(false);
+          setError(err.message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    
+    fetchPrompt();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [modelId, fallbackPrompt]);
+  
+  return { prompt, loading, error, isOptimized };
+}
+
+// Usage in component
+function CustomerSupportChat() {
+  const fallbackPrompt = 'You are a helpful customer service assistant...';
+  
+  const { prompt, loading, isOptimized } = useOptimizedPrompt(
+    'customer-support-llm', 
+    fallbackPrompt
+  );
+  
+  if (loading) {
+    return <div>Loading optimized prompt...</div>;
+  }
+  
+  return (
+    <div className="chat-interface">
+      <div className="prompt-status">
+        {isOptimized ? (
+          <span className="optimized">✅ Using optimized prompt</span>
+        ) : (
+          <span className="fallback">⚠️ Using fallback prompt</span>
+        )}
+      </div>
+      {/* Chat interface implementation */}
+    </div>
+  );
+}
+```
+
+### Next.js API Route
+
+**API Route with Optimization:**
+
+```javascript
+// pages/api/chat.js
+import { HanditClient } from '@handit/sdk';
+import OpenAI from 'openai';
+
+const handit = new HanditClient({
+  apiKey: process.env.HANDIT_API_KEY,
+  projectId: process.env.HANDIT_PROJECT_ID
+});
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  
+  const { message, modelId = 'customer-support-llm' } = req.body;
+  
+  try {
+    // Fetch optimized prompt
+    let systemPrompt;
+    try {
+      systemPrompt = await handit.fetchOptimizedPrompt({ modelId });
+    } catch (error) {
+      systemPrompt = 'You are a helpful customer service assistant.';
+      console.warn('Using fallback prompt:', error.message);
+    }
+    
+    // Generate response
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ]
+    });
+    
+    res.status(200).json({
+      response: completion.choices[0].message.content
+    });
+    
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+```
+
+## Next Steps
+
+Ready to integrate optimized prompts into your application?
+
+- Install the SDK for your preferred language
+- Replace static prompts with `fetch_optimized_prompt()` calls
+- Implement fallback handling for production reliability
+- Set up caching for optimal performance
+- Monitor optimization usage and performance
+- **[Start using Handit.ai](https://beta.handit.ai)** to begin optimizing your prompts
+
+<Callout type="success">
+  **SDK integration complete!** Your application can now automatically fetch and use optimized prompts. The SDK handles caching, error recovery, and real-time updates seamlessly. Visit [beta.handit.ai](https://beta.handit.ai) to get started with prompt optimization today.
+</Callout> 

@@ -1,0 +1,375 @@
+---
+title: 'Agent Wrapper/Decorator Tracing'
+sidebarTitle: 'Agent Wrapper/Decorator'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Agent Wrapper/Decorator Tracing
+
+> **The easiest way to trace complete AI workflows.** Agent wrappers automatically capture your entire agent execution from start to finish with just one decorator or wrapper function.
+
+Perfect for main application entry points like API endpoints, chat handlers, and workflow orchestrators where you want comprehensive observability with minimal code changes.
+
+<Callout type="info">
+  Agent wrappers are the most convenient tracing method—add one decorator and get complete visibility into your AI agent workflows, including all nested operations.
+</Callout>
+
+## How It Works
+
+Agent wrapper tracing provides comprehensive coverage by:
+
+- **Wrapping entire workflows** - Captures complete execution from start to finish
+- **Automatic context management** - Links all child operations together seamlessly
+- **Universal compatibility** - Works with both sync and async functions
+- **Built-in error tracking** - Captures and reports errors with full context
+- **Performance monitoring** - Records execution time and resource usage
+
+## Implementation
+
+### Python: `@start_agent_tracing()`
+
+<Tabs items={["Async", "Sync"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="async_agent_wrapper.py"
+from handit import HanditTracker
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+@tracker.start_agent_tracing()
+async def customer_support_agent(user_message):
+    """Complete customer support workflow"""
+    
+    # Step 1: Classify the user intent
+    intent = await classify_user_intent(user_message)
+    
+    # Step 2: Retrieve relevant knowledge
+    knowledge = await search_knowledge_base(user_message, intent)
+    
+    # Step 3: Generate response
+    response = await generate_response(user_message, intent, knowledge)
+    
+    # Step 4: Log interaction
+    await log_interaction(user_message, response, intent)
+    
+    return {
+        "response": response,
+        "intent": intent,
+        "confidence": 0.95
+    }
+
+# Usage - the entire workflow is automatically traced
+result = await customer_support_agent("I need help with my billing")
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python filename="sync_agent_wrapper.py"
+from handit import HanditTracker
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+@tracker.start_agent_tracing()
+def data_analysis_agent(dataset_path):
+    """Complete data analysis workflow"""
+    
+    # Step 1: Load and validate data
+    data = load_dataset(dataset_path)
+    
+    # Step 2: Perform analysis
+    analysis_results = analyze_data(data)
+    
+    # Step 3: Generate insights
+    insights = generate_insights(analysis_results)
+    
+    # Step 4: Create report
+    report = create_report(insights)
+    
+    return {
+        "insights": insights,
+        "report": report,
+        "status": "completed"
+    }
+
+# Usage - synchronous execution with automatic tracing
+result = data_analysis_agent("/path/to/dataset.csv")
+```
+</Tabs.Tab>
+</Tabs>
+
+### JavaScript: `startAgentTracing()`
+
+```javascript filename="agent_wrapper.js"
+const { config, startAgentTracing } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Define your agent function
+async function ecommerceRecommendationAgent(userId, productCategory) {
+    // Step 1: Get user preferences
+    const userPreferences = await getUserPreferences(userId);
+    
+    // Step 2: Fetch product catalog
+    const products = await getProductCatalog(productCategory);
+    
+    // Step 3: Generate recommendations using ML model
+    const recommendations = await generateRecommendations(
+        userPreferences, 
+        products
+    );
+    
+    // Step 4: Personalize and rank
+    const personalizedRecs = await personalizeRecommendations(
+        recommendations, 
+        userId
+    );
+    
+    return {
+        recommendations: personalizedRecs,
+        userId: userId,
+        category: productCategory
+    };
+}
+
+// Wrap with agent tracing
+const trackedRecommendationAgent = startAgentTracing(ecommerceRecommendationAgent);
+
+// Usage - automatically traces the entire workflow
+const recommendations = await trackedRecommendationAgent("user123", "electronics");
+```
+
+## Real-World Examples
+
+### Multi-Modal AI Assistant
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="multimodal_assistant.py"
+from handit import HanditTracker
+import asyncio
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+@tracker.start_agent_tracing()
+async def multimodal_ai_assistant(user_input, image_data=None):
+    """
+    Complete AI assistant that handles text, images, and complex queries
+    """
+    
+    # Step 1: Analyze input type and content
+    input_analysis = await analyze_input_type(user_input, image_data)
+    
+    # Step 2: Route to appropriate processing pipeline
+    if input_analysis['has_image']:
+        # Process image with vision model
+        image_description = await process_image(image_data)
+        context = f"User query: {user_input}\nImage: {image_description}"
+    else:
+        context = user_input
+    
+    # Step 3: Check if query requires real-time data
+    if input_analysis['needs_realtime_data']:
+        # Fetch current information
+        realtime_data = await fetch_realtime_data(user_input)
+        context += f"\nCurrent data: {realtime_data}"
+    
+    # Step 4: Generate response with full context
+    response = await generate_contextual_response(context)
+    
+    # Step 5: Post-process and validate response
+    final_response = await validate_and_enhance_response(response)
+    
+    return {
+        "response": final_response,
+        "input_type": input_analysis['type'],
+        "confidence": input_analysis['confidence'],
+        "processing_time": "tracked_automatically"
+    }
+
+# Example usage
+result = await multimodal_ai_assistant(
+    "What's in this image and how does it relate to current market trends?",
+    image_data=uploaded_image
+)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="multimodal_assistant.js"
+const { config, startAgentTracing } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+async function multimodalAIAssistant(userInput, imageData = null) {
+    // Step 1: Analyze input type and content
+    const inputAnalysis = await analyzeInputType(userInput, imageData);
+    
+    // Step 2: Route to appropriate processing pipeline
+    let context = userInput;
+    
+    if (inputAnalysis.hasImage) {
+        // Process image with vision model
+        const imageDescription = await processImage(imageData);
+        context = `User query: ${userInput}\nImage: ${imageDescription}`;
+    }
+    
+    // Step 3: Check if query requires real-time data
+    if (inputAnalysis.needsRealtimeData) {
+        // Fetch current information
+        const realtimeData = await fetchRealtimeData(userInput);
+        context += `\nCurrent data: ${realtimeData}`;
+    }
+    
+    // Step 4: Generate response with full context
+    const response = await generateContextualResponse(context);
+    
+    // Step 5: Post-process and validate response
+    const finalResponse = await validateAndEnhanceResponse(response);
+    
+    return {
+        response: finalResponse,
+        inputType: inputAnalysis.type,
+        confidence: inputAnalysis.confidence,
+        processingTime: "tracked_automatically"
+    };
+}
+
+// Wrap with agent tracing
+const trackedMultimodalAssistant = startAgentTracing(multimodalAIAssistant);
+
+// Example usage
+const result = await trackedMultimodalAssistant(
+    "What's in this image and how does it relate to current market trends?",
+    uploadedImage
+);
+```
+</Tabs.Tab>
+</Tabs>
+
+### Error Handling with Agent Wrappers
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="error_handling_agent.py"
+from handit import HanditTracker
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+@tracker.start_agent_tracing()
+async def robust_agent_workflow(user_request):
+    """
+    Agent with built-in error handling and recovery
+    """
+    try:
+        # Step 1: Validate input
+        validated_input = await validate_user_request(user_request)
+        
+        # Step 2: Primary processing
+        primary_result = await primary_processing(validated_input)
+        
+        # Step 3: Enhanced processing
+        enhanced_result = await enhance_result(primary_result)
+        
+        return enhanced_result
+        
+    except ValidationError as e:
+        # Handle validation errors gracefully
+        return {"error": "Invalid input", "details": str(e)}
+    
+    except ProcessingError as e:
+        # Try fallback processing
+        fallback_result = await fallback_processing(user_request)
+        return {"result": fallback_result, "note": "Used fallback processing"}
+    
+    except Exception as e:
+        # Agent wrapper automatically tracks this error
+        # Including full stack trace and context
+        raise e
+
+# The wrapper will automatically track:
+# - Successful executions with full context
+# - Errors with stack traces and input data
+# - Performance metrics for debugging
+result = await robust_agent_workflow(user_input)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="error_handling_agent.js"
+const { config, startAgentTracing } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+async function robustAgentWorkflow(userRequest) {
+    try {
+        // Step 1: Validate input
+        const validatedInput = await validateUserRequest(userRequest);
+        
+        // Step 2: Primary processing
+        const primaryResult = await primaryProcessing(validatedInput);
+        
+        // Step 3: Enhanced processing
+        const enhancedResult = await enhanceResult(primaryResult);
+        
+        return enhancedResult;
+        
+    } catch (error) {
+        if (error.type === 'ValidationError') {
+            // Handle validation errors gracefully
+            return { error: "Invalid input", details: error.message };
+        }
+        
+        if (error.type === 'ProcessingError') {
+            // Try fallback processing
+            const fallbackResult = await fallbackProcessing(userRequest);
+            return { result: fallbackResult, note: "Used fallback processing" };
+        }
+        
+        // Agent wrapper automatically tracks this error
+        // Including full stack trace and context
+        throw error;
+    }
+}
+
+// Wrap with error tracking
+const trackedRobustAgent = startAgentTracing(robustAgentWorkflow);
+
+// The wrapper will automatically track:
+// - Successful executions with full context
+// - Errors with stack traces and input data  
+// - Performance metrics for debugging
+const result = await trackedRobustAgent(userInput);
+```
+</Tabs.Tab>
+</Tabs>
+
+## What Gets Tracked
+
+When you use agent wrappers, Handit.ai automatically captures:
+
+| **Data Type** | **What's Captured** |
+|---------------|-------------------|
+| **📊 Execution Data** | Complete function input/output, execution timing, success/failure status, performance metrics |
+| **🔗 Context Linking** | All nested function calls, LLM interactions, tool executions, error propagation |
+
+<Callout type="success">
+  Agent wrappers provide the most comprehensive tracing with minimal code changes. Just add one decorator/wrapper and get complete visibility into your AI workflows.
+</Callout>
+
+## Best Practices
+
+**Implementation Guidelines:**
+
+1. **Use for main entry points** - Wrap your primary agent functions that handle complete workflows
+2. **Keep functions focused** - Each wrapped function should represent a complete, cohesive workflow
+3. **Handle errors gracefully** - Let the wrapper track errors while you handle them appropriately
+4. **Combine with node tracing** - Use node decorators for detailed sub-function tracking when needed
+
+## Next Steps
+
+- Learn about [Manual Agent Tracing](/tracing/guide/manual_agent) for more control
+- Explore [Node Wrapper/Decorator](/tracing/guide/node_wrapper) for sub-function tracking
+- Check [Node Function Tracing](/tracing/guide/node_function) for custom tracking patterns 

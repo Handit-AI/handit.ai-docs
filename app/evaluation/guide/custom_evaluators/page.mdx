@@ -1,0 +1,362 @@
+---
+title: 'Custom Evaluators'
+sidebarTitle: 'Custom Evaluators'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components" 
+import { Tabs } from "nextra/components"
+
+# Custom Evaluators
+
+> **Define your quality standards with precision.** Custom evaluators allow you to create sophisticated evaluation systems tailored to your specific business requirements, ensuring AI responses meet your exact quality criteria.
+
+This guide covers creating evaluation systems that automatically assess AI responses against your defined standards using LLM-as-Judge methodology.
+
+<Callout type="info">
+  Custom evaluators use your [configured model tokens](/evaluation/guide/model_tokens) to automatically assess AI responses against your defined criteria.
+</Callout>
+
+## Evaluator Components
+
+A custom evaluator consists of:
+
+<Steps>
+### Evaluation Criteria
+Define what constitutes quality for your specific use case
+
+### Evaluation Prompt  
+Instruction template that guides the judge model
+
+### Scoring Framework
+How to interpret and score responses consistently
+
+### Output Format
+Structured format for evaluation results and insights
+</Steps>
+
+## Creating Your First Evaluator
+
+**1. Navigate to Evaluators**
+- Go to **Evaluation Suite**
+- Click **Create New Evaluator**
+
+**2. Basic Configuration**
+
+*[Image placeholder: Custom evaluator creation form]*
+
+**Evaluator Name**
+```
+Customer Support Quality
+```
+
+**Model Token**
+- Select your configured judge model from the dropdown
+- Choose based on evaluation complexity and cost requirements
+
+*[Image placeholder: Model token selection dropdown]*
+
+**3. Create Evaluation Prompt**
+
+This is where you define your evaluation criteria and instructions for the judge model:
+
+```
+You are evaluating customer service AI responses for quality.
+
+Rate the response on these criteria (1-10 scale, 10 = excellent):
+
+1. **Helpfulness**: Does the response directly address and solve the customer's issue?
+2. **Accuracy**: Is all provided information correct and up-to-date?
+3. **Professionalism**: Is the tone and language appropriate for business communication?
+4. **Completeness**: Are all aspects of the customer's question thoroughly addressed?
+
+**Context:**
+- Customer Question: {input}
+- AI Response: {output}
+- Customer History: {context}
+
+**Output Format (JSON):**
+{
+  "scores": {
+    "helpfulness": <1-10>,
+    "accuracy": <1-10>,
+    "professionalism": <1-10>,
+    "completeness": <1-10>,
+    "overall": <average>
+  },
+  "reasoning": "Brief explanation of scoring decisions",
+  "strengths": ["What the response did well"],
+  "improvements": ["Specific areas for improvement"],
+  "escalation_needed": <true/false>
+}
+
+Provide detailed, constructive feedback to help improve response quality.
+```
+
+*[Image placeholder: Evaluation prompt text area with example prompt]*
+
+**4. Save Evaluator**
+- Review your configuration
+- Click **Save** to create the evaluator
+
+*[Image placeholder: Save evaluator button and confirmation]*
+
+## Prompt Engineering Best Practices
+
+### Essential Prompt Structure
+
+**1. Clear Role Definition**
+```
+You are an expert evaluator specializing in [domain].
+Your goal is to assess [specific aspect] of AI responses.
+```
+
+**2. Specific Evaluation Criteria**
+```
+Rate the response on these dimensions:
+1. **Criterion Name** (1-10): Detailed description of what this measures
+2. **Second Criterion** (1-10): Clear explanation of quality indicators
+```
+
+**3. Context Provision**
+```
+**Context:**
+- Original Question: {input}
+- AI Response: {output}
+- Additional Context: {context}
+- User Profile: {user_metadata}
+```
+
+**4. Output Format Specification**
+```
+**Output Format (JSON):**
+{
+  "scores": { ... },
+  "reasoning": "...",
+  "confidence": 0.85
+}
+```
+
+## Domain-Specific Examples
+
+<Tabs items={["E-commerce", "Healthcare", "Education", "Technical Support"]} defaultIndex="0">
+<Tabs.Tab>
+
+**E-commerce Product Recommendations**
+
+```
+You are evaluating AI-generated product recommendations for an e-commerce platform.
+
+Rate each recommendation on these criteria (1-10 scale):
+
+1. **Relevance** (1-10): How well do the recommended products match the customer's query and needs?
+2. **Diversity** (1-10): Does the selection offer variety in price, brand, and features?
+3. **Personalization** (1-10): Are recommendations tailored to the customer's profile and history?
+4. **Business Value** (1-10): Do recommendations balance customer needs with business objectives?
+5. **Presentation** (1-10): Are products presented with compelling descriptions and clear benefits?
+
+**Context:**
+- Customer Query: {input}
+- Product Recommendations: {output}
+- Customer Profile: {customer_profile}
+- Purchase History: {purchase_history}
+
+**Business Guidelines:**
+- Prioritize products with higher margins when quality is equal
+- Always include at least one budget-friendly option
+- Consider seasonal trends and inventory levels
+
+**Output Format (JSON):**
+{
+  "scores": {
+    "relevance": <1-10>,
+    "diversity": <1-10>,
+    "personalization": <1-10>,
+    "business_value": <1-10>,
+    "presentation": <1-10>,
+    "overall": <average>
+  },
+  "reasoning": "Detailed evaluation explanation",
+  "business_impact": {
+    "likely_conversion": <1-10>,
+    "revenue_potential": "low|medium|high"
+  },
+  "recommendations": ["Specific actions to improve future recommendations"]
+}
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Healthcare Information Assessment**
+
+```
+You are evaluating AI responses about health information for accuracy and safety.
+
+**CRITICAL**: This evaluation focuses on safety and accuracy. Be extremely careful about medical claims.
+
+Rate responses on these criteria (1-10 scale):
+
+1. **Medical Accuracy** (1-10): Is the health information factually correct and current?
+2. **Safety** (1-10): Does the response avoid harmful advice and appropriately recommend professional care?
+3. **Clarity** (1-10): Is medical information explained in understandable terms?
+4. **Scope Appropriateness** (1-10): Does the response stay within appropriate bounds for AI assistance?
+5. **Empathy** (1-10): Is the tone supportive and understanding of health concerns?
+
+**Context:**
+- User Question: {input}
+- AI Response: {output}
+- User Health Context: {health_context}
+
+**Safety Guidelines:**
+- Any response suggesting specific treatments requires professional consultation disclaimer
+- Symptoms descriptions should encourage medical professional evaluation
+- No response should discourage seeking professional medical care
+
+**Red Flags (Automatic Low Scores):**
+- Diagnostic claims ("You have...", "This is definitely...")
+- Specific medication recommendations without professional oversight
+- Discouraging professional medical consultation
+
+**Output Format (JSON):**
+{
+  "scores": {
+    "medical_accuracy": <1-10>,
+    "safety": <1-10>,
+    "clarity": <1-10>,
+    "scope_appropriateness": <1-10>,
+    "empathy": <1-10>,
+    "overall": <average>
+  },
+  "safety_assessment": {
+    "risk_level": "low|medium|high",
+    "requires_disclaimer": <true/false>,
+    "professional_referral_needed": <true/false>
+  },
+  "reasoning": "Detailed medical information evaluation",
+  "safety_concerns": ["Any potential safety issues identified"]
+}
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Educational Content Evaluation**
+
+```
+You are evaluating AI-generated educational content for learning effectiveness and accuracy.
+
+Rate content on these educational criteria (1-10 scale):
+
+1. **Accuracy** (1-10): Is the educational content factually correct and current?
+2. **Clarity** (1-10): Is the information presented in a clear, understandable way?
+3. **Engagement** (1-10): Is the content interesting and likely to hold student attention?
+4. **Learning Objectives** (1-10): Does the content clearly achieve stated learning goals?
+5. **Age Appropriateness** (1-10): Is the complexity and content suitable for the target age group?
+
+**Context:**
+- Learning Objective: {input}
+- Generated Content: {output}
+- Target Age Group: {age_group}
+- Subject Area: {subject}
+
+**Educational Best Practices:**
+- Use active learning techniques when possible
+- Include examples and real-world applications
+- Break complex concepts into digestible parts
+- Encourage critical thinking and questions
+
+**Assessment Criteria:**
+- Does content scaffold learning appropriately?
+- Are examples diverse and inclusive?
+- Is there opportunity for practice or application?
+- Does content connect to prior knowledge?
+
+**Output Format (JSON):**
+{
+  "scores": {
+    "accuracy": <1-10>,
+    "clarity": <1-10>,
+    "engagement": <1-10>,
+    "learning_objectives": <1-10>,
+    "age_appropriateness": <1-10>,
+    "overall": <average>
+  },
+  "learning_assessment": {
+    "cognitive_load": "low|appropriate|high",
+    "engagement_level": "low|medium|high", 
+    "learning_effectiveness": <1-10>
+  },
+  "reasoning": "Educational content evaluation details",
+  "pedagogical_strengths": ["Effective teaching elements identified"]
+}
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**Technical Support Quality**
+
+```
+You are evaluating technical support AI responses for problem-solving effectiveness and safety.
+
+Rate responses on these technical criteria (1-10 scale):
+
+1. **Problem Diagnosis** (1-10): Does the response correctly identify the technical issue?
+2. **Solution Accuracy** (1-10): Are the proposed solutions technically correct and safe?
+3. **Step Clarity** (1-10): Are troubleshooting steps clear and easy to follow?
+4. **Safety** (1-10): Do solutions avoid potential system damage or security risks?
+5. **Completeness** (1-10): Does the response provide a complete solution path?
+
+**Context:**
+- Technical Issue: {input}
+- AI Response: {output}
+- System Information: {system_info}
+- User Technical Level: {user_expertise}
+
+**Technical Guidelines:**
+- Always consider user's technical expertise level
+- Prioritize safe solutions over quick fixes
+- Include backup/recovery steps for risky operations
+- Recommend professional help for complex issues
+
+**Safety Checks:**
+- No commands that could delete important data
+- No modifications to critical system files without warnings
+- No network security compromises
+- Clear warnings for potentially risky operations
+
+**Output Format (JSON):**
+{
+  "scores": {
+    "problem_diagnosis": <1-10>,
+    "solution_accuracy": <1-10>,
+    "step_clarity": <1-10>,
+    "safety": <1-10>,
+    "completeness": <1-10>,
+    "overall": <average>
+  },
+  "technical_assessment": {
+    "difficulty_level": "beginner|intermediate|advanced",
+    "risk_level": "low|medium|high",
+    "estimated_resolution_time": "minutes|hours|professional_needed"
+  },
+  "reasoning": "Technical evaluation details",
+  "safety_considerations": ["Potential risks and safeguards"]
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
+## Next Steps
+
+Ready to deploy your custom evaluator?
+
+- [Assign to LLM nodes](/evaluation/guide/llm_assignment) for automated quality assessment
+- Configure sampling percentages and quality thresholds
+- [Monitor evaluation results](/evaluation/guide/evaluation_results) and optimize performance
+
+<Callout type="success">
+  **Your custom evaluator is ready!** Next, learn how to [assign it to your LLM nodes](/evaluation/guide/llm_assignment) to start automatic quality assessment.
+</Callout> 

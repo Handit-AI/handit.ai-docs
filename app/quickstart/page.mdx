@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Handit.ai is an AI-powered platform that helps teams build and deploy intelligent applications at scale.
+description: Get started with Handit.ai's complete AI observability and optimization platform in under 30 minutes.
 sidebarTitle: Quickstart
 ---
 
@@ -8,123 +8,394 @@ import { Callout } from "nextra/components";
 import { Steps } from "nextra/components";
 import { Tabs } from "nextra/components";
 
-# Quickstart Guide
+# Complete Handit.ai Quickstart
 
-Get started with Handit.ai in minutes. This guide will walk you through the basic setup.
+> **Transform your AI from black box to self-improving system in under 30 minutes.** This guide walks you through the complete Handit.ai journey: observability, evaluation, and automated optimization.
 
-### Sign Up
+<Callout type="info">
+  **What you'll build:** A fully observable, continuously evaluated, and automatically optimizing AI system that improves itself based on real production data.
+</Callout>
 
-Create an account at [handit.ai](https://handit.ai/signup) to get started with Handit.ai. You'll need to provide your email address and set up a password.
+## Overview: The Complete Journey
 
-### Install
+Here's what we'll accomplish in three phases:
 
-Install Handit SDK.
+<Steps>
+### Phase 1: AI Observability (5 minutes)
+Set up comprehensive tracing to see inside your AI agents and understand what they're doing
 
-<Tabs items={["python", "js"]} defaultIndex="0">
-  <Tabs.Tab>
-    ```bash filename="terminal" 
-    pip install -U "handit-sdk>=1.9.0" 
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```bash filename="terminal" 
-    npm install @handit.ai/node 
-    ```
-  </Tabs.Tab>
+### Phase 2: Quality Evaluation (10 minutes)  
+Add automated evaluation to continuously assess performance across multiple quality dimensions
+
+### Phase 3: Self-Improving AI (15 minutes)
+Enable automatic optimization that generates better prompts, tests them, and provides proven improvements
+</Steps>
+
+<Callout type="success">
+  **The Result**: Complete visibility into performance with automated optimization recommendations based on real production data.
+</Callout>
+
+## Prerequisites
+
+Before we start, make sure you have:
+
+- An active AI application with LLM calls
+- A [Handit.ai account](https://beta.handit.ai) (sign up if needed)
+- 15-30 minutes to complete the setup
+
+## Phase 1: AI Observability (5 minutes)
+
+Let's add comprehensive tracing to see exactly what your AI is doing.
+
+### Step 1: Install the SDK
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```bash filename="terminal"
+pip install -U "handit-sdk>=1.9.0"
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash filename="terminal"
+npm install @handit.ai/node
+```
+</Tabs.Tab>
 </Tabs>
 
-### Configure Your API Key
+### Step 2: Get Your Integration Token
 
-To use Handit.ai, you'll need to set up your API key. You can find your API key in your [dashboard settings](https://dashboard.handit.ai/settings/integrations).
+1. Log into your [Handit.ai Dashboard](https://beta.handit.ai)
+2. Go to **Settings** → **Integrations**
+3. Copy your integration token
 
-```bash filename=".env"
-HANDIT_API_KEY=YOUR_API_KEY
+*[Image placeholder: Integration token in dashboard settings]*
+
+### Step 3: Create Your Agent Structure
+
+1. Navigate to **"My Agents"** in the dashboard
+2. Click **"Create New Agent"**
+3. Define your agent's workflow using either:
+   - **AI-Powered Creation**: Upload a JSON description of your agent
+   - **Visual Builder**: Drag and drop to build your workflow
+4. Download your `handit.config.json` file
+
+*[Image placeholder: Agent creation interface]*
+
+### Step 4: Add Basic Tracing
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="agent_tracing.py"
+from handit import HanditTracker
+import os
+
+# Initialize tracker
+tracker = HanditTracker()
+tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
+
+# Trace your main agent function
+@tracker.start_agent_tracing()
+async def process_user_request(user_message: str):
+    # Your agent logic here
+    intent = await classify_intent(user_message)
+    response = await generate_response(intent, user_message)
+    return response
+
+# Trace individual components
+@tracker.trace_agent_node("intent-classifier")
+async def classify_intent(message: str):
+    # Your intent classification logic
+    return intent
+
+@tracker.trace_agent_node("response-generator")
+async def generate_response(intent: str, message: str):
+    # Your response generation logic
+    return response
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="agent_tracing.js"
+import { config, startAgentTracing, traceAgentNode } from '@handit.ai/node';
 
-<Callout type="warning">
-  Never commit your API key. Use environment variables or a secure configuration
-  management system.
+// Initialize
+config({ apiKey: process.env.HANDIT_API_KEY });
+
+// Trace your main agent function
+const processUserRequest = startAgentTracing(async (userMessage) => {
+    const intent = await classifyIntent(userMessage);
+    const response = await generateResponse(intent, userMessage);
+    return response;
+});
+
+// Trace individual components
+const classifyIntent = traceAgentNode({
+    agentNodeId: "intent-classifier",
+    callback: async (message) => {
+        // Your intent classification logic
+        return intent;
+    }
+});
+
+const generateResponse = traceAgentNode({
+    agentNodeId: "response-generator", 
+    callback: async (intent, message) => {
+        // Your response generation logic
+        return response;
+    }
+});
+```
+</Tabs.Tab>
+</Tabs>
+
+<Callout type="success">
+  **Phase 1 Complete!** 🎉 You now have full observability with every operation, timing, input, output, and error visible in your dashboard.
 </Callout>
 
-### Create your Agent Flow
+**➡️ Want to dive deeper?** Check out our [detailed Tracing Quickstart](/tracing/quickstart) for advanced features and best practices.
 
-An agent flow is a sequence of connected steps (nodes) that define how your AI agent processes information and performs tasks. Think of it as a flowchart where each node can be either an AI model or a tool, and the connections determine how data moves between them.
+## Phase 2: Quality Evaluation (10 minutes)
 
-<Callout type="important">
-  **Key Concepts to Keep in Mind:**
-  
-  - **Model Node**: Represents any function or endpoint that uses an LLM (Large Language Model) to process or generate content. Examples include text generation, classification, or any AI-powered analysis.
-  
-  - **Tool Node**: Represents any function or endpoint that performs standard operations without LLM involvement. Examples include data processing, API calls, calculations, or any traditional programming logic.
+Now let's add automated evaluation to continuously assess quality across multiple dimensions.
+
+### Step 1: Connect Evaluation Models
+
+1. Go to **Settings** → **Model Tokens**
+2. Add your OpenAI or other model credentials
+3. These models will act as "judges" to evaluate responses
+
+*[Image placeholder: Model token configuration]*
+
+### Step 2: Create Focused Evaluators
+
+Create separate evaluators for each quality aspect. **Critical principle**: One evaluator = one quality dimension.
+
+1. Go to **Evaluation** → **Evaluation Suite**
+2. Click **Create New Evaluator**
+
+**Example Evaluator 1: Response Completeness**
+```
+You are evaluating whether an AI response completely addresses the user's question.
+
+Focus ONLY on completeness - ignore other quality aspects.
+
+User Question: {input}
+AI Response: {output}
+
+Rate on a scale of 1-10:
+1-2 = Missing major parts of the question
+3-4 = Addresses some parts but incomplete
+5-6 = Addresses most parts adequately  
+7-8 = Addresses all parts well
+9-10 = Thoroughly addresses every aspect
+
+Output format:
+Score: [1-10]
+Reasoning: [Brief explanation]
+```
+
+**Example Evaluator 2: Accuracy Check**
+```
+You are checking if an AI response contains accurate information.
+
+Focus ONLY on factual accuracy - ignore other aspects.
+
+User Question: {input}
+AI Response: {output}
+
+Rate on a scale of 1-10:
+1-2 = Contains obvious false information
+3-4 = Contains questionable claims
+5-6 = Mostly accurate with minor concerns
+7-8 = Accurate information
+9-10 = Completely accurate and verifiable
+
+Output format:
+Score: [1-10]
+Reasoning: [Brief explanation]
+```
+
+*[Image placeholder: Evaluator creation interface]*
+
+### Step 3: Associate Evaluators to Your LLM Nodes
+
+1. Go to **Tracing** → **Nodes**
+2. Select your LLM node (e.g., "response-generator")
+3. Navigate to **Evaluation** tab
+4. Add your evaluators with sampling percentages:
+   - Completeness: 10%
+   - Accuracy: 15%
+   - Format: 5%
+
+*[Image placeholder: Evaluator association interface]*
+
+### Step 4: Monitor Results
+
+View real-time evaluation results in:
+- **Tracing** tab: Individual evaluation scores
+- **Agent Performance**: Quality trends over time
+
+*[Image placeholder: Evaluation results dashboard]*
+
+<Callout type="success">
+  **Phase 2 Complete!** 🎉 Continuous evaluation is now running across multiple quality dimensions with real-time insights into performance trends.
 </Callout>
 
-Follow these steps to create your first agent in Handit.ai:
+**➡️ Want more sophisticated evaluators?** Check out our [detailed Evaluation Quickstart](/evaluation/quickstart) for advanced techniques.
 
+## Phase 3: Self-Improving AI (15 minutes)
 
-**Access the Dashboard**
+Finally, let's enable automatic optimization that generates better prompts and provides proven improvements.
 
-    - Log in to your [Handit.ai Dashboard](https://dashboard.handit.ai)
-    - Navigate to "Your Agents" in the sidebar
-    - Click "Create Agent" to begin 
+### Step 1: Connect Optimization Models
 
-**Add Nodes to Your Agent Flow**
+1. Go to **Optimization** → **Settings** → **Model Tokens**
+2. Add or select optimization model tokens
+3. Self-improving AI automatically activates once configured
 
-   - Click "Add Node" to create your first step
-   - Choose between two node types:
-     - **Model Node**: For AI tasks like prediction or generation
-     - **Tool Node**: For utility functions or API integrations
-   - Configure each node with:
-     - Name and unique identifier
-     - Description of functionality
-     - Node type and settings
-     - Next steps in the flow
+*[Image placeholder: Optimization model configuration]*
 
-**Connect Your Nodes**
-
-   - Create connections between nodes by dragging from one to another
-   - Define the data flow and execution path
-   - Ensure logical flow between steps
-
-**Finalize Your Agent**
-   - Click "Create" to save your agent
-   - Provide a descriptive name and purpose
-   - Verify your agent appears in the "Your Agents" list
-
-<Callout type='info'>
-  You can always edit your agent's configuration later through the dashboard.
+<Callout type="tip">
+  **Automatic Activation**: Once optimization tokens are configured, the system automatically begins analyzing evaluation data and generating optimizations. No additional setup required!
 </Callout>
 
+### Step 2: Monitor Optimization Results
 
-## Create Your First Project
+The system is now automatically generating and testing improved prompts. Monitor results in two places:
 
-1. Initialize a new project:
+**Agent Performance Dashboard:**
+- View agent performance metrics
+- Compare current vs optimized versions
+- See improvement percentages
 
-```bash
-handit init my-first-project
-cd my-first-project
+**Release Hub:**
+- Go to **Optimization** → **Release Hub**
+- View detailed prompt comparisons
+- See statistical confidence and recommendations
+
+*[Image placeholder: Release Hub with optimization recommendations]*
+
+### Step 3: Deploy Optimizations
+
+1. **Review Recommendations** in Release Hub
+2. **Compare Performance** between current and optimized prompts
+3. **Mark as Production** for prompts you want to deploy
+4. **Fetch via SDK** in your application
+
+**Fetch Optimized Prompts:**
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="optimization_integration.py"
+from handit import HanditTracker
+
+# Initialize tracker
+tracker = HanditTracker(api_key="your-api-key")
+
+# Fetch current production prompt
+optimized_prompt = tracker.fetch_optimized_prompt(
+    model_id="response-generator"
+)
+
+# Use in your LLM calls
+response = your_llm_client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": optimized_prompt},
+        {"role": "user", "content": user_query}
+    ]
+)
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="optimization_integration.js"
+import { HanditClient } from '@handit/sdk';
 
-2. Configure your project:
+const handit = new HanditClient({ apiKey: 'your-api-key' });
 
-```bash
-handit config
+// Fetch current production prompt
+const optimizedPrompt = await handit.fetchOptimizedPrompt({ 
+  modelId: 'response-generator' 
+});
+
+// Use in your LLM calls
+const response = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: optimizedPrompt },
+    { role: 'user', content: userQuery }
+  ]
+});
 ```
+</Tabs.Tab>
+</Tabs>
 
-3. Deploy your first model:
+<Callout type="success">
+  **Phase 3 Complete!** 🎉 You now have a self-improving AI that automatically detects quality issues, generates better prompts, tests them in the background, and provides proven improvements.
+</Callout>
 
-```bash
-handit deploy
-```
+**➡️ Want advanced optimization features?** Check out our [detailed Optimization Quickstart](/optimization/quickstart) for CI/CD integration and deployment strategies.
+
+## What You've Accomplished
+
+Congratulations! You now have a complete AI observability and optimization system:
+
+### ✅ Full Observability
+- Complete visibility into operations
+- Real-time monitoring of all LLM calls and tools
+- Detailed execution traces with timing and error tracking
+
+### ✅ Continuous Evaluation  
+- Automated quality assessment across multiple dimensions
+- Real-time evaluation scores and trends
+- Quality insights to identify improvement opportunities
+
+### ✅ Self-Improving AI
+- Automatic detection of quality issues
+- AI-generated prompt optimizations
+- Background A/B testing with statistical confidence
+- Production-ready improvements delivered via SDK
 
 ## Next Steps
 
-- Learn about [Model Management](/guides/model-management)
-- Explore [Data Processing](/guides/data-processing)
-- Check out [Deployment Options](/guides/deployment)
-- Read [Best Practices](/guides/best-practices)
+Now that you have the complete system running, explore advanced features:
 
-## Need Help?
+### Deep Dive Guides
+- **[Advanced Tracing](/tracing/quickstart)** - Comprehensive observability features
+- **[Sophisticated Evaluation](/evaluation/quickstart)** - Advanced evaluation techniques  
+- **[Optimization & CI/CD](/optimization/quickstart)** - Advanced deployment strategies
 
-- Join our [Discord Community](https://discord.gg/handit)
-- Check the [FAQ](/faq)
-- Contact [Support](/support)
+### Feature Exploration
+- **[Background A/B Testing](/optimization/optimization_features/ab_testing)** - Understand the testing methodology
+- **[Release Hub](/optimization/guide/release_hub)** - Advanced prompt management
+- **[SDK Integration](/optimization/guide/sdk_integration)** - Production integration patterns
+
+### Get Started Today
+- **[Visit Handit.ai](https://beta.handit.ai)** to begin your AI transformation
+- Join our [Discord community](https://discord.gg/handit-ai) for support
+- Check out [Support](/support) for additional help
+
+<Callout type="info">
+  **Ready to transform your AI?** Visit [beta.handit.ai](https://beta.handit.ai) to get started with the complete Handit.ai platform today.
+</Callout>
+
+## Troubleshooting
+
+**Tracing Not Working?**
+- Verify your API key is correct and set as environment variable
+- Check that your agent structure matches your `handit.config.json`
+- Ensure you're using the correct node slugs in your tracing code
+
+**Evaluations Not Running?**
+- Confirm model tokens are valid and have sufficient credits
+- Verify LLM nodes are receiving traffic
+- Check evaluation percentages are > 0%
+
+**Optimizations Not Generating?**
+- Ensure evaluation data shows quality issues (scores below threshold)
+- Verify optimization model tokens are configured
+- Confirm sufficient evaluation data has been collected
+
+**Need Help?**
+- Visit our [Support](/support) page
+- Join our [Discord community](https://discord.gg/handit-ai)
+- Check individual quickstart guides for detailed troubleshooting

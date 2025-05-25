@@ -1,0 +1,275 @@
+---
+title: 'Self-Improving AI'
+sidebarTitle: 'Self-Improving AI'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+
+# Self-Improving AI
+
+> **Transform errors into improvements automatically.** Handit.ai's self-improving AI uses evaluator-flagged errors to detect root causes in your prompts, then generates multiple improved versions iteratively using LLM analysis.
+
+Turn every quality issue into an opportunity for automatic prompt optimization.
+
+<Callout type="info">
+  Self-improving AI transforms evaluator feedback into actionable prompt improvements, creating multiple optimized versions that target specific quality issues.
+</Callout>
+
+## How Self-Improving AI Works
+
+The self-improving system creates an intelligent optimization loop:
+
+<Steps>
+### Analyze Evaluator Errors
+System examines evaluator-flagged failures to understand specific quality issues
+
+### Detect Root Causes  
+LLM analysis identifies what in the current prompt is causing the detected problems
+
+### Generate Prompt Fixes
+AI creates multiple improved prompt versions that address the identified root causes
+
+### Iterate and Refine
+Process runs iteratively, generating different versions and improvements in parallel
+</Steps>
+
+*[Image placeholder: Self-improving AI workflow showing error analysis to prompt generation]*
+
+## Error Analysis & Root Cause Detection
+
+### Evaluator Error Processing
+
+The system analyzes evaluator-flagged errors to understand prompt weaknesses:
+
+**Example: Evaluator Error Analysis**
+```
+Customer Support LLM - Error Analysis
+
+Recent Evaluator Failures (50 flagged responses):
+
+❌ Empathy Failures (18 responses)
+Evaluator Feedback:
+- "Response lacks acknowledgment of customer frustration"
+- "No emotional validation provided"
+- "Too transactional, not empathetic"
+
+❌ Completeness Failures (15 responses)  
+Evaluator Feedback:
+- "Missing key information requested"
+- "Didn't address all parts of the question"
+- "Incomplete troubleshooting steps"
+
+❌ Tone Failures (12 responses)
+Evaluator Feedback:
+- "Too formal for casual inquiry"
+- "Language doesn't match customer's communication style"
+- "Overly technical for general audience"
+```
+
+*[Image placeholder: Evaluator error analysis dashboard showing categorized failures]*
+
+### LLM Root Cause Analysis
+
+**Current Prompt Analysis:**
+```
+Current Production Prompt:
+"You are a helpful customer service assistant. 
+Respond to customer inquiries with accurate information and clear solutions.
+Always be professional and provide step-by-step instructions when appropriate."
+
+LLM Root Cause Analysis:
+❌ Missing empathy instructions → Causes empathy failures
+❌ No completeness requirements → Causes incomplete responses  
+❌ Fixed formality level → Causes tone mismatches
+❌ No emotional context awareness → Reduces customer satisfaction
+
+Identified Issues:
+1. Prompt lacks emotional intelligence guidance
+2. No systematic approach to addressing all question parts
+3. Rigid communication style doesn't adapt to context
+4. Missing customer sentiment consideration
+```
+
+*[Image placeholder: LLM analysis showing prompt weaknesses and root causes]*
+
+## Prompt Generation & Iteration
+
+### Parallel Prompt Generation
+
+The system generates multiple improved prompt versions simultaneously:
+
+**Generated Prompt Variations:**
+
+**Version A: Empathy-Focused**
+```
+You are a caring customer service specialist who genuinely wants to help.
+
+Before providing solutions:
+1. Acknowledge the customer's concern with empathy
+2. Validate their feelings if they seem frustrated
+3. Show understanding of their situation
+
+Then provide clear, helpful solutions with supportive language.
+```
+
+**Version B: Completeness-Focused**
+```
+You are a thorough customer service assistant.
+
+For every customer inquiry:
+1. Read the entire question carefully
+2. Identify all parts that need addressing
+3. Provide complete information for each part
+4. Confirm you've addressed everything requested
+
+Always ensure comprehensive responses.
+```
+
+**Version C: Adaptive Tone**
+```
+You are a customer service assistant who adapts to each customer.
+
+Match your communication style to the customer:
+- Formal tone for business inquiries
+- Friendly tone for casual questions
+- Technical detail for expert users
+- Simple language for general audiences
+
+Provide helpful, appropriately-toned responses.
+```
+
+*[Image placeholder: Multiple prompt versions generated in parallel]*
+
+### Iterative Improvement Process
+
+**Iteration Cycle:**
+
+```
+Iteration 1: Initial Analysis
+- Analyzed 50 evaluator errors
+- Generated 3 prompt versions (A, B, C)
+- Each targets specific root cause
+
+Iteration 2: Combined Insights  
+- Merged successful elements from versions A, B, C
+- Generated hybrid prompt addressing multiple issues
+- Added refinements based on error patterns
+
+Iteration 3: Advanced Optimization
+- Incorporated feedback from background testing
+- Fine-tuned language and structure
+- Created final optimized version
+
+Final Optimized Prompt:
+"You are an empathetic customer service specialist who provides complete, appropriately-toned responses..."
+[Combines empathy, completeness, and adaptive tone elements]
+```
+
+*[Image placeholder: Iterative improvement process showing prompt evolution]*
+
+## Real-World Example
+
+### Customer Support Optimization
+
+**Step 1: Error Detection**
+```
+Evaluator Flagged Issues:
+- 23 responses marked as "lacking empathy"
+- 15 responses marked as "incomplete"
+- 8 responses marked as "inappropriate tone"
+
+Common Error Patterns:
+- Direct solutions without acknowledgment
+- Missing information in complex queries
+- Formal language for casual questions
+```
+
+**Step 2: Root Cause Analysis**
+```
+LLM Analysis of Current Prompt:
+"The prompt instructs to be 'professional' but doesn't define what that means in different contexts. It lacks guidance for emotional recognition and doesn't require comprehensive question analysis."
+
+Identified Root Causes:
+1. No empathy instructions
+2. No completeness checklist
+3. Rigid tone requirements
+```
+
+**Step 3: Parallel Prompt Generation**
+```
+Generated 4 prompt versions:
+- Version 1: Enhanced empathy focus
+- Version 2: Systematic completeness approach  
+- Version 3: Context-adaptive tone
+- Version 4: Hybrid combining all improvements
+```
+
+**Step 4: Iterative Refinement**
+```
+Iteration Results:
+- Version 4 performed best in background testing
+- Further refined based on specific error patterns
+- Final version addresses all identified root causes
+```
+
+*[Image placeholder: Complete example showing the full optimization process]*
+
+## Background Testing Integration
+
+### Automatic Validation
+
+Each generated prompt version is automatically tested:
+
+```
+Background Testing Results:
+
+Current Production Prompt:
+- Empathy Score: 2.8/5.0
+- Completeness Score: 3.1/5.0  
+- Tone Appropriateness: 3.4/5.0
+
+Generated Version (Iteration 3):
+- Empathy Score: 4.2/5.0 (+50% improvement)
+- Completeness Score: 4.0/5.0 (+29% improvement)
+- Tone Appropriateness: 4.1/5.0 (+21% improvement)
+
+Statistical Confidence: 95%
+Recommendation: Ready for deployment
+```
+
+*[Image placeholder: Background testing results showing improvement metrics]*
+
+## Continuous Learning
+
+### Pattern Recognition
+
+The system learns from successful optimizations:
+
+```
+Learning Insights from Previous Optimizations:
+
+Successful Patterns:
+✅ Empathy acknowledgment phrases increase scores by 40-60%
+✅ Systematic question analysis improves completeness by 25-35%
+✅ Context-adaptive language reduces tone issues by 50%
+
+Applied Learning:
+- Prioritize empathy instructions in future prompts
+- Include systematic approaches for complex queries
+- Add context awareness to all prompt generations
+```
+
+*[Image placeholder: Learning insights dashboard showing successful optimization patterns]*
+
+## Next Steps
+
+Ready to see how your optimized prompts are tested and deployed?
+
+- Learn about [Background A/B Testing](/optimization/optimization_features/ab_testing) methodology and how optimizations are validated
+- Explore [SDK Integration & Prompt Fetching](/optimization/optimization_features/cicd_deployment) to deploy optimizations in your applications
+- [Set up optimization tokens](/optimization/guide/optimization_tokens) to automatically enable self-improving AI
+
+<Callout type="success">
+  **Self-improving AI activates automatically** when you configure optimization tokens. The system will start analyzing evaluator errors and generating improved prompts immediately.
+</Callout> 

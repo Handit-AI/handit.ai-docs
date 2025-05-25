@@ -1,0 +1,141 @@
+---
+title: 'Release Hub & Prompt Selection'
+sidebarTitle: 'Release Hub'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Release Hub & Prompt Selection
+
+The Release Hub is your central dashboard for managing prompt selection and deployment. View your LLM nodes, compare prompt performance, and choose which prompt to mark as production with a simple click.
+
+<Callout type="info">
+  The Release Hub shows all your LLM nodes and their available prompts. Compare metrics and text, then select your chosen prompt to mark as production.
+</Callout>
+
+## How It Works
+
+Managing prompts in Release Hub follows a simple workflow:
+
+<Steps>
+### View Your LLM Nodes
+See all your LLM nodes and their current production prompt status
+
+### Compare Performance
+Review metrics comparison and side-by-side text differences
+
+### Select Best Prompt
+Choose which prompt to mark as production based on performance data
+
+### Mark as Production
+Click to mark as production - prompt becomes available for your applications to fetch
+</Steps>
+
+*[Image placeholder: Release Hub workflow from nodes to selection]*
+
+## Accessing Release Hub
+
+Navigate to the Release Hub by clicking **Optimization** in the main navigation, then selecting **Release Hub** from the sidebar.
+
+*[Image placeholder: Navigation to Release Hub]*
+
+### LLM Node Overview
+
+The Release Hub displays all your LLM nodes with:
+
+**Current Status:**
+- Which prompt is currently marked as production for each node
+- Available optimized prompts ready for selection
+- A/B testing results and confidence levels
+- Performance improvement metrics
+
+**Available Actions:**
+- Compare prompts side-by-side
+- View detailed performance metrics
+- Mark new prompts as production
+- Access selection history
+
+*[Image placeholder: Release Hub main interface showing LLM nodes]*
+
+## Comparing Prompts
+
+### Performance Analysis
+
+For each LLM node, you can compare:
+
+**Quality Metrics:**
+- Current prompt performance scores
+- Optimized prompt performance scores
+- Improvement percentages for each metric
+- Statistical confidence levels
+
+**Business Impact:**
+- Customer satisfaction changes
+- Efficiency improvements
+- Cost implications
+- ROI estimates
+
+**A/B Testing Results:**
+- Sample size and test duration
+- Statistical significance
+- Confidence intervals
+- Recommendation strength
+
+*[Image placeholder: Metrics comparison interface]*
+
+### Text Comparison
+
+**Side-by-Side Analysis:**
+
+**Current vs Optimized:**
+- Full text of current production prompt
+- Full text of optimized prompt candidate
+- Highlighted differences between versions
+- Character and token count changes
+
+**Key Changes:**
+- What was added or removed
+- Structural improvements
+- Tone and style modifications
+- Instruction clarity enhancements
+
+**Impact Analysis:**
+- Why changes improve performance
+- Expected user experience improvements
+- Trade-offs and considerations
+
+*[Image placeholder: Text comparison showing prompt differences]*
+
+## Marking Prompts as Production
+
+### Simple Selection Process
+
+When you're ready to mark an optimized prompt as production:
+
+**Selection Process:**
+1. Review the comparison metrics and text
+2. Click "Mark as Production" on your chosen prompt
+3. Confirm selection in the popup
+4. Prompt becomes the new production version
+
+**What Happens:**
+- Previous prompt is archived (still accessible)
+- New prompt becomes the "production" version
+- Applications can fetch the new prompt via SDK
+- Selection is logged with timestamp and user
+
+*[Image placeholder: Production marking confirmation interface]*
+
+**SDK Integration:**
+Once marked as production, your applications can fetch the new prompt via SDK calls. See the [SDK Integration guide](/optimization/optimization_features/cicd_deployment) for implementation details.
+
+## Next Steps
+
+Ready to start managing your prompts in Release Hub?
+
+- Navigate to **Release Hub** to view your LLM nodes
+- [Compare optimization results](/optimization/optimization_features/ab_testing) from A/B testing
+- Mark your first optimized prompt as production
+- [Learn SDK integration](/optimization/optimization_features/cicd_deployment) to fetch production prompts

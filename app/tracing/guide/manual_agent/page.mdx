@@ -1,0 +1,876 @@
+---
+title: 'Manual Agent Tracing'
+sidebarTitle: 'Manual Agent Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Manual Agent Tracing
+
+> **Maximum control over your AI agent observability.** Manual agent tracing gives you complete control over when and how agent executions are tracked, perfect for complex workflows, custom error handling, and integration with existing monitoring systems.
+
+This approach provides the ultimate flexibility for sophisticated tracing requirements where automatic wrappers don't meet your specific needs.
+
+<Callout type="info">
+  Manual agent tracing provides maximum flexibility but requires more code. Use it when you need custom tracing logic, complex error handling, or integration with existing monitoring systems.
+</Callout>
+
+## How It Works
+
+Manual agent tracing provides comprehensive control through:
+
+- **Complete control** - You decide exactly what gets tracked and when
+- **Custom error handling** - Implement sophisticated error recovery and reporting
+- **Integration friendly** - Works seamlessly with existing monitoring and logging systems
+- **Performance optimization** - Only trace what you need, when you need it
+- **Complex workflows** - Handle multi-step processes with custom logic
+
+## Implementation
+
+### Python: Manual Context Management
+
+<Tabs items={["Async", "Sync"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="manual_async_agent.py"
+from handit import HanditTracker
+import asyncio
+import time
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+async def manual_customer_service_agent(user_message, user_id):
+    """Manually traced customer service agent with custom logic"""
+    
+    agent_start_time = time.time()
+    execution_context = {
+        "user_id": user_id,
+        "start_time": agent_start_time,
+        "steps_completed": [],
+        "errors": []
+    }
+    
+    try:
+        # Step 1: Intent classification with custom tracking
+        intent_start = time.time()
+        intent = await classify_intent(user_message)
+        
+        # Manual tracking of intent classification
+        await tracker._send_tracked_data(
+            model_id="intent-classification",
+            request_body={
+                "user_message": user_message,
+                "user_id": user_id,
+                "timestamp": intent_start
+            },
+            response_body={
+                "intent": intent,
+                "confidence": intent.get("confidence", 0.0),
+                "processing_time": time.time() - intent_start
+            }
+        )
+        
+        execution_context["steps_completed"].append("intent_classification")
+        
+        # Step 2: Knowledge retrieval with conditional tracking
+        if intent["confidence"] > 0.8:
+            knowledge_start = time.time()
+            knowledge = await retrieve_knowledge(user_message, intent["category"])
+            
+            # Only track high-confidence knowledge retrieval
+            await tracker._send_tracked_data(
+                model_id="knowledge-retrieval",
+                request_body={
+                    "query": user_message,
+                    "intent": intent,
+                    "timestamp": knowledge_start
+                },
+                response_body={
+                    "knowledge_found": len(knowledge) > 0,
+                    "knowledge_count": len(knowledge),
+                    "processing_time": time.time() - knowledge_start
+                }
+            )
+            
+            execution_context["steps_completed"].append("knowledge_retrieval")
+        else:
+            # Use fallback for low confidence
+            knowledge = await get_fallback_responses(intent["category"])
+            execution_context["steps_completed"].append("fallback_retrieval")
+        
+        # Step 3: Response generation with detailed tracking
+        response_start = time.time()
+        response = await generate_response(user_message, intent, knowledge)
+        
+        # Track response generation with quality metrics
+        await tracker._send_tracked_data(
+            model_id="response-generation",
+            request_body={
+                "user_message": user_message,
+                "intent": intent,
+                "knowledge_items": len(knowledge),
+                "timestamp": response_start
+            },
+            response_body={
+                "response": response,
+                "response_length": len(response),
+                "processing_time": time.time() - response_start,
+                "quality_score": calculate_response_quality(response)
+            }
+        )
+        
+        execution_context["steps_completed"].append("response_generation")
+        
+        # Final tracking: Complete agent execution
+        total_time = time.time() - agent_start_time
+        await tracker._send_tracked_data(
+            model_id="customer-service-agent-complete",
+            request_body={
+                "user_id": user_id,
+                "user_message": user_message,
+                "execution_context": execution_context
+            },
+            response_body={
+                "response": response,
+                "intent": intent,
+                "total_execution_time": total_time,
+                "steps_completed": execution_context["steps_completed"],
+                "success": True
+            }
+        )
+        
+        return {
+            "response": response,
+            "intent": intent,
+            "execution_time": total_time,
+            "success": True
+        }
+        
+    except Exception as e:
+        # Comprehensive error tracking
+        error_time = time.time()
+        execution_context["errors"].append({
+            "error": str(e),
+            "timestamp": error_time,
+            "step": execution_context["steps_completed"][-1] if execution_context["steps_completed"] else "startup"
+        })
+        
+        # Track the error with full context
+        await tracker._send_tracked_data(
+            model_id="customer-service-agent-error",
+            request_body={
+                "user_id": user_id,
+                "user_message": user_message,
+                "execution_context": execution_context
+            },
+            response_body={
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "execution_time": error_time - agent_start_time,
+                "steps_completed": execution_context["steps_completed"],
+                "success": False
+            }
+        )
+        
+        # Decide on error recovery strategy
+        if "intent" in locals() and intent["category"] == "urgent":
+            # Immediate escalation for urgent issues
+            escalation_response = await escalate_to_human(user_message, str(e))
+            return {
+                "response": escalation_response,
+                "escalated": True,
+                "error": str(e)
+            }
+        else:
+            # Graceful fallback
+            fallback_response = "I apologize, but I'm having trouble processing your request. Please try again."
+            return {
+                "response": fallback_response,
+                "fallback": True,
+                "error": str(e)
+            }
+
+# Helper functions
+async def classify_intent(message):
+    # Your intent classification logic
+    return {"category": "support", "confidence": 0.9}
+
+async def retrieve_knowledge(message, category):
+    # Your knowledge retrieval logic
+    return ["knowledge_item_1", "knowledge_item_2"]
+
+async def generate_response(message, intent, knowledge):
+    # Your response generation logic
+    return "Generated response based on intent and knowledge"
+
+def calculate_response_quality(response):
+    # Your quality scoring logic
+    return 0.85
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python filename="manual_sync_agent.py"
+from handit import HanditTracker
+import time
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+def manual_data_processing_agent(dataset_path, processing_options):
+    """Manually traced data processing agent with detailed monitoring"""
+    
+    agent_start_time = time.time()
+    processing_stats = {
+        "total_records": 0,
+        "processed_records": 0,
+        "failed_records": 0,
+        "processing_stages": []
+    }
+    
+    try:
+        # Step 1: Data loading with validation
+        load_start = time.time()
+        data = load_dataset(dataset_path)
+        processing_stats["total_records"] = len(data)
+        
+        # Track data loading
+        tracker._send_tracked_data_sync(
+            model_id="data-loading",
+            request_body={
+                "dataset_path": dataset_path,
+                "processing_options": processing_options,
+                "timestamp": load_start
+            },
+            response_body={
+                "records_loaded": len(data),
+                "loading_time": time.time() - load_start,
+                "data_quality": validate_data_quality(data)
+            }
+        )
+        
+        processing_stats["processing_stages"].append("data_loading")
+        
+        # Step 2: Data cleaning with progress tracking
+        clean_start = time.time()
+        cleaned_data = []
+        failed_records = []
+        
+        for i, record in enumerate(data):
+            try:
+                cleaned_record = clean_record(record)
+                cleaned_data.append(cleaned_record)
+                processing_stats["processed_records"] += 1
+            except Exception as e:
+                failed_records.append({"record_id": i, "error": str(e)})
+                processing_stats["failed_records"] += 1
+            
+            # Track progress every 1000 records
+            if (i + 1) % 1000 == 0:
+                tracker._send_tracked_data_sync(
+                    model_id="data-cleaning-progress",
+                    request_body={
+                        "progress": (i + 1) / len(data),
+                        "processed_count": i + 1
+                    },
+                    response_body={
+                        "success_rate": processing_stats["processed_records"] / (i + 1),
+                        "current_batch": i // 1000 + 1
+                    }
+                )
+        
+        # Track cleaning completion
+        tracker._send_tracked_data_sync(
+            model_id="data-cleaning-complete",
+            request_body={
+                "total_records": len(data),
+                "processing_options": processing_options
+            },
+            response_body={
+                "cleaned_records": len(cleaned_data),
+                "failed_records": len(failed_records),
+                "cleaning_time": time.time() - clean_start,
+                "success_rate": len(cleaned_data) / len(data)
+            }
+        )
+        
+        processing_stats["processing_stages"].append("data_cleaning")
+        
+        # Step 3: Analysis with quality gates
+        analysis_start = time.time()
+        
+        # Quality gate: Minimum success rate
+        success_rate = len(cleaned_data) / len(data)
+        if success_rate < 0.8:
+            raise ValueError(f"Data quality too low: {success_rate:.2%} success rate")
+        
+        analysis_result = analyze_cleaned_data(cleaned_data)
+        
+        # Track analysis
+        tracker._send_tracked_data_sync(
+            model_id="data-analysis",
+            request_body={
+                "record_count": len(cleaned_data),
+                "analysis_type": processing_options.get("analysis_type", "default")
+            },
+            response_body={
+                "analysis_result": analysis_result,
+                "analysis_time": time.time() - analysis_start,
+                "quality_passed": True
+            }
+        )
+        
+        processing_stats["processing_stages"].append("data_analysis")
+        
+        # Final tracking: Complete agent execution
+        total_time = time.time() - agent_start_time
+        tracker._send_tracked_data_sync(
+            model_id="data-processing-agent-complete",
+            request_body={
+                "dataset_path": dataset_path,
+                "processing_options": processing_options,
+                "processing_stats": processing_stats
+            },
+            response_body={
+                "analysis_result": analysis_result,
+                "total_execution_time": total_time,
+                "processing_stats": processing_stats,
+                "success": True
+            }
+        )
+        
+        return {
+            "analysis": analysis_result,
+            "stats": processing_stats,
+            "execution_time": total_time,
+            "success": True
+        }
+        
+    except Exception as e:
+        # Comprehensive error tracking
+        error_time = time.time()
+        
+        tracker._send_tracked_data_sync(
+            model_id="data-processing-agent-error",
+            request_body={
+                "dataset_path": dataset_path,
+                "processing_options": processing_options,
+                "processing_stats": processing_stats
+            },
+            response_body={
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "execution_time": error_time - agent_start_time,
+                "processing_stages": processing_stats["processing_stages"],
+                "success": False
+            }
+        )
+        
+        raise e
+
+# Helper functions
+def load_dataset(path):
+    # Your data loading logic
+    return [{"id": i, "data": f"record_{i}"} for i in range(5000)]
+
+def validate_data_quality(data):
+    # Your data quality validation
+    return {"quality_score": 0.92, "issues": []}
+
+def clean_record(record):
+    # Your record cleaning logic
+    if record["id"] % 100 == 0:  # Simulate 1% failure rate
+        raise ValueError("Corrupted record")
+    return {"id": record["id"], "cleaned_data": record["data"].upper()}
+
+def analyze_cleaned_data(data):
+    # Your analysis logic
+    return {"total_records": len(data), "analysis": "completed"}
+```
+</Tabs.Tab>
+</Tabs>
+
+### JavaScript: Manual Control Flow
+
+```javascript filename="manual_agent.js"
+const { config, captureAgentNode, endAgentTracing } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+async function manualEcommerceAgent(userId, actionType, payload) {
+    const agentStartTime = Date.now();
+    const executionContext = {
+        userId,
+        actionType,
+        startTime: agentStartTime,
+        stepsCompleted: [],
+        errors: [],
+        externalId: `ecommerce-${userId}-${Date.now()}`
+    };
+    
+    try {
+        // Step 1: User authentication and validation
+        const authStart = Date.now();
+        const userAuth = await authenticateUser(userId);
+        
+        // Manual tracking of authentication
+        await captureAgentNode({
+            agentNodeSlug: 'user-authentication',
+            externalId: executionContext.externalId,
+            requestBody: {
+                userId,
+                actionType,
+                timestamp: authStart
+            },
+            responseBody: {
+                authenticated: userAuth.success,
+                userTier: userAuth.tier,
+                processingTime: Date.now() - authStart
+            }
+        });
+        
+        executionContext.stepsCompleted.push('authentication');
+        
+        // Step 2: Action-specific processing with conditional logic
+        let actionResult;
+        
+        if (actionType === 'purchase') {
+            actionResult = await processPurchase(payload, userAuth, executionContext);
+        } else if (actionType === 'recommendation') {
+            actionResult = await processRecommendation(payload, userAuth, executionContext);
+        } else if (actionType === 'support') {
+            actionResult = await processSupport(payload, userAuth, executionContext);
+        } else {
+            throw new Error(`Unknown action type: ${actionType}`);
+        }
+        
+        // Step 3: Final result processing
+        const finalStart = Date.now();
+        const finalResult = await finalizeResult(actionResult, userAuth);
+        
+        // Track final processing
+        await captureAgentNode({
+            agentNodeSlug: 'result-finalization',
+            externalId: executionContext.externalId,
+            requestBody: {
+                actionResult,
+                userTier: userAuth.tier
+            },
+            responseBody: {
+                finalResult,
+                processingTime: Date.now() - finalStart
+            }
+        });
+        
+        executionContext.stepsCompleted.push('finalization');
+        
+        // Complete agent execution tracking
+        const totalTime = Date.now() - agentStartTime;
+        await captureAgentNode({
+            agentNodeSlug: 'ecommerce-agent-complete',
+            externalId: executionContext.externalId,
+            requestBody: {
+                userId,
+                actionType,
+                executionContext
+            },
+            responseBody: {
+                result: finalResult,
+                totalExecutionTime: totalTime,
+                stepsCompleted: executionContext.stepsCompleted,
+                success: true
+            }
+        });
+        
+        // End the agent tracing session
+        await endAgentTracing({ externalId: executionContext.externalId });
+        
+        return {
+            result: finalResult,
+            executionTime: totalTime,
+            success: true,
+            externalId: executionContext.externalId
+        };
+        
+    } catch (error) {
+        // Comprehensive error handling and tracking
+        const errorTime = Date.now();
+        executionContext.errors.push({
+            error: error.message,
+            timestamp: errorTime,
+            step: executionContext.stepsCompleted[executionContext.stepsCompleted.length - 1] || 'startup'
+        });
+        
+        // Track the error with full context
+        await captureAgentNode({
+            agentNodeSlug: 'ecommerce-agent-error',
+            externalId: executionContext.externalId,
+            requestBody: {
+                userId,
+                actionType,
+                executionContext
+            },
+            responseBody: {
+                error: error.message,
+                errorType: error.constructor.name,
+                executionTime: errorTime - agentStartTime,
+                stepsCompleted: executionContext.stepsCompleted,
+                success: false
+            },
+            error: true
+        });
+        
+        // End the agent tracing session with error
+        await endAgentTracing({ externalId: executionContext.externalId });
+        
+        // Custom error recovery based on context
+        if (actionType === 'purchase' && executionContext.stepsCompleted.includes('authentication')) {
+            // Save purchase attempt for later retry
+            await savePurchaseAttempt(userId, payload, error.message);
+            return {
+                result: { saved: true, retryable: true },
+                error: error.message,
+                externalId: executionContext.externalId
+            };
+        } else {
+            // Return graceful error response
+            return {
+                result: { success: false, message: 'Operation failed' },
+                error: error.message,
+                externalId: executionContext.externalId
+            };
+        }
+    }
+}
+
+// Helper functions for different action types
+async function processPurchase(payload, userAuth, context) {
+    const purchaseStart = Date.now();
+    
+    try {
+        // Validate purchase data
+        const validation = await validatePurchaseData(payload);
+        
+        // Track validation
+        await captureAgentNode({
+            agentNodeSlug: 'purchase-validation',
+            externalId: context.externalId,
+            requestBody: { purchaseData: payload },
+            responseBody: { 
+                valid: validation.valid, 
+                issues: validation.issues 
+            }
+        });
+        
+        if (!validation.valid) {
+            throw new Error(`Purchase validation failed: ${validation.issues.join(', ')}`);
+        }
+        
+        // Process payment
+        const payment = await processPayment(payload.paymentInfo, payload.amount);
+        
+        // Track payment
+        await captureAgentNode({
+            agentNodeSlug: 'payment-processing',
+            externalId: context.externalId,
+            requestBody: { 
+                amount: payload.amount, 
+                paymentMethod: payload.paymentInfo.method 
+            },
+            responseBody: { 
+                transactionId: payment.transactionId, 
+                success: payment.success 
+            }
+        });
+        
+        context.stepsCompleted.push('purchase_processing');
+        
+        return {
+            transactionId: payment.transactionId,
+            amount: payload.amount,
+            processingTime: Date.now() - purchaseStart
+        };
+        
+    } catch (error) {
+        // Track purchase-specific error
+        await captureAgentNode({
+            agentNodeSlug: 'purchase-error',
+            externalId: context.externalId,
+            requestBody: { purchaseData: payload },
+            responseBody: { error: error.message },
+            error: true
+        });
+        throw error;
+    }
+}
+
+async function processRecommendation(payload, userAuth, context) {
+    const recStart = Date.now();
+    
+    // Get user preferences
+    const preferences = await getUserPreferences(context.userId);
+    
+    // Track preference retrieval
+    await captureAgentNode({
+        agentNodeSlug: 'preference-retrieval',
+        externalId: context.externalId,
+        requestBody: { userId: context.userId },
+        responseBody: { 
+            preferencesFound: preferences.length > 0,
+            preferenceCount: preferences.length 
+        }
+    });
+    
+    // Generate recommendations
+    const recommendations = await generateRecommendations(preferences, payload.category);
+    
+    // Track recommendation generation
+    await captureAgentNode({
+        agentNodeSlug: 'recommendation-generation',
+        externalId: context.externalId,
+        requestBody: { 
+            preferences, 
+            category: payload.category,
+            userTier: userAuth.tier 
+        },
+        responseBody: { 
+            recommendationCount: recommendations.length,
+            processingTime: Date.now() - recStart 
+        }
+    });
+    
+    context.stepsCompleted.push('recommendation_processing');
+    
+    return {
+        recommendations,
+        category: payload.category,
+        processingTime: Date.now() - recStart
+    };
+}
+
+// Additional helper functions
+async function authenticateUser(userId) {
+    // Your authentication logic
+    return { success: true, tier: 'premium' };
+}
+
+async function validatePurchaseData(payload) {
+    // Your validation logic
+    return { valid: true, issues: [] };
+}
+
+async function processPayment(paymentInfo, amount) {
+    // Your payment processing logic
+    return { transactionId: 'txn_12345', success: true };
+}
+```
+
+## Advanced Patterns
+
+### Multi-Agent Orchestration
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="multi_agent_orchestration.py"
+from handit import HanditTracker
+import asyncio
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+async def orchestrate_multi_agent_workflow(task_request):
+    """Orchestrate multiple specialized agents with manual coordination tracking"""
+    
+    orchestration_id = f"orchestration-{int(time.time())}"
+    workflow_start = time.time()
+    
+    # Track orchestration start
+    await tracker._send_tracked_data(
+        model_id="multi-agent-orchestration-start",
+        request_body={
+            "task_request": task_request,
+            "orchestration_id": orchestration_id,
+            "timestamp": workflow_start
+        },
+        response_body={"status": "started", "agents_planned": 3}
+    )
+    
+    try:
+        # Agent 1: Analysis Agent
+        analysis_result = await run_analysis_agent(task_request, orchestration_id)
+        
+        # Agent 2: Processing Agent (depends on analysis)
+        processing_result = await run_processing_agent(
+            analysis_result, 
+            task_request, 
+            orchestration_id
+        )
+        
+        # Agent 3: Synthesis Agent (depends on both)
+        final_result = await run_synthesis_agent(
+            analysis_result, 
+            processing_result, 
+            orchestration_id
+        )
+        
+        # Track successful orchestration
+        total_time = time.time() - workflow_start
+        await tracker._send_tracked_data(
+            model_id="multi-agent-orchestration-complete",
+            request_body={
+                "orchestration_id": orchestration_id,
+                "task_request": task_request
+            },
+            response_body={
+                "final_result": final_result,
+                "total_execution_time": total_time,
+                "agents_completed": 3,
+                "success": True
+            }
+        )
+        
+        return final_result
+        
+    except Exception as e:
+        # Track orchestration failure
+        await tracker._send_tracked_data(
+            model_id="multi-agent-orchestration-error",
+            request_body={"orchestration_id": orchestration_id},
+            response_body={"error": str(e), "success": False}
+        )
+        raise
+
+async def run_analysis_agent(task_request, orchestration_id):
+    """Run analysis agent with orchestration context"""
+    agent_start = time.time()
+    
+    # Agent-specific processing
+    analysis = await perform_analysis(task_request)
+    
+    # Track with orchestration context
+    await tracker._send_tracked_data(
+        model_id="analysis-agent",
+        request_body={
+            "task_request": task_request,
+            "orchestration_id": orchestration_id,
+            "agent_role": "analysis"
+        },
+        response_body={
+            "analysis_result": analysis,
+            "execution_time": time.time() - agent_start,
+            "orchestration_id": orchestration_id
+        }
+    )
+    
+    return analysis
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="multi_agent_orchestration.js"
+const { config, captureAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+async function orchestrateMultiAgentWorkflow(taskRequest) {
+    const orchestrationId = `orchestration-${Date.now()}`;
+    const workflowStart = Date.now();
+    
+    // Track orchestration start
+    await captureAgentNode({
+        agentNodeSlug: 'multi-agent-orchestration-start',
+        externalId: orchestrationId,
+        requestBody: {
+            taskRequest,
+            orchestrationId,
+            timestamp: workflowStart
+        },
+        responseBody: { status: 'started', agentsPlanned: 3 }
+    });
+    
+    try {
+        // Agent 1: Analysis Agent
+        const analysisResult = await runAnalysisAgent(taskRequest, orchestrationId);
+        
+        // Agent 2: Processing Agent (depends on analysis)
+        const processingResult = await runProcessingAgent(
+            analysisResult,
+            taskRequest,
+            orchestrationId
+        );
+        
+        // Agent 3: Synthesis Agent (depends on both)
+        const finalResult = await runSynthesisAgent(
+            analysisResult,
+            processingResult,
+            orchestrationId
+        );
+        
+        // Track successful orchestration
+        const totalTime = Date.now() - workflowStart;
+        await captureAgentNode({
+            agentNodeSlug: 'multi-agent-orchestration-complete',
+            externalId: orchestrationId,
+            requestBody: {
+                orchestrationId,
+                taskRequest
+            },
+            responseBody: {
+                finalResult,
+                totalExecutionTime: totalTime,
+                agentsCompleted: 3,
+                success: true
+            }
+        });
+        
+        return finalResult;
+        
+    } catch (error) {
+        // Track orchestration failure
+        await captureAgentNode({
+            agentNodeSlug: 'multi-agent-orchestration-error',
+            externalId: orchestrationId,
+            requestBody: { orchestrationId },
+            responseBody: { error: error.message, success: false },
+            error: true
+        });
+        throw error;
+    }
+}
+```
+</Tabs.Tab>
+</Tabs>
+
+## Best Practices
+
+**When to Use Manual Tracing:**
+
+| **Use Case** | **Why Manual Tracing** |
+|--------------|------------------------|
+| **Complex error recovery** | Custom error handling logic and recovery strategies |
+| **Multi-step workflows** | Dependencies between steps require custom coordination |
+| **Existing monitoring integration** | Need to integrate with current logging and monitoring systems |
+| **Performance optimization** | Selective tracing based on conditions and requirements |
+| **Business-specific tracking** | Custom metrics and tracking requirements unique to your domain |
+
+**Implementation Guidelines:**
+
+1. **Use consistent external IDs** - Ensure proper correlation across all trace points
+2. **Track both success and failure paths** - Comprehensive coverage of all execution scenarios
+3. **Include relevant context** - Provide meaningful data in all traces for debugging
+4. **Implement proper error handling** - Handle tracing failures gracefully without affecting business logic
+5. **Consider performance impact** - Balance tracing detail with system performance requirements
+
+<Callout type="warning">
+  Manual tracing requires careful error handling and context management. Make sure to properly end tracing sessions and handle all failure scenarios.
+</Callout>
+
+<Callout type="success">
+  Manual agent tracing gives you the power to implement sophisticated monitoring and optimization strategies tailored to your specific use cases.
+</Callout>
+
+## Next Steps
+
+- Explore [Agent Wrapper/Decorator](/tracing/guide/agent_wrapper) for automatic tracing
+- Learn about [Node Wrapper/Decorator](/tracing/guide/node_wrapper) for function-level control
+- Check [Node Function Tracing](/tracing/guide/node_function) for flexible tracking patterns 

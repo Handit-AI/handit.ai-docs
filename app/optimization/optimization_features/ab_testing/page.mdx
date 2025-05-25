@@ -1,0 +1,138 @@
+---
+title: 'A/B Testing'
+sidebarTitle: 'A/B Testing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+
+# Background A/B Testing
+
+Handit.ai automatically tests optimizations against your current prompt using a small portion of your data in the background. This approach is cost-efficient, completely secure for users, and provides clear metrics for comparison in the Release Hub.
+
+<Callout type="info">
+  A/B testing happens invisibly in the background using only a representative sample of your data. Users always get responses from your current prompt while we test optimizations on a subset and compare evaluation results.
+</Callout>
+
+## How It Works
+
+Our background A/B testing process is simple and efficient:
+
+<Steps>
+### Sample Selection
+We select a small, representative portion of your production queries for testing
+
+### Background Processing
+Both your current prompt and the optimization process the same sample inputs in parallel
+
+### Evaluation Comparison
+Our evaluators score both responses, providing direct quality metrics
+
+### Release Hub Results
+Statistical comparisons appear in Release Hub for your review and deployment decisions
+</Steps>
+
+*[Image placeholder: Background A/B testing workflow]*
+
+## Cost-Efficient Testing
+
+**Smart Sampling Approach:**
+
+Instead of testing on all your data, we use a strategic sampling method:
+
+- **Sample Size:** Only 10-15% of your production queries
+- **Representative Data:** Automatically selected to match your traffic patterns  
+- **Cost Impact:** Minimal increase in evaluation costs
+- **Statistical Validity:** Sufficient sample size for reliable results
+
+**Example Testing Volume:**
+
+If you process 1,000 queries daily:
+- **Production queries:** 1,000 (normal processing, users get current prompt responses)
+- **Background testing:** 150 queries (15% sample for A/B testing)
+- **Additional cost:** ~15% evaluation increase
+- **User impact:** Zero (completely invisible)
+
+*[Image placeholder: Cost-efficient sampling visualization]*
+
+## User Security & Zero Impact
+
+**Complete User Protection:**
+
+Your users are never exposed to experimental prompts:
+
+- **User Experience:** Always receives responses from your current production prompt
+- **No Delays:** Background testing runs in parallel, no performance impact
+- **No Risk:** Experimental responses are only used for evaluation, never sent to users
+- **Privacy:** Same data handling as your normal operations
+
+**Background Testing Flow:**
+
+When a user submits a query:
+1. **User gets:** Response from current production prompt (immediately)
+2. **Background:** Same query processed by optimization (for evaluation only)
+3. **Evaluation:** Both responses scored by evaluators
+4. **Results:** Metrics stored for Release Hub comparison
+
+*[Image placeholder: User security and background flow]*
+
+## Release Hub Metrics
+
+**Clear Performance Comparison:**
+
+Background A/B testing provides the metrics you see in Release Hub:
+
+**Example Comparison Results:**
+
+**Customer Support Optimization - Empathy Enhancement**
+
+**Current Prompt Performance:**
+- Empathy Score: 3.2 out of 5 average
+- Helpfulness Score: 4.1 out of 5 average  
+- Overall Quality: 3.8 out of 5 average
+
+**Optimized Prompt Performance:**
+- Empathy Score: 4.4 out of 5 average (+37% improvement)
+- Helpfulness Score: 4.3 out of 5 average (+5% improvement)
+- Overall Quality: 4.2 out of 5 average (+11% improvement)
+
+**Statistical Confidence:** 95% (based on 287 background evaluations)
+
+**Release Hub Recommendation:** ✅ Ready for deployment
+
+*[Image placeholder: Release Hub metrics comparison]*
+
+## Automatic Process
+
+**No Setup Required:**
+
+Background A/B testing starts automatically when optimizations are generated:
+
+- **Trigger:** Self-improving AI creates new optimization
+- **Testing:** Background A/B test begins automatically  
+- **Duration:** Runs until statistical significance achieved (typically 3-7 days)
+- **Results:** Appear in Release Hub when ready
+- **Decision:** You choose when to deploy based on proven results
+
+**Testing Status:**
+
+You can monitor progress in your dashboard:
+- Sample collection progress
+- Current confidence levels
+- Preliminary results
+- Estimated completion time
+
+*[Image placeholder: Testing progress dashboard]*
+
+## Next Steps
+
+Ready to see background A/B testing in action?
+
+- [Enable self-improving AI](/optimization/quickstart) to automatically generate optimizations that are tested
+- Monitor background testing progress in your platform dashboard  
+- [Review results in Release Hub](/optimization/guide/release_hub) when statistical significance is achieved
+- Deploy proven optimizations with confidence
+
+<Callout type="success">
+  **Background A/B testing is automatic.** When you enable optimization, the system automatically tests improvements using cost-efficient sampling while keeping your users completely protected.
+</Callout>

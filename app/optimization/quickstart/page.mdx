@@ -1,0 +1,229 @@
+---
+title: 'Optimization Quickstart'
+sidebarTitle: 'Quickstart'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+
+# Optimization Quickstart
+
+Transform your AI from static to self-improving in under 15 minutes. This guide shows you how to set up automated optimization, A/B testing, and CI/CD deployment using the Handit.ai platform.
+
+<Callout type="info">
+  **Prerequisites**: You need active Handit.ai evaluation running on your LLM nodes. If you haven't set up evaluation yet, start with our [Evaluation Quickstart](/evaluation/quickstart).
+</Callout>
+
+## Overview
+
+Here's what we'll accomplish using the Handit.ai platform:
+
+<Steps>
+### Connect Optimization Models
+Add AI models that will analyze problems and generate improved prompts - this automatically enables self-improving AI
+
+### Monitor Optimization Results
+View performance comparisons between current and optimized prompts in Agent Performance and Release Hub
+
+### Deploy Optimizations
+Mark winning prompts as production in Release Hub and fetch them via SDK for use in your applications
+</Steps>
+
+<Callout type="success">
+  **The Result**: Your AI will automatically detect quality issues, generate better prompts, test them in the background, and provide you with proven improvements ready for deployment.
+</Callout>
+
+## Step 1: Connect Optimization Models
+
+Connect the AI models that will analyze your evaluation data and generate optimized prompts.
+
+**1. Navigate to Optimization Settings**
+- Go to your Handit.ai dashboard
+- Click **Optimization** → **Settings** → **Model Tokens**
+- Click **Add Optimization Token** or select an existing token
+
+*[Image placeholder: Optimization settings page with token selection interface]*
+
+**2. Configure Your Optimization Model**
+
+Select or configure your optimization model:
+
+*[Image placeholder: Optimization token configuration form]*
+
+**3. Save Configuration**
+- Save the optimization token configuration
+- Self-improving AI automatically activates
+
+<Callout type="tip">
+  **Automatic Activation**: Once optimization tokens are configured, self-improving AI automatically begins analyzing your evaluation data and generating optimizations. No additional setup required!
+</Callout>
+
+## Step 2: Monitor Optimization Results
+
+Your AI is now automatically generating and testing improved prompts. Monitor the results in two places:
+
+**1. Agent Performance Dashboard**
+- Go to **Agent Performance** 
+- View how your agents and LLM nodes are performing
+- Compare current vs optimized versions
+
+*[Image placeholder: Agent Performance dashboard showing optimization results]*
+
+**Example Metrics:**
+```
+Customer Support Agent
+
+LLM Node: Response Generator
+├── Current Version: 4.2/5.0 overall quality
+├── Optimized Version: 4.6/5.0 overall quality
+└── Improvement: +9.5% quality increase
+
+Recent Optimizations:
+✅ Empathy Enhancement: +15% empathy score
+✅ Technical Clarity: +12% accuracy score  
+🔄 Response Completeness: Currently testing
+```
+
+**2. Release Hub Analysis**
+- Go to **Optimization** → **Release Hub**
+- View detailed metrics for each prompt per LLM node
+- See performance comparisons and deployment recommendations
+
+*[Image placeholder: Release Hub showing prompt metrics per LLM node]*
+
+**Example Release Hub View:**
+```
+Customer Support LLM - Prompt Performance
+
+Current Production Prompt:
+- Overall Quality: 4.2/5.0
+- Empathy: 4.0/5.0
+- Accuracy: 4.3/5.0
+
+Optimized Prompt v1.2:
+- Overall Quality: 4.6/5.0 (+9.5% improvement)
+- Empathy: 4.7/5.0 (+17.5% improvement)
+- Accuracy: 4.5/5.0 (+4.7% improvement)
+
+Statistical Confidence: 95%
+Recommendation: Ready for production
+```
+
+*[Image placeholder: Detailed prompt comparison in Release Hub]*
+
+## Step 3: Deploy Optimizations
+
+Select winning optimizations in the Release Hub and integrate them into your applications via SDK.
+
+**1. Navigate to Release Hub**
+- Go to **Optimization** → **Release Hub**
+- View recommended optimizations for each LLM node
+
+*[Image placeholder: Release Hub main interface showing recommended optimizations]*
+
+**2. Compare and Select**
+```
+Recommended for Production:
+
+✅ Empathy Enhancement v1.2
+Performance: +15% empathy, +7% overall quality
+Status: Recommended for production
+
+✅ Technical Accuracy v2.1  
+Performance: +12% accuracy, +5% overall quality
+Status: Ready for production
+```
+
+**3. Mark as Production**
+- Select the optimization you want to use
+- Click **Mark as Production**
+- Prompt becomes immediately available via SDK
+
+*[Image placeholder: Marking prompt as production in Release Hub]*
+
+**4. Fetch via SDK**
+
+Once marked as production, fetch optimized prompts directly in your application:
+
+**Python SDK:**
+```python
+from handit import HanditTracker
+
+# Initialize with your project
+tracker = HanditTracker(api_key="your-api-key")
+
+# Fetch the current production prompt
+optimized_prompt = tracker.fetch_optimized_prompt(model_id="customer-support-llm")
+
+# Use in your own LLM calls
+response = your_llm_client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": optimized_prompt},
+        {"role": "user", "content": user_query}
+    ]
+)
+```
+
+**JavaScript SDK:**
+```javascript
+import { HanditClient } from '@handit/sdk';
+
+// Initialize client
+const handit = new HanditClient({ apiKey: 'your-api-key' });
+
+// Fetch current production prompt
+const optimizedPrompt = await handit.fetchOptimizedPrompt({ 
+  modelId: 'customer-support-llm' 
+});
+
+// Use in your own LLM calls
+const response = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: optimizedPrompt },
+    { role: 'user', content: userQuery }
+  ]
+});
+```
+
+*[Image placeholder: Code examples showing SDK integration]*
+
+**5. Monitor Performance**
+- Track the performance of deployed prompts in Agent Performance
+- Monitor for any issues in your applications
+- Continue the optimization cycle
+
+*[Image placeholder: Prompt performance monitoring in Agent Performance dashboard]*
+
+## Next Steps
+
+Ready to explore more optimization features?
+
+- Learn about [Background A/B Testing](/optimization/optimization_features/ab_testing) methodology
+- Explore [Release Hub & Prompt Selection](/optimization/guide/release_hub) for advanced deployment
+- Understand [Self-Improving AI](/optimization/optimization_features/self_improving_ai) capabilities
+
+<Callout type="success">
+  **Congratulations!** You now have a self-improving AI system that automatically detects issues, generates solutions, tests improvements, and provides you with proven optimizations.
+</Callout>
+
+
+## Troubleshooting
+
+**Optimizations Not Generating?**
+- Check that evaluation data shows quality issues (scores below threshold)
+- Verify optimization model token is valid and has credits
+- Ensure evaluation has been running long enough to collect data
+- Confirm optimization is enabled for the correct LLM nodes
+
+**A/B Tests Not Running?**
+- Verify sufficient traffic on the LLM node for statistical significance
+- Check that optimization model can access evaluation data
+- Ensure A/B testing is enabled in optimization settings
+- Confirm test traffic percentage is appropriate for your volume
+
+**Need Help?**
+- Check our [detailed optimization guides](/optimization/guide/optimization_tokens)
+- Visit [Support](/support) for assistance
+- Join our [Discord community](https://discord.gg/handit-ai) 

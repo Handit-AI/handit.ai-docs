@@ -1,0 +1,328 @@
+---
+title: 'LLM Node Tracing'
+sidebarTitle: 'LLM Node Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+import { Cards } from "nextra/components"
+
+# LLM Node Tracing
+
+> **Monitor every AI decision your agent makes.** LLM Node Tracing captures every interaction with your language models, providing detailed insights into prompts, responses, performance, and token usage for complete AI observability.
+
+Perfect for tracking GPT, Claude, and custom LLM calls while optimizing prompts, monitoring costs, and analyzing model performance in production.
+
+<Callout type="info">
+  LLM Node Tracing is essential for understanding how your AI models behave, optimizing prompts for better results, and controlling costs in production environments.
+</Callout>
+
+## What Gets Tracked
+
+Every LLM interaction is captured with complete context:
+
+| **Data Type** | **What's Captured** | **Why It Matters** |
+|---------------|-------------------|-------------------|
+| **🔤 Prompts & Responses** | Complete input prompts and model outputs | Debug issues, optimize prompts, validate behavior |
+| **⚙️ Model Parameters** | Temperature, max tokens, model version | Track configuration changes and their impact |
+| **⏱️ Performance** | Response times and latency metrics | Identify slow operations and bottlenecks |
+| **❌ Errors** | Failed requests, timeouts, and retry attempts | Quickly diagnose and fix model issues |
+
+## Implementation Methods
+
+### Model Wrapper Approach
+
+Automatically track all interactions with a specific model instance:
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="llm_tracking.py"
+from handit import HanditTracker
+from langchain.chat_models import ChatOpenAI
+
+# Initialize tracker
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Create your LLM model
+model = ChatOpenAI(
+    model="gpt-4",
+    temperature=0.7,
+    max_tokens=150
+)
+
+# Track the model
+tracked_model = tracker.track_model(model, model_id="gpt-4-chat")
+
+# Use the tracked model (automatically captures input/output)
+response = await tracked_model.agenerate([["Hello, how are you?"]])
+print(response)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="llm_tracking.js"
+const { config, captureModel } = require('handit-sdk');
+
+// Configure the tracker
+config({ apiKey: 'your-api-key' });
+
+// Your LLM call function
+async function callOpenAI(prompt) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7
+    })
+  });
+  
+  return await response.json();
+}
+
+// Track the LLM interaction manually
+async function trackedLLMCall(prompt) {
+  const requestBody = {
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7
+  };
+  
+  const response = await callOpenAI(prompt);
+  
+  // Capture the model interaction
+  await captureModel({
+    modelId: 'gpt-4-chat',
+    requestBody: requestBody,
+    responseBody: response
+  });
+  
+  return response;
+}
+```
+</Tabs.Tab>
+</Tabs>
+
+### Node Decorator Approach
+
+Track specific functions that contain LLM interactions:
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="llm_decorator.py"
+from handit import HanditTracker
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+@tracker.trace_agent_node("llm-processing")
+async def process_with_llm(user_input):
+    # Your LLM processing logic
+    model_response = await some_llm_call(user_input)
+    processed_result = format_response(model_response)
+    return processed_result
+
+# Usage - automatically tracked
+result = await process_with_llm("What is machine learning?")
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="llm_decorator.js"
+const { traceAgentNode } = require('handit-sdk');
+
+// Define your LLM processing function
+async function processWithLLM(userInput) {
+  // Your LLM processing logic
+  const modelResponse = await someLLMCall(userInput);
+  const processedResult = formatResponse(modelResponse);
+  return processedResult;
+}
+
+// Wrap with tracing
+const trackedLLMProcessor = traceAgentNode({
+  agentNodeId: 'llm-processing',
+  callback: processWithLLM
+});
+
+// Usage - automatically tracked
+const result = await trackedLLMProcessor("What is machine learning?");
+```
+</Tabs.Tab>
+</Tabs>
+
+## Complete Example: Customer Service Bot
+
+Here's a comprehensive example showing LLM node tracing in a multi-step customer service workflow:
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="customer_service_bot.py"
+from handit import HanditTracker
+from langchain.chat_models import ChatOpenAI
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Track the main LLM model
+chat_model = ChatOpenAI(model="gpt-4")
+tracked_chat_model = tracker.track_model(chat_model, model_id="customer-service-llm")
+
+@tracker.trace_agent_node("intent-classification")
+async def classify_intent(user_message):
+    """Classify user intent using LLM"""
+    classification_prompt = f"""
+    Classify the following customer message into one of these categories:
+    - support_request
+    - billing_inquiry  
+    - product_question
+    - complaint
+    
+    Message: {user_message}
+    """
+    
+    response = await tracked_chat_model.agenerate([classification_prompt])
+    return response.content.strip()
+
+@tracker.trace_agent_node("response-generation")
+async def generate_response(user_message, intent):
+    """Generate appropriate response based on intent"""
+    response_prompt = f"""
+    User intent: {intent}
+    User message: {user_message}
+    
+    Generate a helpful customer service response:
+    """
+    
+    response = await tracked_chat_model.agenerate([response_prompt])
+    return response.content
+
+# Main customer service function
+@tracker.start_agent_tracing()
+async def handle_customer_inquiry(user_message):
+    intent = await classify_intent(user_message)
+    response = await generate_response(user_message, intent)
+    return {
+        "intent": intent,
+        "response": response
+    }
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="customer_service_bot.js"
+const { config, startAgentTracing, traceAgentNode, captureModel } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// LLM call function
+async function callLLM(prompt) {
+  const requestBody = {
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3
+  };
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestBody)
+  });
+  
+  const result = await response.json();
+  
+  // Track the LLM interaction
+  await captureModel({
+    modelId: 'customer-service-llm',
+    requestBody: requestBody,
+    responseBody: result
+  });
+  
+  return result;
+}
+
+// Intent classification with tracing
+const classifyIntent = traceAgentNode({
+  agentNodeId: 'intent-classification',
+  callback: async (userMessage) => {
+    const prompt = `
+    Classify the following customer message into one of these categories:
+    - support_request
+    - billing_inquiry  
+    - product_question
+    - complaint
+    
+    Message: ${userMessage}
+    `;
+    
+    const response = await callLLM(prompt);
+    return response.choices[0].message.content.trim();
+  }
+});
+
+// Response generation with tracing
+const generateResponse = traceAgentNode({
+  agentNodeId: 'response-generation',
+  callback: async (userMessage, intent) => {
+    const prompt = `
+    User intent: ${intent}
+    User message: ${userMessage}
+    
+    Generate a helpful customer service response:
+    `;
+    
+    const response = await callLLM(prompt);
+    return response.choices[0].message.content;
+  }
+});
+
+// Main customer service function
+const handleCustomerInquiry = startAgentTracing(async (userMessage) => {
+  const intent = await classifyIntent(userMessage);
+  const response = await generateResponse(userMessage, intent);
+  
+  return {
+    intent: intent,
+    response: response
+  };
+});
+```
+</Tabs.Tab>
+</Tabs>
+
+## Dashboard Analytics
+
+LLM Node Tracing provides comprehensive insights through your Handit.ai dashboard:
+
+### Performance Monitoring
+- **Response times** - Track latency trends and identify slow operations
+- **Request volume** - Monitor usage patterns and peak traffic
+- **Execution timing** - Understand processing bottlenecks
+
+### Complete Observability
+- **Prompt inspection** - Review exact inputs sent to models
+- **Response analysis** - Examine model outputs and quality
+- **Parameter tracking** - Monitor configuration changes and their impact
+- **Error context** - Debug failed requests with full stack traces
+
+### Cost Optimization
+- **Token usage analysis** - Track input/output token consumption
+- **Cost breakdown** - Monitor expenses across different models
+- **Efficiency metrics** - Identify opportunities for optimization
+
+<Callout type="success">
+  LLM Node Tracing provides the visibility you need to optimize model performance, reduce costs, and improve user experience in production AI applications.
+</Callout>
+
+## Next Steps
+
+Ready to expand your tracing coverage?
+
+- Learn about [Agent Tracing](/tracing/tracing_features/agent) for end-to-end workflow monitoring
+- Explore [Tool Tracing](/tracing/tracing_features/tool) for function and tool execution monitoring 

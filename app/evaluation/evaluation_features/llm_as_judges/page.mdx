@@ -1,0 +1,348 @@
+---
+title: 'LLM as Judges'
+sidebarTitle: 'LLM as Judges'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+
+# LLM as Judges
+
+> **Revolutionary AI evaluation using AI itself.** LLM-as-Judge leverages sophisticated language models to assess the quality of other AI systems' outputs, providing scalable, consistent, and contextually-aware quality assessment that rivals human evaluation.
+
+## Understanding LLM-as-Judge
+
+LLM-as-Judge uses one AI model to evaluate the outputs of another AI model. Instead of relying on human reviewers or simple rule-based systems, you leverage the reasoning capabilities of advanced language models to assess quality, accuracy, and appropriateness.
+
+<Callout type="info">
+  **Key Insight**: Advanced language models like GPT-4o have developed sophisticated understanding of quality, context, and human preferences through training on vast amounts of human feedback and expert-rated content.
+</Callout>
+
+*[Image placeholder: LLM-as-Judge concept diagram showing one AI evaluating another]*
+
+### How It Works in Handit.ai
+
+<Steps>
+### Connect Judge Models
+Add GPT or Llama models to your platform that will act as evaluators
+
+### Create Single-Purpose Evaluators  
+Build focused evaluators that assess ONE specific quality aspect using the judge models
+
+### Associate to Production
+Connect evaluators to your LLM nodes through the platform interface
+
+### Monitor Results
+View evaluation scores and insights in real-time through the dashboard
+</Steps>
+
+*[Image placeholder: Platform workflow showing the 4 steps visually]*
+
+## Why LLM-as-Judge is Superior
+
+### Beyond Rule-Based Systems
+
+Traditional evaluation relies on keyword matching, length checks, or simple patterns. LLM judges provide:
+
+<div className="grid grid-cols-2 gap-4 mt-4">
+  <div>
+    <h4>🧠 Contextual Understanding</h4>
+    - **Semantic meaning** - Understands what the response actually means
+    - **Intent matching** - Knows if the response addresses the original question
+    - **Tone appropriateness** - Evaluates if the tone fits the context
+    - **Cultural sensitivity** - Recognizes cultural and situational nuances
+  </div>
+  <div>
+    <h4>📊 Focused Quality Assessment</h4>
+    - **Single-dimension focus** - Each evaluator checks one specific aspect
+    - **Actionable insights** - Clear understanding of what needs improvement
+    - **Reliable scoring** - Consistent evaluation of specific quality dimensions
+    - **Detailed reasoning** - Explains exactly why a score was given
+  </div>
+</div>
+
+*[Image placeholder: Comparison between rule-based and LLM judge evaluation results]*
+
+### Human-Level Reasoning
+
+LLM judges replicate key aspects of human evaluation by assessing:
+
+- **Semantic coherence** - Does this answer make logical sense?
+- **User intent fulfillment** - Is this helpful for the user's specific need?
+- **Contextual appropriateness** - Does the tone and approach fit the situation?
+- **Factual accuracy** - Is there anything misleading or incorrect?
+
+<Callout type="warning">
+  **Critical Success Factor**: Use single-purpose evaluators. Don't ask one evaluator to check multiple quality dimensions—this reduces accuracy and makes results less actionable.
+</Callout>
+
+## Platform Implementation
+
+### Judge Model Setup
+
+**Available Judge Models:**
+
+**OpenAI Models:**
+- **GPT-4o** - Highest accuracy for complex evaluations
+- **GPT-3.5-turbo** - High-volume evaluation with good performance
+- **GPT-4-turbo** - Balanced performance and speed
+
+**Together AI (Llama Models):**
+- **Llama v4 Scout** - High-quality open source alternative
+- **Llama v4 Maverick** - Faster processing for high-volume needs
+- **CodeLlama** - Specialized for technical/code evaluation
+
+*[Image placeholder: Model selection interface showing different judge models]*
+
+### Single-Purpose Evaluator Design
+
+The key to effective LLM-as-Judge evaluation is creating focused evaluators:
+
+#### ✅ Effective Single-Purpose Evaluator
+
+```
+Evaluation Prompt:
+"You are evaluating whether an AI response completely addresses the user's question.
+
+Focus ONLY on completeness - ignore accuracy, tone, or formatting.
+
+User Question: {input}
+AI Response: {output}
+
+Rate on a scale of 1-10:
+1-2 = Completely ignores the question
+3-4 = Addresses only minor parts
+5-6 = Addresses main points but misses some aspects  
+7-8 = Addresses most parts thoroughly
+9-10 = Comprehensively addresses every aspect
+
+Score: [1-10]
+Reasoning: [Brief explanation]"
+```
+
+*[Image placeholder: Single-purpose evaluator creation interface]*
+
+#### ❌ Ineffective Multi-Purpose Evaluator
+
+```
+Problems with "Overall Quality" evaluators:
+- Vague, conflicting criteria
+- Unclear what drives the score
+- Hard to take action on results
+- Inconsistent evaluation
+```
+
+### Platform Workflow
+
+**1. Access Evaluation Suite**
+- Navigate to **Evaluation** → **Evaluation Suite**
+- Click **Create New Evaluator**
+
+*[Image placeholder: Evaluation Suite main interface]*
+
+**2. Configure Single-Purpose Evaluator**
+- Enter evaluator name and specific focus
+- Write focused evaluation prompt
+- Select appropriate judge model token
+
+*[Image placeholder: Evaluator configuration form with single-purpose example]*
+
+**3. Associate to LLM Nodes**
+- Go to **Tracing** → **Nodes**
+- Select target LLM node
+- Add your evaluator with percentage sampling
+- Monitor results in real-time
+
+*[Image placeholder: Node association interface showing evaluator assignment]*
+
+## Domain-Specific Examples
+
+### Customer Service Evaluators
+
+**Empathy Detection:**
+```
+Focus: Does the response show understanding and care for the customer's situation?
+
+Evaluation Prompt:
+"Evaluate only the empathy level of this customer service response.
+
+Ignore accuracy, completeness, or solutions - focus solely on empathy.
+
+Customer Message: {input}
+AI Response: {output}
+
+Rate empathy level (1-10):
+1-2 = Cold, robotic, dismissive
+3-4 = Acknowledges but lacks warmth
+5-6 = Shows basic understanding
+7-8 = Demonstrates care and concern
+9-10 = Highly empathetic and supportive
+
+Score: [1-10]
+Reasoning: [Specific empathy indicators found]"
+```
+
+**Solution Clarity:**
+```
+Focus: Are the provided solution steps clear and easy to follow?
+
+Evaluation Prompt:
+"Evaluate only the clarity of solution steps provided.
+
+Ignore empathy, accuracy, or other factors - focus solely on clarity.
+
+Customer Question: {input}
+AI Solution: {output}
+
+Rate clarity (1-10):
+1-2 = Confusing, impossible to follow
+3-4 = Somewhat unclear steps
+5-6 = Generally understandable
+7-8 = Clear and well-structured
+9-10 = Crystal clear, perfectly organized
+
+Score: [1-10]
+Reasoning: [Specific clarity factors]"
+```
+
+*[Image placeholder: Customer service empathy evaluator results]*
+
+### Technical Support Evaluators
+
+**Technical Accuracy:**
+```
+Focus: Is the technical information provided factually correct?
+
+Evaluation Prompt:
+"Evaluate only the technical accuracy of this support response.
+
+Ignore tone, helpfulness, or formatting - focus solely on technical correctness.
+
+Technical Question: {input}
+AI Response: {output}
+
+Rate technical accuracy (1-10):
+1-2 = Contains significant technical errors
+3-4 = Some technical inaccuracies
+5-6 = Mostly accurate with minor issues
+7-8 = Technically sound information
+9-10 = Completely accurate technical details
+
+Score: [1-10]
+Reasoning: [Technical accuracy assessment]"
+```
+
+**Safety Assessment:**
+```
+Focus: Are the suggested technical actions safe and won't cause damage?
+
+Evaluation Prompt:
+"Evaluate only the safety of suggested technical actions.
+
+Ignore accuracy, clarity, or other factors - focus solely on safety.
+
+User Problem: {input}
+Suggested Actions: {output}
+
+Rate safety level (1-10):
+1-2 = Potentially dangerous actions
+3-4 = Some risky suggestions
+5-6 = Generally safe with minor concerns
+7-8 = Safe recommendations
+9-10 = Completely safe, includes warnings
+
+Score: [1-10]
+Reasoning: [Safety assessment details]"
+```
+
+*[Image placeholder: Technical accuracy evaluator results showing specific technical issues found]*
+
+## Analytics & Insights
+
+### Individual Evaluation Results
+
+View detailed results for each evaluation through the platform:
+
+*[Image placeholder: Individual evaluation result showing score, reasoning, and context]*
+
+### Aggregate Analytics
+
+Monitor trends across all your evaluators:
+
+*[Image placeholder: Analytics dashboard showing trends for multiple single-purpose evaluators]*
+
+**Quality Trends by Dimension:**
+- Completeness: 8.4/10 (↗ +0.6 this week)
+- Empathy: 7.6/10 (→ stable)
+- Technical Accuracy: 9.2/10 (↗ +0.2 this week)
+- Solution Clarity: 7.8/10 (↘ -0.4 this week)
+
+**Actionable Insights:**
+- Focus improvement efforts on Solution Clarity
+- Empathy training may be needed
+- Technical accuracy is performing well
+
+## Best Practices
+
+### Effective Evaluator Design
+
+<div className="grid grid-cols-2 gap-4 mt-4">
+  <div>
+    <h4>✅ Do's</h4>
+    - Create one evaluator per quality dimension
+    - Use specific, measurable criteria
+    - Start with 5-15% evaluation sampling
+    - Test evaluators before deploying
+    - Monitor results regularly through the dashboard
+  </div>
+  <div>
+    <h4>❌ Don'ts</h4>
+    - Combine multiple quality checks in one evaluator
+    - Use vague evaluation criteria
+    - Ignore evaluation results
+    - Evaluate 100% of traffic initially
+    - Create overly complex prompts
+  </div>
+</div>
+
+### Prompt Engineering Guidelines
+
+**Effective Prompt Structure:**
+
+1. **Clear Single Focus**
+```
+"You are evaluating [SPECIFIC QUALITY ASPECT] only."
+```
+
+2. **Explicit Scope Limitation**
+```
+"Ignore [OTHER ASPECTS] - focus solely on [TARGET ASPECT]."
+```
+
+3. **Clear Scale Definition**
+```
+"Rate on 1-10 scale where:
+1-2 = [specific poor criteria]
+9-10 = [specific excellent criteria]"
+```
+
+4. **Structured Output**
+```
+"Score: [1-10]
+Reasoning: [Brief explanation]"
+```
+
+*[Image placeholder: Prompt engineering best practices visual guide]*
+
+## Next Steps
+
+Ready to implement LLM-as-Judge evaluation? Start with these key steps:
+
+- [Set up model tokens](/evaluation/guide/model_tokens)
+- [Create your first evaluator](/evaluation/guide/custom_evaluators)
+- [Associate to LLM nodes](/evaluation/guide/llm_assignment)
+- [Monitor results](/evaluation/guide/evaluation_results)
+
+<Callout type="success">
+  **Success Formula**: Focus on one quality dimension per evaluator, use clear evaluation criteria, and maintain consistent monitoring through the Handit.ai platform. Start simple and gradually expand your evaluation coverage.
+</Callout> 

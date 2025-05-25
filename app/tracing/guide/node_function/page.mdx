@@ -1,0 +1,652 @@
+---
+title: 'Node Function Tracing'
+sidebarTitle: 'Node Function Tracing'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Node Function Tracing
+
+> **Maximum flexibility for programmatic tracing.** Node function tracing allows you to trace any function call with complete control over when and how the tracing happens, perfect for custom tracking patterns, dynamic function calls, and integrating tracing into existing codebases.
+
+This approach gives you the ultimate flexibility to trace functions programmatically, including functions you can't modify directly or need conditional tracing.
+
+<Callout type="info">
+  Node function tracing gives you the most flexibility to trace functions programmatically, including functions you can't modify directly or need conditional tracing.
+</Callout>
+
+## How It Works
+
+Node function tracing provides programmatic control through:
+
+- **Programmatic control** - Call tracing functions directly in your code
+- **Dynamic tracing** - Decide at runtime what to trace
+- **Custom keys** - Use custom identifiers for tracking
+- **Flexible input handling** - Works with any function signature
+- **Error capture** - Automatically handles and reports errors
+
+## Implementation
+
+### Python: `trace_agent_node_func` & `trace_agent_node_func_sync`
+
+<Tabs items={["Async", "Sync"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="async_node_function.py"
+from handit import HanditTracker
+import asyncio
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Example: Dynamic function tracing
+async def process_user_request(user_id, request_type, data):
+    """Process different types of user requests"""
+    
+    if request_type == "analysis":
+        # Trace the analysis function
+        result = await tracker.trace_agent_node_func(
+            analyze_data,
+            data,
+            key="data-analysis"
+        )
+        
+    elif request_type == "recommendation":
+        # Trace with custom key based on user
+        result = await tracker.trace_agent_node_func(
+            generate_recommendations,
+            user_id,
+            data,
+            key=f"recommendations-{user_id}"
+        )
+        
+    elif request_type == "search":
+        # Trace with additional context
+        result = await tracker.trace_agent_node_func(
+            search_knowledge_base,
+            data["query"],
+            data["filters"],
+            key="knowledge-search",
+            context={"user_id": user_id}
+        )
+    
+    return result
+
+# Example functions to trace
+async def analyze_data(data):
+    """Analyze the provided data"""
+    # Complex analysis logic
+    analysis_result = perform_complex_analysis(data)
+    return {"analysis": analysis_result, "confidence": 0.95}
+
+async def generate_recommendations(user_id, preferences):
+    """Generate personalized recommendations"""
+    user_profile = await get_user_profile(user_id)
+    recommendations = await ml_recommendation_engine(user_profile, preferences)
+    return recommendations
+
+async def search_knowledge_base(query, filters):
+    """Search through knowledge base"""
+    results = await vector_search(query, filters)
+    return {"results": results, "count": len(results)}
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python filename="sync_node_function.py"
+from handit import HanditTracker
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Example: Conditional tracing based on environment
+def process_data_pipeline(data, stage, enable_tracing=True):
+    """Process data through different pipeline stages"""
+    
+    if stage == "validation" and enable_tracing:
+        # Trace validation step
+        result = tracker.trace_agent_node_func_sync(
+            validate_data,
+            data,
+            key="data-validation"
+        )
+        
+    elif stage == "transformation":
+        # Always trace transformation (critical step)
+        result = tracker.trace_agent_node_func_sync(
+            transform_data,
+            data,
+            key="data-transformation"
+        )
+        
+    elif stage == "enrichment":
+        # Trace with custom metadata
+        result = tracker.trace_agent_node_func_sync(
+            enrich_data,
+            data,
+            key="data-enrichment",
+            metadata={"stage": stage, "data_size": len(data)}
+        )
+    
+    return result
+
+# Example: Tracing external library functions
+def process_with_external_lib(input_data):
+    """Process data using external library with tracing"""
+    
+    # Trace external library function
+    processed_data = tracker.trace_agent_node_func_sync(
+        external_ml_library.process,
+        input_data,
+        key="external-ml-processing"
+    )
+    
+    # Trace post-processing
+    final_result = tracker.trace_agent_node_func_sync(
+        post_process_results,
+        processed_data,
+        key="post-processing"
+    )
+    
+    return final_result
+
+def validate_data(data):
+    """Validate input data"""
+    # Validation logic
+    if not data or len(data) == 0:
+        raise ValueError("Empty data provided")
+    return {"status": "valid", "record_count": len(data)}
+
+def transform_data(data):
+    """Transform data to required format"""
+    # Transformation logic
+    transformed = [transform_record(record) for record in data]
+    return {"transformed_data": transformed, "success_rate": 0.98}
+```
+</Tabs.Tab>
+</Tabs>
+
+### JavaScript: `captureAgentNode`
+
+```javascript filename="node_function.js"
+const { config, captureAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Example: Dynamic function tracing
+async function processUserRequest(userId, requestType, data) {
+    let result;
+    
+    if (requestType === 'analysis') {
+        // Trace the analysis function
+        const analysisResult = await analyzeData(data);
+        
+        // Manually capture the execution
+        await captureAgentNode({
+            agentNodeSlug: 'data-analysis',
+            requestBody: { userId, data },
+            responseBody: analysisResult
+        });
+        
+        result = analysisResult;
+        
+    } else if (requestType === 'recommendation') {
+        // Trace with custom key based on user
+        const recommendations = await generateRecommendations(userId, data);
+        
+        await captureAgentNode({
+            agentNodeSlug: `recommendations-${userId}`,
+            requestBody: { userId, preferences: data },
+            responseBody: recommendations
+        });
+        
+        result = recommendations;
+        
+    } else if (requestType === 'search') {
+        // Trace with error handling
+        try {
+            const searchResults = await searchKnowledgeBase(data.query, data.filters);
+            
+            await captureAgentNode({
+                agentNodeSlug: 'knowledge-search',
+                requestBody: { query: data.query, filters: data.filters, userId },
+                responseBody: searchResults,
+                error: false
+            });
+            
+            result = searchResults;
+            
+        } catch (error) {
+            // Capture error case
+            await captureAgentNode({
+                agentNodeSlug: 'knowledge-search',
+                requestBody: { query: data.query, filters: data.filters, userId },
+                responseBody: { error: error.message },
+                error: true
+            });
+            
+            throw error;
+        }
+    }
+    
+    return result;
+}
+
+// Example: Tracing external API calls
+async function callExternalService(endpoint, payload) {
+    const startTime = Date.now();
+    
+    try {
+        const response = await fetch(`https://api.external-service.com/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        const duration = Date.now() - startTime;
+        
+        // Capture successful API call
+        await captureAgentNode({
+            agentNodeSlug: `external-api-${endpoint}`,
+            requestBody: { endpoint, payload, timestamp: startTime },
+            responseBody: { ...result, duration, status: response.status }
+        });
+        
+        return result;
+        
+    } catch (error) {
+        const duration = Date.now() - startTime;
+        
+        // Capture failed API call
+        await captureAgentNode({
+            agentNodeSlug: `external-api-${endpoint}`,
+            requestBody: { endpoint, payload, timestamp: startTime },
+            responseBody: { 
+                error: error.message, 
+                duration, 
+                failed: true 
+            },
+            error: true
+        });
+        
+        throw error;
+    }
+}
+
+// Example functions
+async function analyzeData(data) {
+    // Complex analysis logic
+    const analysis = await performComplexAnalysis(data);
+    return { analysis, confidence: 0.95 };
+}
+
+async function generateRecommendations(userId, preferences) {
+    const userProfile = await getUserProfile(userId);
+    const recommendations = await mlRecommendationEngine(userProfile, preferences);
+    return recommendations;
+}
+
+async function searchKnowledgeBase(query, filters) {
+    const results = await vectorSearch(query, filters);
+    return { results, count: results.length };
+}
+```
+
+## Advanced Use Cases
+
+### Conditional Tracing Based on Context
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="conditional_tracing.py"
+from handit import HanditTracker
+import os
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Environment-based tracing
+ENABLE_DETAILED_TRACING = os.getenv('DETAILED_TRACING', 'false').lower() == 'true'
+PRODUCTION_ENV = os.getenv('ENVIRONMENT') == 'production'
+
+async def smart_processing_pipeline(data, user_tier='basic'):
+    """Pipeline with intelligent tracing based on context"""
+    
+    # Always trace for premium users in production
+    should_trace = PRODUCTION_ENV and user_tier == 'premium'
+    
+    # Or trace everything in development
+    should_trace = should_trace or ENABLE_DETAILED_TRACING
+    
+    # Step 1: Preprocessing (always trace critical steps)
+    preprocessed = await tracker.trace_agent_node_func(
+        preprocess_data,
+        data,
+        key="preprocessing"
+    )
+    
+    # Step 2: Main processing (conditional tracing)
+    if should_trace:
+        result = await tracker.trace_agent_node_func(
+            main_processing,
+            preprocessed,
+            key=f"main-processing-{user_tier}"
+        )
+    else:
+        result = await main_processing(preprocessed)
+    
+    # Step 3: Post-processing (trace only errors in production)
+    if PRODUCTION_ENV:
+        try:
+            final_result = await post_process(result)
+        except Exception as e:
+            # Trace the error case
+            await tracker.trace_agent_node_func(
+                lambda x: x,  # Identity function to capture error
+                {"input": result, "error": str(e)},
+                key="post-processing-error"
+            )
+            raise
+    else:
+        # Trace everything in development
+        final_result = await tracker.trace_agent_node_func(
+            post_process,
+            result,
+            key="post-processing"
+        )
+    
+    return final_result
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="conditional_tracing.js"
+const { config, captureAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Environment-based tracing
+const ENABLE_DETAILED_TRACING = process.env.DETAILED_TRACING === 'true';
+const PRODUCTION_ENV = process.env.NODE_ENV === 'production';
+
+async function smartProcessingPipeline(data, userTier = 'basic') {
+    // Intelligent tracing decisions
+    const shouldTrace = (PRODUCTION_ENV && userTier === 'premium') || ENABLE_DETAILED_TRACING;
+    
+    // Step 1: Preprocessing (always trace critical steps)
+    const preprocessed = await preprocessData(data);
+    
+    await captureAgentNode({
+        agentNodeSlug: 'preprocessing',
+        requestBody: { originalData: data },
+        responseBody: preprocessed
+    });
+    
+    // Step 2: Main processing (conditional tracing)
+    let result;
+    if (shouldTrace) {
+        const startTime = Date.now();
+        result = await mainProcessing(preprocessed);
+        
+        await captureAgentNode({
+            agentNodeSlug: `main-processing-${userTier}`,
+            requestBody: { preprocessedData: preprocessed, userTier },
+            responseBody: { ...result, processingTime: Date.now() - startTime }
+        });
+    } else {
+        result = await mainProcessing(preprocessed);
+    }
+    
+    // Step 3: Post-processing (trace only errors in production)
+    let finalResult;
+    if (PRODUCTION_ENV) {
+        try {
+            finalResult = await postProcess(result);
+        } catch (error) {
+            // Trace the error case
+            await captureAgentNode({
+                agentNodeSlug: 'post-processing-error',
+                requestBody: { input: result },
+                responseBody: { error: error.message },
+                error: true
+            });
+            throw error;
+        }
+    } else {
+        // Trace everything in development
+        finalResult = await postProcess(result);
+        
+        await captureAgentNode({
+            agentNodeSlug: 'post-processing',
+            requestBody: { input: result },
+            responseBody: finalResult
+        });
+    }
+    
+    return finalResult;
+}
+```
+</Tabs.Tab>
+</Tabs>
+
+### Tracing Third-Party Libraries
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="third_party_tracing.py"
+from handit import HanditTracker
+import pandas as pd
+import numpy as np
+from some_ml_library import MLModel
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+async def trace_data_science_pipeline(raw_data):
+    """Trace a complete data science pipeline with third-party libraries"""
+    
+    # Trace pandas operations
+    cleaned_data = await tracker.trace_agent_node_func(
+        lambda data: pd.DataFrame(data).dropna().fillna(0),
+        raw_data,
+        key="pandas-data-cleaning"
+    )
+    
+    # Trace numpy computations
+    normalized_data = await tracker.trace_agent_node_func(
+        lambda data: (data - np.mean(data)) / np.std(data),
+        cleaned_data,
+        key="numpy-normalization"
+    )
+    
+    # Trace ML model inference
+    model = MLModel()
+    predictions = await tracker.trace_agent_node_func(
+        model.predict,
+        normalized_data,
+        key="ml-model-inference"
+    )
+    
+    return predictions
+
+# Trace database operations
+async def trace_database_operations(query, params):
+    """Trace database queries with performance metrics"""
+    
+    import time
+    start_time = time.time()
+    
+    # Execute and trace database query
+    result = await tracker.trace_agent_node_func(
+        execute_db_query,
+        query,
+        params,
+        key="database-query",
+        metadata={
+            "query_type": query.split()[0].upper(),
+            "table": extract_table_name(query),
+            "execution_time": time.time() - start_time
+        }
+    )
+    
+    return result
+
+def execute_db_query(query, params):
+    # Your database execution logic
+    pass
+
+def extract_table_name(query):
+    # Extract table name from SQL query
+    pass
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="third_party_tracing.js"
+const { config, captureAgentNode } = require('handit-sdk');
+const axios = require('axios');
+const tf = require('@tensorflow/tfjs');
+
+config({ apiKey: 'your-api-key' });
+
+// Trace TensorFlow.js operations
+async function traceMLPipeline(inputData) {
+    // Trace data preprocessing
+    const preprocessedData = await preprocessData(inputData);
+    
+    await captureAgentNode({
+        agentNodeSlug: 'data-preprocessing',
+        requestBody: { rawData: inputData },
+        responseBody: { processedData: preprocessedData }
+    });
+    
+    // Trace model inference
+    const model = await tf.loadLayersModel('/path/to/model.json');
+    const predictions = model.predict(tf.tensor(preprocessedData));
+    const predictionData = await predictions.data();
+    
+    await captureAgentNode({
+        agentNodeSlug: 'tensorflow-inference',
+        requestBody: { inputShape: preprocessedData.shape },
+        responseBody: { predictions: Array.from(predictionData) }
+    });
+    
+    return predictionData;
+}
+
+// Trace external API calls with retry logic
+async function traceExternalAPIWithRetry(endpoint, payload, maxRetries = 3) {
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const startTime = Date.now();
+            const response = await axios.post(endpoint, payload);
+            const duration = Date.now() - startTime;
+            
+            // Trace successful call
+            await captureAgentNode({
+                agentNodeSlug: 'external-api-call',
+                requestBody: { 
+                    endpoint, 
+                    payload, 
+                    attempt, 
+                    maxRetries 
+                },
+                responseBody: { 
+                    data: response.data, 
+                    status: response.status,
+                    duration,
+                    success: true 
+                }
+            });
+            
+            return response.data;
+            
+        } catch (error) {
+            lastError = error;
+            const duration = Date.now() - startTime;
+            
+            // Trace failed attempt
+            await captureAgentNode({
+                agentNodeSlug: 'external-api-call',
+                requestBody: { 
+                    endpoint, 
+                    payload, 
+                    attempt, 
+                    maxRetries 
+                },
+                responseBody: { 
+                    error: error.message,
+                    status: error.response?.status,
+                    duration,
+                    willRetry: attempt < maxRetries 
+                },
+                error: true
+            });
+            
+            if (attempt === maxRetries) break;
+            
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+    }
+    
+    throw lastError;
+}
+
+// Trace WebSocket operations
+function traceWebSocketCommunication(websocket, messageType, data) {
+    websocket.on('message', async (message) => {
+        await captureAgentNode({
+            agentNodeSlug: 'websocket-message-received',
+            requestBody: { messageType, expectedData: data },
+            responseBody: { receivedMessage: message }
+        });
+    });
+    
+    websocket.on('error', async (error) => {
+        await captureAgentNode({
+            agentNodeSlug: 'websocket-error',
+            requestBody: { messageType, data },
+            responseBody: { error: error.message },
+            error: true
+        });
+    });
+}
+```
+</Tabs.Tab>
+</Tabs>
+
+## Best Practices
+
+**When to Use Node Function Tracing:**
+
+| **Use Case** | **Why Node Function Tracing** |
+|--------------|-------------------------------|
+| **Dynamic function selection** | Choose which functions to trace based on runtime conditions |
+| **Third-party library integration** | Trace external libraries and APIs without modifying their code |
+| **Conditional tracing logic** | Implement complex tracing rules based on environment or user context |
+| **Custom tracking patterns** | Create specialized tracing workflows for unique requirements |
+| **Error-specific tracing** | Focus tracing on error scenarios and edge cases |
+
+**Implementation Guidelines:**
+
+1. **Use descriptive keys for tracking** - Choose meaningful identifiers that help with debugging and analysis
+2. **Include relevant context in captures** - Add metadata that provides useful debugging information
+3. **Handle errors explicitly** - Implement proper error handling and capture error scenarios
+4. **Consider performance impact** - Balance tracing detail with system performance requirements
+5. **Add metadata for debugging** - Include timing, user context, and other relevant information
+
+<Callout type="warning">
+  Node function tracing requires more manual work but provides maximum flexibility. Use it when decorators and wrappers don't fit your use case.
+</Callout>
+
+<Callout type="success">
+  Node function tracing is perfect for integrating Handit.ai into existing codebases without major refactoring.
+</Callout>
+
+## Next Steps
+
+- Learn about [Agent Wrapper/Decorator](/tracing/guide/agent_wrapper) for simpler automation
+- Explore [Node Wrapper/Decorator](/tracing/guide/node_wrapper) for function-level tracing
+- Check [Manual Agent Tracing](/tracing/guide/manual_agent) for complete control 

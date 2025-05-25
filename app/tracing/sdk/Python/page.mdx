@@ -10,10 +10,12 @@ import { Table } from "nextra/components"
 
 # Python SDK
 
-The Handit.ai Python SDK provides comprehensive tracking and monitoring capabilities for your AI applications. This guide will help you integrate and use the SDK effectively.
+> **Comprehensive AI agent observability for Python applications.** The Handit.ai Python SDK provides powerful tracking and monitoring capabilities designed specifically for AI applications, with seamless integration for popular frameworks like LangChain and OpenAI.
+
+This guide covers everything you need to integrate and use the SDK effectively in your Python AI applications.
 
 <Callout type="info">
-  The SDK automatically tracks function executions, model calls, and tool usage, providing detailed insights into your AI application's behavior.
+  The SDK automatically tracks function executions, model calls, and tool usage, providing detailed insights into your AI application's behavior with minimal setup required.
 </Callout>
 
 ## Installation
@@ -190,9 +192,9 @@ async def my_agent(input_data):
   </tbody>
 </Table>
 
-## Detailed Function Documentation
+## Core Methods Documentation
 
-### Configuration and Setup
+### Configuration
 
 #### `config(api_key: str, tracking_url: Optional[str] = None)`
 Initializes the tracker with your API key and optional custom tracking URL.
@@ -211,128 +213,107 @@ def config(self, api_key: str, tracking_url: Optional[str] = None):
     """
 ```
 
-**Internal State:**
-- Sets `self.api_key` for authentication
-- Optionally updates `self.tracking_server_url` if provided
-- Required before using any other tracking functions
+**What it does:**
+- Sets authentication credentials for all tracking operations
+- Optionally configures custom tracking server endpoint
+- Must be called before using any other tracking functions
 
-### Agent Tracing
+### Agent-Level Tracing
 
-#### `start_agent_tracing()`
-Decorator for tracing complete agent execution, supporting both async and sync functions.
+#### `start_agent_tracing(key: str)`
+Decorator for tracing complete agent execution workflows.
 
 ```python filename="agent.py"
-def start_agent_tracing(self):
+def start_agent_tracing(self, key: str):
     """
     Decorator to trace full agent execution.
     Supports both async and sync functions.
     
-    Usage:
-        @tracker.start_agent_tracing(key="agent-name")
-        async def my_agent(input_data):
-            # Agent logic here
-            pass
+    Args:
+        key (str): Unique identifier for the agent
     """
 ```
 
-**Key Features:**
-- Creates and manages `agent_log_id` using `ContextVar`
-- Handles both async and sync functions automatically
-- Tracks start/end events and errors
-- Maintains context throughout the agent's execution
+**Key capabilities:**
+- Creates and manages execution context using `ContextVar`
+- Automatically handles both async and sync functions
+- Tracks start/end events with timing and error information
+- Links all nested operations to the same agent execution
 
-**Internal Flow:**
-1. Creates new `agent_log_id` context
-2. Executes wrapped function
-3. Sends end event with success/error status
-4. Cleans up context
-
-### Node Tracing
+### Function-Level Tracing
 
 #### `trace_agent_node(agent_node_id: str)`
-Decorator for tracing individual agent nodes (functions, tools, etc.).
+Decorator for tracing individual functions within an agent workflow.
 
 ```python filename="node.py"
 def trace_agent_node(self, agent_node_id: str):
     """
     Decorator to trace individual agent node execution.
-    Supports both async and sync functions.
     
     Args:
         agent_node_id (str): Unique identifier for the node
     """
 ```
 
-**Key Features:**
-- Tracks input/output for each node
-- Handles both async and sync functions
-- Captures and reports errors
-- Links to parent agent context
+**Key capabilities:**
+- Captures input parameters and return values
+- Handles both async and sync functions automatically
+- Reports errors with full context and stack traces
+- Links to parent agent execution context
 
-**Internal Flow:**
-1. Captures input arguments
-2. Executes function
-3. Captures output or error
-4. Sends tracking data
-
-### Function Tracing
-
-#### `trace_agent_node_func(func: Callable, *args, key: str = None, **kwargs)`
-Async function to trace any function call without decorating.
+#### `trace_agent_node_func(func, *args, key=None, **kwargs)`
+Programmatic function tracing without decorators.
 
 ```python filename="function.py"
 async def trace_agent_node_func(self, func: Callable, *args, key: str = None, **kwargs):
     """
-    Async function to trace any function call, supporting both sync and async functions.
+    Trace any function call without modifying the function definition.
     
     Args:
         func (Callable): The function to trace
-        *args: Positional arguments
-        key (str, optional): Tracking key (defaults to function name)
-        **kwargs: Keyword arguments
+        *args: Positional arguments for the function
+        key (str, optional): Tracking identifier (defaults to function name)
+        **kwargs: Keyword arguments for the function
     """
 ```
 
-**Key Features:**
+**Key capabilities:**
 - Works with both sync and async functions
-- No need to modify original function
-- Captures arguments and return values
-- Handles errors gracefully
+- No need to modify original function definitions
+- Captures complete input/output data
+- Handles errors gracefully with full context
 
-#### `trace_agent_node_func_sync(func: Callable, *args, key: str = None, **kwargs)`
-Synchronous version of `trace_agent_node_func`.
+#### `trace_agent_node_func_sync(func, *args, key=None, **kwargs)`
+Optimized synchronous version for CPU-bound operations.
 
 ```python filename="function_sync.py"
 def trace_agent_node_func_sync(self, func: Callable, *args, key: str = None, **kwargs):
     """
-    Synchronous version of trace_agent_node_func.
-    Optimized for CPU-bound operations.
+    Synchronous version optimized for CPU-bound operations.
     """
 ```
 
-### Model Tracking
+### Model & Tool Tracking
 
 #### `track_model(model, model_id: str)`
-Creates a tracked version of an AI model.
+Creates a tracked version of AI models (LLMs, embeddings, etc.).
 
 ```python filename="model.py"
 def track_model(self, model, model_id: str):
     """
-    Creates a tracked version of an AI model (LLM, embedding model, etc.)
+    Creates a tracked version of an AI model.
     
     Args:
-        model: The model to track (ChatOpenAI, OpenAIEmbeddings, etc.)
-        model_id (str): The ID of the model to track
+        model: The model instance to track
+        model_id (str): Unique identifier for tracking
     """
 ```
 
-**Key Features:**
-- Monkey-patches model's `__call__` method
-- Tracks all model calls automatically
-- Captures prompts and responses
+**Key capabilities:**
+- Automatically intercepts all model calls
+- Captures prompts, responses, and performance metrics
+- Works with LangChain, OpenAI, and custom models
 - Maintains original model functionality
-
-### Tool Tracking
 
 #### `track_tool(tool, tool_id: str)`
 Creates a tracked version of any tool or function.
@@ -340,40 +321,40 @@ Creates a tracked version of any tool or function.
 ```python filename="tool.py"
 def track_tool(self, tool, tool_id: str):
     """
-    Creates a tracked version of a tool (RAG, API call, function, etc.)
+    Creates a tracked version of a tool or function.
     
     Args:
-        tool: The tool to track
-        tool_id (str): The ID of the tool to track
+        tool: The tool/function to track
+        tool_id (str): Unique identifier for tracking
     """
 ```
 
-**Key Features:**
+**Key capabilities:**
 - Works with any callable object
-- Tracks input/output for each call
-- Handles both sync and async tools
-- Preserves original tool functionality
+- Tracks input/output for each execution
+- Handles both sync and async operations
+- Preserves original functionality
 
-### Request Interception
+### HTTP Request Tracking
 
 #### `intercept_requests(func)`
-Decorator to intercept and track HTTP requests.
+Automatically tracks HTTP requests to specified URLs.
 
 ```python filename="requests.py"
 def intercept_requests(self, func):
     """
-    Decorator to intercept and track HTTP requests.
+    Intercepts and tracks HTTP requests.
     
     Args:
-        func: The request function to intercept (e.g., requests.post)
+        func: The request function to intercept
     """
 ```
 
-**Key Features:**
-- Automatically tracks matching URLs
-- Updates URL list from server
-- Captures request/response data
-- Transparent to application code
+**Key capabilities:**
+- Automatically tracks requests to configured URLs
+- Updates tracking list from server dynamically
+- Captures request/response data transparently
+- Works with requests library methods
 
 ### Custom Event Tracking
 
@@ -383,89 +364,54 @@ Manually track custom events and operations.
 ```python filename="events.py"
 def capture_model(self, model_id: str, request_body: Any, response_body: Any):
     """
-    Track custom events and operations.
+    Manually track custom events.
     
     Args:
-        model_id (str): Identifier for the event
+        model_id (str): Event identifier
         request_body (Any): Input data
         response_body (Any): Output data
     """
 ```
 
-**Key Features:**
-- Manual event tracking
-- Flexible input/output format
-- Links to current agent context
-- Useful for batch operations
+**Key capabilities:**
+- Manual event tracking for custom scenarios
+- Flexible input/output data format
+- Links to current agent execution context
+- Useful for batch operations and webhooks
 
 ### Performance Optimization
 
 #### `fetch_optimized_prompt(model_id: str)`
-Fetches optimized prompts for models.
+Retrieves optimized prompts based on performance data.
 
 ```python filename="optimization.py"
 def fetch_optimized_prompt(self, model_id: str):
     """
-    Fetches the most optimized prompt for a given model ID.
+    Fetches the best-performing prompt for a model.
     
     Args:
-        model_id (str): The ID of the model to fetch the optimized prompt for
+        model_id (str): Model identifier
         
     Returns:
-        dict: The optimized prompt data
+        dict: Optimized prompt data
     """
 ```
 
-**Key Features:**
-- Retrieves best-performing prompts
-- Supports A/B testing
-- Enables self-optimization
-- Requires API key configuration
-
-### Internal Utilities
-
-#### `_sanitize_and_serialize(obj: Any)`
-Internal method for data sanitization and serialization.
-
-```python filename="utils.py"
-def _sanitize_and_serialize(self, obj: Any) -> Any:
-    """
-    Sanitize sensitive data and serialize objects.
-    Handles special cases like Pinecone results.
-    """
-```
-
-#### `_send_tracked_data(model_id, request_body, response_body)`
-Internal method for sending tracking data.
-
-```python filename="tracking.py"
-async def _send_tracked_data(self, model_id, request_body, response_body):
-    """
-    Sends tracking data to the server.
-    Updates agent_log_id if provided in response.
-    """
-```
-
-#### `_end_agent_tracing(error: Optional[Exception] = None)`
-Internal method for ending agent tracing.
-
-```python filename="tracing.py"
-async def _end_agent_tracing(self, error: Optional[Exception] = None):
-    """
-    Ends agent tracing and optionally reports error.
-    Cleans up context variables.
-    """
-```
+**Key capabilities:**
+- Retrieves best-performing prompts from A/B testing
+- Enables continuous optimization workflows
+- Supports self-improving AI systems
+- Requires proper API key configuration
 
 <Callout type="info">
-  All tracking functions automatically handle errors and maintain context, ensuring reliable operation even when exceptions occur.
+  All tracking methods automatically handle errors and maintain execution context, ensuring reliable operation even when exceptions occur in your application code.
 </Callout>
 
 <Callout type="warning">
-  Always configure the tracker with your API key before using any tracking functions.
+  Always configure the tracker with `tracker.config(api_key="your-key")` before using any tracking functions.
 </Callout>
 
-## Use Cases
+## Real-World Use Cases
 
 ### 1. Invoice Processing Agent
 
@@ -884,10 +830,10 @@ class PerformanceMonitor:
         return result
 ```
 
-<Callout type="info">
-  These examples demonstrate real-world use cases of the Handit.ai SDK, showing how to effectively track and monitor AI applications in production environments.
+<Callout type="success">
+  These examples demonstrate real-world applications of the Handit.ai Python SDK, showing how to effectively track and monitor AI applications in production environments.
 </Callout>
 
-<Callout type="warning">
-  Remember to replace "your-api-key" with your actual Handit.ai API key in production code.
+<Callout type="info">
+  Remember to replace `"your-api-key"` with your actual Handit.ai API key in production code.
 </Callout>

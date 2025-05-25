@@ -8,171 +8,193 @@ import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
 import { Cards } from 'nextra/components'
 
-# Tracing
+# AI Agent Tracing
 
-Tracing is an observability technique that allows you to follow the execution flow of your AI application. It's like mounting an action camera on each method to chronicle exactly what happened.
+> **Every AI agent is a black box until you add tracing.** See exactly what your agents are doing, why they're failing, and how to make them better.
 
-<details>
-<summary>**What Handit Tracing records?**</summary>
-
-- **What ran** - Every operation, LLM call, or function
-  - LLM invocations and their parameters
-  - Tool executions and their results
-  - Function calls and their context
-  - Chain of operations in complex workflows
-
-- **With what data** - The inputs and outputs of each step
-  - Prompts and completions for LLMs
-  - Input parameters and return values
-  - Context and metadata
-  - Error messages and stack traces
-
-- **How long it took** - The duration of each operation
-  - Total execution time
-  - Token generation latency
-  - Network request duration
-  - Processing overhead
-
-- **Whether it succeeded or failed** - The final state of each execution
-  - Success/failure status
-  - Error types and messages
-  - Retry attempts and results
-  - Recovery actions taken
-
-</details>  
+Tracing captures the complete execution flow of your AI agents—from the initial user request to the final response. Think of it as a flight recorder for your AI: when something goes wrong (or right), you have the complete story.
 
 <Callout type="info">
-  Tracing is essential for understanding how your AI application behaves, identifying bottlenecks, and debugging issues.
+  Tracing transforms AI development from guesswork to data-driven optimization. See every LLM call, tool execution, and decision your agents make.
 </Callout>
 
+## Why AI Agents Need Tracing
+
+AI agents are inherently complex—they make decisions, call tools, interact with LLMs, and chain operations together. Without tracing, you're debugging in the dark.
 
 <details>
-<summary>**Why You Need Tracing?**</summary>
+<summary>**🔍 Visibility - See Inside the Black Box**</summary>
 
-- **Visibility** - See exactly what's happening in your AI application
-   - Track every LLM call, tool execution, and function
-   - Monitor prompt engineering in real-time
-   - Understand the full context of each operation
-   - Get insights into your application's behavior
+**What you get:**
+- Complete execution flow of every agent run
+- Every LLM call with exact prompts and responses  
+- All tool executions and their results
+- Decision points and reasoning chains
+- Context flow between operations
 
-- **Debugging** - Quickly identify where and why something fails
-   - Pinpoint exact failure points in complex chains
-   - Access detailed error logs and stack traces
-   - See the exact inputs that caused issues
-   - Reduce time-to-resolution for problems
+**Why it matters:**
+Your agent might be failing because of a subtle prompt issue, a tool returning unexpected data, or a logic error in the chain. Tracing shows you exactly where and why.
 
-- **Optimization** - Find and improve parts of your system
-   - Identify slow operations and bottlenecks
-   - Track token usage and costs
-   - Measure response times and latency
-   - Optimize prompts and model parameters
+</details>
 
-- **Monitoring** - Keep an eye on real-time performance
-   - Track system health and reliability
-   - Monitor resource usage and costs
-   - Get alerts for anomalies
-   - Make data-driven decisions
+<details>
+<summary>**🐛 Debugging - Fix Issues Fast**</summary>
 
-</details>  
+**What you get:**
+- Pinpoint exact failure locations in complex chains
+- See the exact inputs that caused errors
+- Track error propagation through your agent
+- Access complete stack traces and context
+- Compare successful vs failed executions
+
+**Why it matters:**
+Instead of spending hours reproducing bugs, you see exactly what happened in production. Debug in minutes instead of days.
+
+</details>
+
+<details>
+<summary>**⚡ Optimization - Make Agents Faster & Better**</summary>
+
+**What you get:**
+- Execution time breakdown for every operation
+- Performance bottleneck identification  
+- Input/output analysis for optimization opportunities
+- Error pattern detection
+- Prompt engineering insights
+
+**Why it matters:**
+See which parts of your agent are slow or causing issues. Optimize prompts, reduce unnecessary operations, and improve performance with data, not guesswork.
+
+</details>
+
+<details>
+<summary>**📊 Monitoring - Keep Production Healthy**</summary>
+
+**What you get:**
+- Real-time performance metrics
+- Success/failure rate tracking
+- Resource usage monitoring
+- Alert integration for anomalies
+- Historical trend analysis
+
+**Why it matters:**
+Know when your agents start failing before your users complain. Monitor performance trends and catch issues early.
+
+</details>
 
 <Callout type="warning">
-  Without tracing, you're flying blind. Every production AI system needs observability to ensure reliability and performance.
+  **Production AI agents without tracing are a ticking time bomb.** When they fail—and they will—you need complete visibility to fix them quickly.
 </Callout>
 
+## What Handit.ai Tracing Captures
 
-## Main Components
+Every execution creates a complete trace with:
 
-| Component | Description | Example |
-|-----------|-------------|---------|
-| **Agent Tracing** | The main orchestrator, the root | The main API endpoint processing requests. (The endpoint or the main function that executes the entire workflow) |
-| **LLM Node Tracing** | This essential component keeps a detailed record of every interaction with your LLM | GPT-4, Claude, your custom LLM model |
-| **Tool Tracing** | This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools | Custom utility, API Tool, RAG Tool, data processing functions |
+| **Data Type** | **What's Captured** | **Example** |
+|---------------|-------------------|-------------|
+| **Execution Flow** | Complete operation sequence | User request → LLM reasoning → tool calls → final response |
+| **LLM Interactions** | Prompts, responses, and timing | "Analyze this data..." → 1.2s → "The data shows..." |
+| **Tool Executions** | Input parameters, outputs, errors | `search_web("AI agents")` → 10 results → 0.8s |
+| **Performance** | Timing and resource usage | Total: 3.2s, LLM: 1.2s, Tools: 0.8s |
+| **Context** | Data flow between operations | Search results → LLM analysis → structured output |
 
-## Tracing Functions
+*[Image placeholder: Example trace visualization showing agent execution flow]*
 
-### Agent Tracing
-This powerful tool gives you complete visibility into your entire workflow, from start to finish. It acts as the root of your tracing tree, important to automatically collecting and correlating all operations within your Application.
+## Tracing Components
+
+### 🤖 Agent Tracing
+**The orchestrator** - Tracks your entire agent from start to finish.
+
+Captures the complete agent execution as a single trace, automatically linking all LLM calls, tool executions, and operations together. This is your agent's "flight recorder."
+
+**Best for:** Main agent workflows, API endpoints, complex multi-step processes
 
 <details>
-<summary>**Details**</summary>
+<summary>**What Agent Tracing Records**</summary>
 
-- Tracks the entire agent execution flow
-  - Captures the complete sequence of operations
-  - Maintains parent-child relationships between operations
-  - Provides a hierarchical view of your workflow
-- Automatically captures start and end times
-  - Records precise timestamps for each phase
-  - Calculates total execution duration
-  - Tracks time spent in each sub-operation
-- Records success/failure status
-  - Captures detailed error information
-  - Tracks retry attempts and recovery actions
-  - Provides status summaries for the entire workflow
-- Links all child operations together
-  - Creates a complete trace of the execution path
-  - Enables end-to-end request tracking
-  - Helps identify bottlenecks and dependencies
+- **Complete execution timeline** with start/end times
+- **All child operations** (LLM calls, tool executions) automatically linked
+- **Success/failure status** with detailed error context
+- **Input/output data** for the entire agent run
+- **Performance metrics** including total duration and resource usage
+- **Error handling** with retry attempts and recovery actions
+
+**Example Use Cases:**
+- Customer support agent handling user queries
+- Research agent gathering and analyzing information  
+- Code generation agent creating and testing solutions
 
 </details>
 
-### LLM Node Tracing
-This essential component keeps a detailed record of every interaction with your LLM models (GPT-4, Claude, etc.), helping you understand their behavior and optimize their performance.
+### 🧠 LLM Node Tracing
+**The brain monitor** - Tracks every interaction with language models.
+
+Records complete details of LLM interactions including prompts, responses, and performance. Essential for understanding and optimizing your agent's reasoning.
+
+**Best for:** LLM calls, prompt engineering, performance optimization
 
 <details>
-<summary>**Details**</summary>
+<summary>**What LLM Node Tracing Records**</summary>
 
-- Wraps AI models (LLMs, embeddings)
-  - Supports all major model providers
-  - Handles both synchronous and asynchronous calls
-  - Maintains model-specific configurations
-- Records prompts and responses
-  - Captures complete prompt history
-  - Stores model responses and completions
-  - Tracks prompt engineering changes
-- Tracks token usage and latency
-  - Monitors input and output tokens
-  - Calculates token costs
-  - Measures response times
-- Captures model parameters
-  - Records temperature and other settings
-  - Tracks model version information
-  - Stores custom model configurations
+- **Complete prompts and responses** with exact text
+- **Model parameters** (temperature, max_tokens, etc.)
+- **Response timing** and latency analysis
+- **Error handling** for failed LLM calls
+- **Input/output data flow** between operations
+
+**Example Use Cases:**
+- GPT-4 calls for reasoning and analysis
+- Claude for document processing
+- Custom model endpoints
+- Embedding generation for RAG systems
 
 </details>
 
-### Tool Tracing
-The silent guardian of your utility functions. This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools. It's essential for understanding how your tools interact with the rest of your AI application.
+### 🛠️ Tool Tracing  
+**The action tracker** - Monitors every tool and function your agent uses.
+
+Captures detailed information about tool executions, from simple functions to complex API calls. See exactly what tools are called, with what parameters, and what they return.
+
+**Best for:** Custom functions, API calls, database queries, file operations
 
 <details>
-<summary>**Details**</summary>
+<summary>**What Tool Tracing Records**</summary>
 
-- Monitors tool execution
-  - Tracks tool lifecycle events
-  - Records tool-specific metrics
-  - Monitors tool health and status
-- Records input/output data
-  - Captures tool parameters
-  - Stores tool results
-  - Tracks data transformations
-- Tracks execution time
-  - Measures tool performance
-  - Identifies slow operations
-  - Monitors resource usage
-- Handles errors and retries
-  - Captures tool-specific errors
-  - Manages retry attempts
-  - Provides error context
+- **Function parameters** and return values
+- **Execution timing** and performance metrics
+- **Error handling** with detailed error messages
+- **Resource usage** for expensive operations
+- **Side effects** like file writes or API calls
+- **Retry logic** and failure recovery
+
+**Example Use Cases:**
+- Web search APIs for information gathering
+- Database queries for data retrieval
+- File processing and manipulation
+- External service integrations
 
 </details>
 
-<Callout type="info">
-  Each tracing function is designed to work seamlessly together, giving you a complete picture of your AI application's behavior. Choose the right tool for each part of your workflow, and combine them to create a comprehensive tracing solution.
-</Callout>
+## Getting Started
+
+Transform your AI agents from black boxes to fully observable systems:
+
+<Steps>
+### Add Tracing to Your Agent
+Choose from decorators, wrappers, or manual instrumentation
+
+### Run Your Agent
+Execute normally - tracing happens automatically in the background
+
+### View Insights
+Access detailed traces, performance metrics, and optimization opportunities
+</Steps>
 
 <Callout type="success">
-  With Handit.ai, you can implement tracing in minutes and start getting valuable insights about your AI application.
+  **Ready to see inside your AI agents?** Add tracing in under 5 minutes and get complete visibility into your agent's behavior.
 </Callout>
 
+**Start tracing your agents today:**
+<Cards.Card title="Quick Setup Guide" href="/tracing/quickstart" arrow />
 
-**Integrate into your stack in minutes:**
-<Cards.Card title="Quickstart" href="/tracing/quickstart" arrow />
+*Transform your AI agents from mysterious black boxes to fully observable, debuggable, and optimizable systems.*

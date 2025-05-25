@@ -1,0 +1,132 @@
+---
+title: 'LLM Node Assignment'
+sidebarTitle: 'LLM Node Assignment'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components" 
+
+# LLM Node Assignment
+
+> **Connect evaluators to your AI functions.** Assign custom evaluators to your LLM nodes for automated quality assessment of your AI responses.
+
+Learn the simple process of associating your custom evaluators with specific LLM nodes in your system.
+
+<Callout type="info">
+  Before assigning evaluators, ensure you have [created custom evaluators](/evaluation/guide/custom_evaluators) and configured [model tokens](/evaluation/guide/model_tokens).
+</Callout>
+
+## Assignment Methods
+
+You can associate evaluators with LLM nodes in two ways:
+
+<Steps>
+### From Evaluation Suite
+Select your evaluator and associate it with LLM nodes
+
+### From Agent Performance Dashboard
+Use the three-dot menu on LLM nodes to manage evaluator associations
+</Steps>
+
+## Method 1: From Evaluation Suite
+
+**1. Navigate to Evaluation Suite**
+- Go to **Evaluation Suite**
+- Find the evaluator you want to assign
+
+*[Image placeholder: Evaluation Suite with list of evaluators]*
+
+**2. Associate LLM Node**
+- Click on your evaluator
+- Click **Associate LLM Node**
+- Select the model/node you want to evaluate
+
+*[Image placeholder: Associate LLM Node interface with model selection]*
+
+**3. Confirm Association**
+- Review your selection
+- Click **Save** to create the association
+
+*[Image placeholder: Confirmation of evaluator-node association]*
+
+## Method 2: From Agent Performance Dashboard
+
+**1. Navigate to Agent Performance**
+- Go to **Agent Performance** dashboard
+- Locate the LLM node you want to evaluate
+
+*[Image placeholder: Agent Performance dashboard showing LLM nodes]*
+
+**2. Manage Evaluators**
+- Click the **three-dot menu** on the LLM node
+- Select **Add Evaluators** to associate new evaluators
+- Or select **Remove Evaluators** to remove existing associations
+
+*[Image placeholder: Three-dot menu showing Add/Remove Evaluators options]*
+
+**3. Select and Save**
+- Choose which evaluators to associate with this node
+- Save your selections
+
+*[Image placeholder: Evaluator selection interface]*
+
+## Multiple Evaluator Management
+
+Assign multiple evaluators to the same LLM node for comprehensive quality assessment:
+
+**Example: Customer Support Node**
+```
+Node: Customer Support LLM
+
+Associated Evaluators:
+✅ Response Quality Check
+✅ Safety Compliance  
+✅ Customer Satisfaction
+```
+
+*[Image placeholder: Multiple evaluator assignment interface]*
+
+**Benefits:**
+- **Comprehensive Assessment**: Evaluate different quality dimensions
+- **Specialized Focus**: Each evaluator targets specific criteria
+- **Balanced Coverage**: Combine accuracy, safety, and user experience metrics
+
+## Best Practices
+
+### Start Simple
+- Begin with one evaluator per node
+- Add more evaluators as you understand the system
+- Focus on your most critical AI functions first
+
+### Choose Relevant Evaluators
+- **Customer Support**: Helpfulness and professionalism evaluators
+- **Content Generation**: Accuracy and engagement evaluators  
+- **Technical Support**: Safety and completeness evaluators
+
+### Monitor and Optimize
+- Check evaluation results regularly in your dashboard
+- Adjust evaluator associations based on insights
+- Remove evaluators that aren't providing value
+
+## Removing Associations
+
+To remove an evaluator from an LLM node:
+
+- Click the three-dot menu on the LLM node in **Agent Performance**
+- Select **Remove Evaluators**
+- Choose which evaluators to remove
+- Confirm the removal
+
+*[Image placeholder: Remove evaluators interface]*
+
+## Next Steps
+
+Your evaluators are now associated with LLM nodes and will automatically assess AI responses:
+
+- [Monitor evaluation results](/evaluation/guide/evaluation_results) to track quality trends
+- Adjust evaluator associations based on performance insights
+- Scale evaluation across additional nodes as needed
+
+<Callout type="success">
+  **Your evaluators are now running!** They will automatically assess AI responses and provide quality insights in your dashboard.
+</Callout> 

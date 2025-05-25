@@ -1,0 +1,159 @@
+---
+title: 'Tracing Guide'
+sidebarTitle: 'Overview'
+---
+
+import { Callout } from "nextra/components"
+import { Cards } from 'nextra/components'
+
+# Tracing Guide
+
+> **Master comprehensive AI agent observability.** This guide covers all the different methods for implementing tracing in your AI applications, helping you choose the right approach for your specific needs.
+
+Whether you're building a new AI agent or adding observability to an existing system, this guide will help you implement the most effective tracing strategy.
+
+<Callout type="info">
+  Each tracing method serves different purposes. You can combine multiple approaches in the same application for maximum observability.
+</Callout>
+
+## Tracing Methods Overview
+
+### Agent-Level Tracing
+
+**For complete workflows and end-to-end processes:**
+
+**Agent Wrapper/Decorator** - Most convenient approach that automatically traces entire agent workflows with minimal code changes. Perfect for main entry points, API endpoints, and complete workflows.
+
+**Manual Agent Tracing** - Maximum control approach that gives you complete control over what gets tracked and when. Ideal for complex error handling, custom workflows, and existing monitoring integration.
+
+### Function-Level Tracing
+
+**For individual functions and components:**
+
+**Node Wrapper/Decorator** - Balanced approach that provides automatic tracing with function-level granularity. Great for LLM calls, tool executions, and data processing steps.
+
+**Node Function Tracing** - Maximum flexibility approach that offers programmatic control over function tracing. Perfect for dynamic tracing, third-party libraries, and conditional tracking.
+
+## Choosing the Right Method
+
+### Decision Matrix
+
+| Use Case | Recommended Method | Why |
+|----------|-------------------|-----|
+| **New AI application** | Agent Wrapper/Decorator | Easiest to implement, comprehensive coverage |
+| **Legacy codebase** | Node Function Tracing | Integrates without refactoring |
+| **Specific functions** | Node Wrapper/Decorator | Function-level control with automation |
+| **Complex error handling** | Manual Agent Tracing | Full control over error scenarios |
+| **High-performance requirements** | Node Function Tracing | Conditional and optimized tracing |
+| **Third-party integrations** | Node Function Tracing | Works with any library or service |
+
+### Implementation Strategies
+
+**🚀 Getting Started (New Projects)**
+1. Start with **Agent Wrapper/Decorator** for main workflows
+2. Add **Node Wrapper/Decorator** for key functions
+3. Use **Node Function Tracing** for special cases
+4. Consider **Manual Agent Tracing** for complex scenarios
+
+**🔄 Gradual Adoption (Existing Projects)**
+1. Begin with **Node Function Tracing** for minimal changes
+2. Gradually add **Node Wrapper/Decorator** to key functions
+3. Upgrade to **Agent Wrapper/Decorator** for complete workflows
+4. Implement **Manual Agent Tracing** where needed
+
+## Method Comparison
+
+| Feature | Agent Wrapper | Manual Agent | Node Wrapper | Node Function |
+|---------|---------------|--------------|--------------|---------------|
+| **Ease of Use** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **Flexibility** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Performance** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Error Handling** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Legacy Integration** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+
+## Real-World Examples
+
+### E-commerce AI Assistant
+
+```javascript
+// Agent Wrapper for main workflow
+const ecommerceAssistant = startAgentTracing(async (userQuery) => {
+  // Node Wrapper for specific functions
+  const intent = await classifyIntent(userQuery);
+  const products = await searchProducts(intent);
+  const recommendation = await generateRecommendation(products);
+  
+  return recommendation;
+});
+
+// Node Function for dynamic third-party calls
+async function processPayment(paymentData) {
+  return await traceAgentNodeFunc(
+    externalPaymentAPI.process,
+    paymentData,
+    key: "payment-processing"
+  );
+}
+```
+
+### Data Science Pipeline
+
+```python
+# Manual Agent for complex pipeline control
+async def data_science_pipeline(dataset_path):
+    pipeline_id = f"pipeline-{timestamp}"
+    
+    # Manual tracking with custom logic
+    await tracker._send_tracked_data(
+        model_id="pipeline-start",
+        request_body={"dataset": dataset_path, "pipeline_id": pipeline_id},
+        response_body={"status": "started"}
+    )
+    
+    # Node Wrapper for individual steps
+    raw_data = await load_data(dataset_path)
+    cleaned_data = await clean_data(raw_data)
+    analysis = await analyze_data(cleaned_data)
+    
+    return analysis
+
+@tracker.trace_agent_node("data-cleaning")
+async def clean_data(raw_data):
+    # Automatic tracing of cleaning process
+    return cleaned_data
+```
+
+## Best Practices
+
+### Combining Methods
+
+<Callout type="tip">
+  **Recommended Pattern:** Use Agent Wrappers for main workflows, Node Wrappers for key functions, and Node Function tracing for special cases.
+</Callout>
+
+**Hierarchical Tracing** - Start broad with agent wrappers, then add specific function tracing for detailed insights
+
+**Performance Monitoring** - Use conditional tracing to avoid overhead in production environments
+
+**Error Boundaries** - Implement proper error handling at each tracing level to ensure reliability
+
+**Context Propagation** - Ensure tracing context flows through all methods for complete correlation
+
+### Common Implementation Patterns
+
+**MVP Approach** - Start with Agent Wrappers for quick implementation and immediate value
+
+**Enterprise Pattern** - Combine all methods for comprehensive monitoring and observability
+
+**Legacy Integration** - Use Node Function tracing to gradually add observability without major refactoring
+
+**High-Performance** - Use conditional tracing with smart sampling for performance-critical applications
+
+## Next Steps
+
+Ready to implement tracing? Choose your approach:
+
+- Learn about [Agent Wrapper/Decorator](/tracing/guide/agent_wrapper) for quick implementation
+- Explore [Manual Agent Tracing](/tracing/guide/manual_agent) for maximum control
+- Check [Node Wrapper/Decorator](/tracing/guide/node_wrapper) for function-level tracing
+- Discover [Node Function Tracing](/tracing/guide/node_function) for flexible integration 

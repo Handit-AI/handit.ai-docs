@@ -10,10 +10,12 @@ import { Table } from "nextra/components"
 
 # JavaScript SDK
 
-The Handit.ai JavaScript SDK provides comprehensive tracking and monitoring capabilities for your AI applications. This guide will help you integrate and use the SDK effectively in your Node.js applications.
+> **Modern AI agent observability for Node.js applications.** The Handit.ai JavaScript SDK provides comprehensive tracking and monitoring capabilities designed specifically for Node.js AI applications, with seamless integration for popular HTTP libraries like Axios and Fetch.
+
+This guide covers everything you need to integrate and use the SDK effectively in your JavaScript/TypeScript AI applications.
 
 <Callout type="info">
-  The SDK automatically tracks HTTP requests, agent executions, and custom events, providing detailed insights into your AI application's behavior.
+  The SDK automatically tracks HTTP requests, agent executions, and custom events, providing detailed insights into your AI application's behavior with minimal setup required.
 </Callout>
 
 ## Installation
@@ -43,7 +45,6 @@ const myAgent = handit.startAgentTracing(async (input) => {
 // Use the agent
 await myAgent({ query: "Hello" });
 ```
-
 
 ## Method Reference
 
@@ -175,8 +176,7 @@ await myAgent({ query: "Hello" });
   </tbody>
 </Table>
 
-
-## Detailed Function Reference
+## Core Methods Documentation
 
 ### Configuration
 
@@ -199,17 +199,16 @@ handit.config({
 });
 ```
 
-**Internal State:**
-- Sets `apiKey` for authentication
-- Updates `trackingServerUrl` if provided
-- Updates `performanceServerUrl` if provided
-- Initializes `urlsToTrack` array
-- Sets `isInitialized` flag
+**What it does:**
+- Sets authentication credentials for all tracking operations
+- Configures custom tracking and performance server endpoints
+- Initializes internal state and URL tracking lists
+- Must be called before using any other tracking functions
 
-### Agent Tracing
+### Agent-Level Tracing
 
 #### `startAgentTracing(callback)`
-Creates a traced version of an agent function, supporting both async and sync callbacks.
+Creates a traced version of an agent function for complete workflow tracking.
 
 ```javascript filename="agent.js"
 /**
@@ -229,26 +228,17 @@ const agent = handit.startAgentTracing(async (input) => {
 });
 ```
 
-**Key Features:**
-- Creates new `agentLogId` in AsyncLocalStorage
-- Handles both async and sync functions
-- Automatically tracks start/end events
-- Captures errors and stack traces
-- Maintains context throughout execution
+**Key capabilities:**
+- Creates execution context using AsyncLocalStorage
+- Handles both async and sync callback functions
+- Automatically tracks start/end events with timing
+- Captures errors and stack traces for debugging
+- Maintains context throughout the entire execution
 
-**Internal Flow:**
-1. Creates new AsyncLocalStorage context
-2. Generates unique `agentLogId`
-3. Executes callback with context
-4. Sends start event
-5. Handles result or error
-6. Sends end event
-7. Cleans up context
-
-### Node Tracing
+### Function-Level Tracing
 
 #### `traceAgentNode({ agentNodeId, callback, externalId })`
-Creates a traced version of a node function (tool, model, etc.).
+Creates a traced version of individual functions within an agent workflow.
 
 ```javascript filename="node.js"
 /**
@@ -277,24 +267,17 @@ const node = handit.traceAgentNode({
 });
 ```
 
-**Key Features:**
-- Links to parent agent context
-- Tracks input/output
-- Handles errors automatically
-- Supports external IDs
-- Preserves function signature
+**Key capabilities:**
+- Links to parent agent execution context
+- Captures input parameters and return values
+- Handles errors automatically with full context
+- Supports optional external IDs for integration
+- Preserves original function signature and behavior
 
-**Internal Flow:**
-1. Captures input arguments
-2. Executes callback
-3. Captures output or error
-4. Sends tracking data
-5. Returns result or throws error
-
-### Model Tracking
+### Model & Event Tracking
 
 #### `captureModel({ modelId, requestBody, responseBody })`
-Manually track model calls or custom events.
+Manually track model calls, API responses, or custom events.
 
 ```javascript filename="model.js"
 /**
@@ -319,23 +302,17 @@ await handit.captureModel({
 });
 ```
 
-**Key Features:**
-- Manual event tracking
-- Links to current agent context
-- Handles Axios responses
-- Supports custom events
-- Error handling
+**Key capabilities:**
+- Manual event tracking for custom scenarios
+- Links to current agent execution context
+- Handles Axios response objects automatically
+- Supports any custom event types
+- Robust error handling and data sanitization
 
-**Internal Flow:**
-1. Sanitizes input/output
-2. Links to agent context
-3. Sends tracking data
-4. Updates agent context if needed
-
-### Request Interception
+### HTTP Request Tracking
 
 #### `interceptAxiosRequest(axiosInstance)`
-Adds tracking to Axios HTTP requests.
+Automatically tracks Axios HTTP requests to configured URLs.
 
 ```javascript filename="axios.js"
 /**
@@ -351,23 +328,15 @@ const axios = require('axios');
 handit.interceptAxiosRequest(axios);
 ```
 
-**Key Features:**
-- Request/response interceptors
-- URL-based tracking
-- Automatic context linking
-- Error handling
-- Preserves original functionality
-
-**Internal Flow:**
-1. Adds request interceptor
-2. Checks URL against tracked list
-3. Captures request data
-4. Adds response interceptor
-5. Captures response data
-6. Sends tracking data
+**Key capabilities:**
+- Adds request/response interceptors transparently
+- URL-based tracking with server-managed lists
+- Automatic context linking to agent executions
+- Comprehensive error handling and logging
+- Preserves all original Axios functionality
 
 #### `interceptFetchRequest()`
-Adds tracking to Fetch API requests.
+Automatically tracks Fetch API requests to configured URLs.
 
 ```javascript filename="fetch.js"
 /**
@@ -380,24 +349,17 @@ Adds tracking to Fetch API requests.
 handit.interceptFetchRequest();
 ```
 
-**Key Features:**
-- Global fetch override
-- URL-based tracking
-- Automatic context linking
-- Error handling
-- Maintains original behavior
-
-**Internal Flow:**
-1. Stores original fetch
-2. Overrides global fetch
-3. Checks URL against tracked list
-4. Captures request/response
-5. Sends tracking data
+**Key capabilities:**
+- Global fetch function override
+- URL-based tracking with dynamic configuration
+- Automatic context linking to agent executions
+- Error handling for failed requests
+- Maintains original Fetch API behavior
 
 ### Performance Optimization
 
 #### `fetchOptimizedPrompt({ modelId })`
-Fetches optimized prompts for models.
+Retrieves optimized prompts based on performance data and A/B testing.
 
 ```javascript filename="optimization.js"
 /**
@@ -416,75 +378,22 @@ const prompt = await handit.fetchOptimizedPrompt({
 });
 ```
 
-**Key Features:**
-- Performance data retrieval
-- API key authentication
-- Error handling
-- Response parsing
+**Key capabilities:**
+- Retrieves best-performing prompts from A/B testing
+- API key authentication and validation
+- Comprehensive error handling and response parsing
+- Enables continuous optimization workflows
+- Supports self-improving AI systems
 
-**Internal Flow:**
-1. Validates modelId
-2. Makes API request
-3. Handles response
-4. Returns prompt data
+<Callout type="info">
+  All tracking methods automatically handle errors and maintain execution context, ensuring reliable operation even when exceptions occur in your application code.
+</Callout>
 
-### Internal Utilities
+<Callout type="warning">
+  Always configure the SDK with `handit.config({ apiKey: "your-key" })` before using any tracking functions.
+</Callout>
 
-#### `getCurrentAgentLogId()`
-Gets the current agent log ID from AsyncLocalStorage.
-
-```javascript filename="utils.js"
-/**
- * Get current agent log ID
- * @returns {string|null} Current agent log ID or null
- */
-const agentLogId = handit.getCurrentAgentLogId();
-```
-
-#### `setAgentLogId(agentLogId)`
-Sets the agent log ID in AsyncLocalStorage.
-
-```javascript filename="utils.js"
-/**
- * Set agent log ID
- * @param {string} agentLogId - Agent log ID to set
- */
-handit.setAgentLogId('agent-123');
-```
-
-#### `updateTrackedUrls()`
-Updates the list of URLs to track from the server.
-
-```javascript filename="utils.js"
-/**
- * Update tracked URLs list
- * @returns {Promise<void>}
- */
-await handit.updateTrackedUrls();
-```
-
-#### `sendTrackedData({ modelId, requestBody, responseBody, error, externalId })`
-Sends tracking data to the server.
-
-```javascript filename="utils.js"
-/**
- * Send tracking data
- * @param {Object} options - Tracking options
- * @param {string} options.modelId - Model/event identifier
- * @param {any} options.requestBody - Input data
- * @param {any} options.responseBody - Output data
- * @param {boolean} [options.error] - Error flag
- * @param {string} [options.externalId] - External ID
- * @returns {Promise<Object>} Server response
- */
-await handit.sendTrackedData({
-  modelId: 'model-123',
-  requestBody: { input: 'data' },
-  responseBody: { output: 'result' }
-});
-```
-
-## Use Cases
+## Real-World Use Cases
 
 ### 1. Chatbot with Axios Integration
 
@@ -817,10 +726,10 @@ class EventTracker {
 }
 ```
 
-<Callout type="info">
-  These examples demonstrate real-world use cases of the Handit.ai JavaScript SDK, showing how to effectively track and monitor AI applications in production environments.
+<Callout type="success">
+  These examples demonstrate real-world applications of the Handit.ai JavaScript SDK, showing how to effectively track and monitor AI applications in production environments.
 </Callout>
 
-<Callout type="warning">
-  Remember to replace "your-api-key" with your actual Handit.ai API key in production code.
+<Callout type="info">
+  Remember to replace `"your-api-key"` with your actual Handit.ai API key in production code.
 </Callout>

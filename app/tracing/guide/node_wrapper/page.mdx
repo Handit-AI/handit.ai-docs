@@ -1,0 +1,1189 @@
+---
+title: 'Node Wrapper/Decorator Tracing'
+sidebarTitle: 'Node Wrapper/Decorator'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Node Wrapper/Decorator Tracing
+
+> **The perfect balance between automation and control.** Node wrappers and decorators automatically trace individual functions while giving you granular control over what gets tracked and how, making them ideal for component-level monitoring.
+
+Perfect for tracing specific functions in your AI pipeline—like LLM calls, tool executions, or data processing steps—without needing to modify the entire workflow.
+
+<Callout type="info">
+  Node decorators are ideal for tracing specific functions in your AI pipeline - like LLM calls, tool executions, or data processing steps - without needing to modify the entire workflow.
+</Callout>
+
+## How It Works
+
+Node wrapper tracing provides function-level precision through:
+
+- **Function-level granularity** - Trace specific functions without affecting others
+- **Automatic input/output capture** - Records function parameters and return values
+- **Error handling** - Captures exceptions with full context
+- **Performance tracking** - Measures execution time and resource usage
+- **Composable** - Combine multiple traced functions in complex workflows
+
+## Implementation
+
+### Python: `@trace_agent_node()`
+
+<Tabs items={["Async Functions", "Sync Functions"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="async_node_decorators.py"
+from handit import HanditTracker
+import asyncio
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Example: LLM interaction tracing
+@tracker.trace_agent_node("llm-intent-classification")
+async def classify_user_intent(user_message):
+    """Classify user intent using LLM"""
+    # Your LLM call logic here
+    response = await call_openai_api({
+        "model": "gpt-4",
+        "messages": [
+            {"role": "system", "content": "Classify user intent into: support, sales, technical"},
+            {"role": "user", "content": user_message}
+        ]
+    })
+    
+    return {
+        "intent": response.choices[0].message.content.strip(),
+        "confidence": 0.95,
+        "model_used": "gpt-4"
+    }
+
+# Example: Knowledge retrieval tracing
+@tracker.trace_agent_node("knowledge-base-search")
+async def search_knowledge_base(query, intent_category):
+    """Search knowledge base for relevant information"""
+    # Your vector search logic here
+    search_results = await vector_database.search(
+        query=query,
+        filters={"category": intent_category},
+        top_k=5
+    )
+    
+    return {
+        "results": search_results,
+        "result_count": len(search_results),
+        "search_quality": calculate_search_quality(search_results)
+    }
+
+# Example: Response generation tracing
+@tracker.trace_agent_node("llm-response-generation")
+async def generate_response(user_message, intent, knowledge_context):
+    """Generate response using LLM with context"""
+    context_prompt = f"""
+    User Intent: {intent}
+    Knowledge Context: {knowledge_context}
+    User Message: {user_message}
+    
+    Generate a helpful response:
+    """
+    
+    response = await call_openai_api({
+        "model": "gpt-4",
+        "messages": [{"role": "user", "content": context_prompt}],
+        "temperature": 0.7
+    })
+    
+    return {
+        "response": response.choices[0].message.content,
+        "tokens_used": response.usage.total_tokens,
+        "model": "gpt-4"
+    }
+
+# Example: Data processing tracing
+@tracker.trace_agent_node("data-validation")
+async def validate_user_input(user_data):
+    """Validate and sanitize user input"""
+    validation_results = {
+        "is_valid": True,
+        "errors": [],
+        "warnings": []
+    }
+    
+    # Email validation
+    if not validate_email(user_data.get("email")):
+        validation_results["errors"].append("Invalid email format")
+        validation_results["is_valid"] = False
+    
+    # Phone validation
+    if not validate_phone(user_data.get("phone")):
+        validation_results["warnings"].append("Phone number format unusual")
+    
+    return validation_results
+
+# Using the traced functions together
+async def complete_customer_service_flow(user_message, user_data):
+    """Example of using multiple traced functions together"""
+    
+    # Each function is automatically traced individually
+    validation = await validate_user_input(user_data)
+    
+    if not validation["is_valid"]:
+        return {"error": "Invalid user data", "details": validation["errors"]}
+    
+    intent = await classify_user_intent(user_message)
+    knowledge = await search_knowledge_base(user_message, intent["intent"])
+    response = await generate_response(user_message, intent, knowledge)
+    
+    return {
+        "response": response["response"],
+        "intent": intent["intent"],
+        "validation": validation,
+        "tokens_used": response["tokens_used"]
+    }
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python filename="sync_node_decorators.py"
+from handit import HanditTracker
+import time
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Example: Data processing pipeline with sync functions
+@tracker.trace_agent_node("data-loader")
+def load_data(file_path, format_type="csv"):
+    """Load data from file with format detection"""
+    start_time = time.time()
+    
+    if format_type == "csv":
+        data = load_csv_data(file_path)
+    elif format_type == "json":
+        data = load_json_data(file_path)
+    else:
+        raise ValueError(f"Unsupported format: {format_type}")
+    
+    return {
+        "data": data,
+        "record_count": len(data),
+        "load_time": time.time() - start_time,
+        "format": format_type
+    }
+
+@tracker.trace_agent_node("data-cleaner")
+def clean_data(raw_data):
+    """Clean and preprocess data"""
+    cleaned_records = []
+    errors = []
+    
+    for i, record in enumerate(raw_data["data"]):
+        try:
+            cleaned_record = {
+                "id": record.get("id"),
+                "value": str(record.get("value", "")).strip(),
+                "category": record.get("category", "unknown").lower()
+            }
+            
+            # Validation
+            if not cleaned_record["id"]:
+                raise ValueError("Missing ID")
+            
+            cleaned_records.append(cleaned_record)
+            
+        except Exception as e:
+            errors.append({"record_index": i, "error": str(e)})
+    
+    return {
+        "cleaned_data": cleaned_records,
+        "success_count": len(cleaned_records),
+        "error_count": len(errors),
+        "errors": errors
+    }
+
+@tracker.trace_agent_node("data-analyzer")
+def analyze_data(cleaned_data):
+    """Analyze cleaned data and generate insights"""
+    data = cleaned_data["cleaned_data"]
+    
+    # Category analysis
+    category_counts = {}
+    for record in data:
+        category = record["category"]
+        category_counts[category] = category_counts.get(category, 0) + 1
+    
+    # Quality metrics
+    quality_score = cleaned_data["success_count"] / (
+        cleaned_data["success_count"] + cleaned_data["error_count"]
+    )
+    
+    return {
+        "total_records": len(data),
+        "category_distribution": category_counts,
+        "quality_score": quality_score,
+        "insights": generate_insights(category_counts),
+        "analysis_complete": True
+    }
+
+@tracker.trace_agent_node("report-generator")
+def generate_report(analysis_results):
+    """Generate final report from analysis"""
+    report = {
+        "summary": {
+            "total_records": analysis_results["total_records"],
+            "quality_score": analysis_results["quality_score"],
+            "categories_found": len(analysis_results["category_distribution"])
+        },
+        "details": analysis_results["insights"],
+        "recommendations": generate_recommendations(analysis_results),
+        "generated_at": time.time()
+    }
+    
+    return report
+
+# Complete pipeline using traced functions
+def run_data_pipeline(file_path):
+    """Complete data processing pipeline with individual function tracing"""
+    
+    # Each step is automatically traced
+    raw_data = load_data(file_path)
+    cleaned_data = clean_data(raw_data)
+    analysis = analyze_data(cleaned_data)
+    report = generate_report(analysis)
+    
+    return report
+
+# Helper functions (not traced)
+def load_csv_data(path):
+    # Your CSV loading logic
+    return [{"id": i, "value": f"data_{i}", "category": "test"} for i in range(100)]
+
+def generate_insights(category_counts):
+    # Your insight generation logic
+    return f"Found {len(category_counts)} categories"
+
+def generate_recommendations(analysis):
+    # Your recommendation logic
+    return ["Improve data quality", "Add more categories"]
+```
+</Tabs.Tab>
+</Tabs>
+
+### JavaScript: `traceAgentNode()`
+
+```javascript filename="node_wrappers.js"
+const { config, traceAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Example: LLM interaction tracing
+const classifyUserIntent = traceAgentNode({
+    agentNodeId: 'llm-intent-classification',
+    callback: async (userMessage) => {
+        // Your LLM call logic here
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'gpt-4',
+                messages: [
+                    { role: 'system', content: 'Classify user intent into: support, sales, technical' },
+                    { role: 'user', content: userMessage }
+                ]
+            })
+        });
+        
+        const result = await response.json();
+        
+        return {
+            intent: result.choices[0].message.content.trim(),
+            confidence: 0.95,
+            modelUsed: 'gpt-4',
+            tokensUsed: result.usage.total_tokens
+        };
+    }
+});
+
+// Example: Knowledge base search tracing
+const searchKnowledgeBase = traceAgentNode({
+    agentNodeId: 'knowledge-base-search',
+    callback: async (query, intentCategory) => {
+        // Your vector search logic here
+        const searchResults = await vectorDatabase.search({
+            query: query,
+            filters: { category: intentCategory },
+            topK: 5
+        });
+        
+        return {
+            results: searchResults,
+            resultCount: searchResults.length,
+            searchQuality: calculateSearchQuality(searchResults)
+        };
+    }
+});
+
+// Example: Response generation tracing
+const generateResponse = traceAgentNode({
+    agentNodeId: 'llm-response-generation',
+    callback: async (userMessage, intent, knowledgeContext) => {
+        const contextPrompt = `
+        User Intent: ${intent}
+        Knowledge Context: ${JSON.stringify(knowledgeContext)}
+        User Message: ${userMessage}
+        
+        Generate a helpful response:
+        `;
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'gpt-4',
+                messages: [{ role: 'user', content: contextPrompt }],
+                temperature: 0.7
+            })
+        });
+        
+        const result = await response.json();
+        
+        return {
+            response: result.choices[0].message.content,
+            tokensUsed: result.usage.total_tokens,
+            model: 'gpt-4'
+        };
+    }
+});
+
+// Example: Data validation tracing
+const validateUserInput = traceAgentNode({
+    agentNodeId: 'data-validation',
+    callback: async (userData) => {
+        const validationResults = {
+            isValid: true,
+            errors: [],
+            warnings: []
+        };
+        
+        // Email validation
+        if (!validateEmail(userData.email)) {
+            validationResults.errors.push('Invalid email format');
+            validationResults.isValid = false;
+        }
+        
+        // Phone validation
+        if (!validatePhone(userData.phone)) {
+            validationResults.warnings.push('Phone number format unusual');
+        }
+        
+        return validationResults;
+    }
+});
+
+// Example: API integration tracing
+const fetchUserProfile = traceAgentNode({
+    agentNodeId: 'user-profile-api',
+    callback: async (userId) => {
+        const startTime = Date.now();
+        
+        try {
+            const response = await fetch(`https://api.userservice.com/users/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.USER_API_KEY}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            
+            const userProfile = await response.json();
+            
+            return {
+                profile: userProfile,
+                fetchTime: Date.now() - startTime,
+                source: 'user-api',
+                cached: false
+            };
+            
+        } catch (error) {
+            // Try cache fallback
+            const cachedProfile = await getCachedProfile(userId);
+            
+            if (cachedProfile) {
+                return {
+                    profile: cachedProfile,
+                    fetchTime: Date.now() - startTime,
+                    source: 'cache',
+                    cached: true,
+                    warning: 'API unavailable, using cached data'
+                };
+            }
+            
+            throw error;
+        }
+    }
+});
+
+// Using traced functions in a complete workflow
+async function completeCustomerServiceFlow(userMessage, userData) {
+    // Each function is automatically traced individually
+    const validation = await validateUserInput(userData);
+    
+    if (!validation.isValid) {
+        return { 
+            error: 'Invalid user data', 
+            details: validation.errors 
+        };
+    }
+    
+    const userProfile = await fetchUserProfile(userData.userId);
+    const intent = await classifyUserIntent(userMessage);
+    const knowledge = await searchKnowledgeBase(userMessage, intent.intent);
+    const response = await generateResponse(userMessage, intent, knowledge);
+    
+    return {
+        response: response.response,
+        intent: intent.intent,
+        userProfile: userProfile.profile,
+        validation: validation,
+        tokensUsed: response.tokensUsed,
+        processingComplete: true
+    };
+}
+
+// Helper functions
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validatePhone(phone) {
+    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+    return phoneRegex.test(phone);
+}
+
+async function getCachedProfile(userId) {
+    // Your cache lookup logic
+    return { name: 'Cached User', id: userId };
+}
+
+function calculateSearchQuality(results) {
+    // Your quality calculation logic
+    return results.length > 0 ? 0.8 : 0.0;
+}
+```
+
+## Advanced Patterns
+
+### Conditional Tracing with Decorators
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="conditional_decorators.py"
+from handit import HanditTracker
+import os
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Environment-based tracing
+TRACE_EXPENSIVE_OPERATIONS = os.getenv('TRACE_EXPENSIVE', 'false').lower() == 'true'
+USER_TIER_TRACING = os.getenv('TRACE_USER_TIERS', 'premium,enterprise').split(',')
+
+# Conditional decorator factory
+def conditional_trace(node_id, condition=True):
+    def decorator(func):
+        if condition:
+            return tracker.trace_agent_node(node_id)(func)
+        else:
+            return func
+    return decorator
+
+# Usage examples
+@conditional_trace("expensive-ml-operation", TRACE_EXPENSIVE_OPERATIONS)
+async def expensive_ml_processing(data):
+    """Only trace this expensive operation when enabled"""
+    # Your expensive ML processing
+    result = await run_complex_ml_model(data)
+    return result
+
+@tracker.trace_agent_node("user-tier-check")
+async def check_user_tier(user_id):
+    """Always trace user tier checks"""
+    user_tier = await get_user_tier(user_id)
+    return {"user_id": user_id, "tier": user_tier}
+
+@conditional_trace("premium-feature", lambda: True)  # Dynamic condition
+async def premium_feature_processing(user_id, data):
+    """Conditionally trace based on user tier"""
+    user_info = await check_user_tier(user_id)
+    
+    if user_info["tier"] in USER_TIER_TRACING:
+        # This will be traced because the condition is met
+        return await advanced_processing(data)
+    else:
+        # Basic processing for other users
+        return await basic_processing(data)
+
+# Dynamic tracing based on runtime conditions
+class SmartTracer:
+    def __init__(self, tracker):
+        self.tracker = tracker
+        self.trace_config = {}
+    
+    def smart_trace(self, node_id):
+        def decorator(func):
+            async def wrapper(*args, **kwargs):
+                # Decide at runtime whether to trace
+                should_trace = self.should_trace_function(node_id, args, kwargs)
+                
+                if should_trace:
+                    # Apply tracing
+                    traced_func = self.tracker.trace_agent_node(node_id)(func)
+                    return await traced_func(*args, **kwargs)
+                else:
+                    # Execute without tracing
+                    return await func(*args, **kwargs)
+            
+            return wrapper
+        return decorator
+    
+    def should_trace_function(self, node_id, args, kwargs):
+        # Your custom logic to decide if function should be traced
+        # Could be based on user tier, request type, system load, etc.
+        return True
+
+# Usage of smart tracer
+smart_tracer = SmartTracer(tracker)
+
+@smart_tracer.smart_trace("adaptive-processing")
+async def adaptive_processing(request_data):
+    """Function that's traced adaptively based on context"""
+    return await process_request(request_data)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="conditional_wrappers.js"
+const { config, traceAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Environment-based tracing
+const TRACE_EXPENSIVE_OPERATIONS = process.env.TRACE_EXPENSIVE === 'true';
+const USER_TIER_TRACING = (process.env.TRACE_USER_TIERS || 'premium,enterprise').split(',');
+
+// Conditional wrapper factory
+function conditionalTrace(nodeId, condition = true) {
+    return function(callback) {
+        if (condition) {
+            return traceAgentNode({ agentNodeId: nodeId, callback });
+        } else {
+            return callback;
+        }
+    };
+}
+
+// Usage examples
+const expensiveMLProcessing = conditionalTrace(
+    'expensive-ml-operation',
+    TRACE_EXPENSIVE_OPERATIONS
+)(async (data) => {
+    // Your expensive ML processing
+    const result = await runComplexMLModel(data);
+    return result;
+});
+
+const checkUserTier = traceAgentNode({
+    agentNodeId: 'user-tier-check',
+    callback: async (userId) => {
+        const userTier = await getUserTier(userId);
+        return { userId, tier: userTier };
+    }
+});
+
+// Dynamic tracing based on user tier
+const premiumFeatureProcessing = async (userId, data) => {
+    const userInfo = await checkUserTier(userId);
+    
+    // Decide whether to trace based on user tier
+    const shouldTrace = USER_TIER_TRACING.includes(userInfo.tier);
+    
+    const processingFunction = async (data) => {
+        if (userInfo.tier === 'enterprise') {
+            return await enterpriseProcessing(data);
+        } else if (userInfo.tier === 'premium') {
+            return await premiumProcessing(data);
+        } else {
+            return await basicProcessing(data);
+        }
+    };
+    
+    if (shouldTrace) {
+        const tracedFunction = traceAgentNode({
+            agentNodeId: `${userInfo.tier}-feature-processing`,
+            callback: processingFunction
+        });
+        return await tracedFunction(data);
+    } else {
+        return await processingFunction(data);
+    }
+};
+
+// Smart tracer class for advanced conditional logic
+class SmartTracer {
+    constructor() {
+        this.traceConfig = {};
+        this.systemMetrics = {};
+    }
+    
+    smartTrace(nodeId, options = {}) {
+        return (callback) => {
+            return async (...args) => {
+                const shouldTrace = await this.shouldTraceFunction(nodeId, args, options);
+                
+                if (shouldTrace) {
+                    const tracedFunction = traceAgentNode({
+                        agentNodeId: nodeId,
+                        callback
+                    });
+                    return await tracedFunction(...args);
+                } else {
+                    return await callback(...args);
+                }
+            };
+        };
+    }
+    
+    async shouldTraceFunction(nodeId, args, options) {
+        // Dynamic decision making based on:
+        // - System load
+        // - Request characteristics
+        // - User context
+        // - Time of day
+        // - Error rates
+        
+        const systemLoad = await this.getCurrentSystemLoad();
+        const requestSize = this.estimateRequestSize(args);
+        
+        // Don't trace during high system load
+        if (systemLoad > 0.8) {
+            return false;
+        }
+        
+        // Always trace large requests
+        if (requestSize > 1000) {
+            return true;
+        }
+        
+        // Trace randomly for sampling
+        return Math.random() < 0.1; // 10% sampling
+    }
+    
+    async getCurrentSystemLoad() {
+        // Your system monitoring logic
+        return 0.3; // Example: 30% load
+    }
+    
+    estimateRequestSize(args) {
+        // Estimate the size/complexity of the request
+        return JSON.stringify(args).length;
+    }
+}
+
+// Usage of smart tracer
+const smartTracer = new SmartTracer();
+
+const adaptiveProcessing = smartTracer.smartTrace('adaptive-processing', {
+    alwaysTrace: false,
+    samplingRate: 0.1
+})(async (requestData) => {
+    // Function that's traced adaptively based on context
+    return await processRequest(requestData);
+});
+
+// Performance-aware tracing
+const performanceAwareFunction = async (data, userContext) => {
+    const startTime = Date.now();
+    
+    // Light processing that's always traced
+    const lightProcessing = traceAgentNode({
+        agentNodeId: 'light-processing',
+        callback: async (data) => {
+            return await quickValidation(data);
+        }
+    });
+    
+    const validationResult = await lightProcessing(data);
+    
+    if (validationResult.needsHeavyProcessing) {
+        // Heavy processing that's conditionally traced
+        const shouldTraceHeavy = Date.now() - startTime < 1000; // Only if we're still fast
+        
+        const heavyProcessing = conditionalTrace(
+            'heavy-processing',
+            shouldTraceHeavy
+        )(async (data) => {
+            return await complexAnalysis(data);
+        });
+        
+        return await heavyProcessing(data);
+    }
+    
+    return validationResult;
+};
+```
+</Tabs.Tab>
+</Tabs>
+
+### Error Recovery with Node Tracing
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="error_recovery_decorators.py"
+from handit import HanditTracker
+import asyncio
+from functools import wraps
+
+tracker = HanditTracker()
+tracker.config(api_key="your-api-key")
+
+# Custom decorator that combines tracing with retry logic
+def trace_with_retry(node_id, max_retries=3, backoff_factor=1.0):
+    def decorator(func):
+        @tracker.trace_agent_node(f"{node_id}-with-retry")
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            last_exception = None
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    result = await func(*args, **kwargs)
+                    
+                    # Log successful attempt if it wasn't the first
+                    if attempt > 0:
+                        await tracker._send_tracked_data(
+                            model_id=f"{node_id}-retry-success",
+                            request_body={"attempt": attempt + 1, "args": args[:1]},
+                            response_body={"success": True, "result": result}
+                        )
+                    
+                    return result
+                    
+                except Exception as e:
+                    last_exception = e
+                    
+                    # Log the retry attempt
+                    await tracker._send_tracked_data(
+                        model_id=f"{node_id}-retry-attempt",
+                        request_body={"attempt": attempt + 1, "max_retries": max_retries},
+                        response_body={"error": str(e), "will_retry": attempt < max_retries}
+                    )
+                    
+                    if attempt < max_retries:
+                        # Wait before retrying
+                        await asyncio.sleep(backoff_factor * (2 ** attempt))
+                    else:
+                        # Final failure
+                        await tracker._send_tracked_data(
+                            model_id=f"{node_id}-final-failure",
+                            request_body={"total_attempts": max_retries + 1},
+                            response_body={"final_error": str(e)}
+                        )
+                        raise last_exception
+            
+            raise last_exception
+        
+        return wrapper
+    return decorator
+
+# Usage examples
+@trace_with_retry("external-api-call", max_retries=3)
+async def call_external_api(endpoint, payload):
+    """API call with automatic retry and tracing"""
+    response = await make_http_request(endpoint, payload)
+    if response.status_code != 200:
+        raise Exception(f"API Error: {response.status_code}")
+    return response.json()
+
+@trace_with_retry("llm-inference", max_retries=2, backoff_factor=0.5)
+async def call_llm_with_retry(prompt):
+    """LLM call with retry logic"""
+    response = await call_openai_api(prompt)
+    if not response.choices:
+        raise Exception("Empty LLM response")
+    return response.choices[0].message.content
+
+# Circuit breaker pattern with tracing
+class TracedCircuitBreaker:
+    def __init__(self, tracker, node_id, failure_threshold=5, recovery_timeout=60):
+        self.tracker = tracker
+        self.node_id = node_id
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = "CLOSED"  # CLOSED, OPEN, HALF_OPEN
+    
+    def __call__(self, func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            if self.state == "OPEN":
+                if self._should_attempt_reset():
+                    self.state = "HALF_OPEN"
+                else:
+                    # Log circuit breaker blocking the call
+                    await self.tracker._send_tracked_data(
+                        model_id=f"{self.node_id}-circuit-breaker-blocked",
+                        request_body={"state": self.state, "failure_count": self.failure_count},
+                        response_body={"blocked": True}
+                    )
+                    raise Exception("Circuit breaker is OPEN")
+            
+            # Apply normal tracing
+            traced_func = self.tracker.trace_agent_node(f"{self.node_id}-circuit-protected")(func)
+            
+            try:
+                result = await traced_func(*args, **kwargs)
+                await self._on_success()
+                return result
+            except Exception as e:
+                await self._on_failure()
+                raise
+        
+        return wrapper
+    
+    async def _on_success(self):
+        if self.state == "HALF_OPEN":
+            self.state = "CLOSED"
+            await self.tracker._send_tracked_data(
+                model_id=f"{self.node_id}-circuit-breaker-reset",
+                request_body={"previous_state": "HALF_OPEN"},
+                response_body={"new_state": "CLOSED"}
+            )
+        self.failure_count = 0
+    
+    async def _on_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        
+        if self.failure_count >= self.failure_threshold:
+            self.state = "OPEN"
+            await self.tracker._send_tracked_data(
+                model_id=f"{self.node_id}-circuit-breaker-opened",
+                request_body={"failure_count": self.failure_count},
+                response_body={"state": "OPEN"}
+            )
+    
+    def _should_attempt_reset(self):
+        return (time.time() - self.last_failure_time) > self.recovery_timeout
+
+# Usage
+circuit_breaker = TracedCircuitBreaker(tracker, "unreliable-service")
+
+@circuit_breaker
+async def unreliable_external_service(data):
+    """Service that might fail and needs circuit breaker protection"""
+    # Your unreliable service call
+    return await external_service.process(data)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="error_recovery_wrappers.js"
+const { config, traceAgentNode, captureAgentNode } = require('handit-sdk');
+
+config({ apiKey: 'your-api-key' });
+
+// Wrapper factory that combines tracing with retry logic
+function traceWithRetry(nodeId, maxRetries = 3, backoffFactor = 1.0) {
+    return function(callback) {
+        return traceAgentNode({
+            agentNodeId: `${nodeId}-with-retry`,
+            callback: async (...args) => {
+                let lastException = null;
+                
+                for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                    try {
+                        const result = await callback(...args);
+                        
+                        // Log successful attempt if it wasn't the first
+                        if (attempt > 0) {
+                            await captureAgentNode({
+                                agentNodeSlug: `${nodeId}-retry-success`,
+                                requestBody: { attempt: attempt + 1, args: args.slice(0, 1) },
+                                responseBody: { success: true, result }
+                            });
+                        }
+                        
+                        return result;
+                        
+                    } catch (error) {
+                        lastException = error;
+                        
+                        // Log the retry attempt
+                        await captureAgentNode({
+                            agentNodeSlug: `${nodeId}-retry-attempt`,
+                            requestBody: { attempt: attempt + 1, maxRetries },
+                            responseBody: { 
+                                error: error.message, 
+                                willRetry: attempt < maxRetries 
+                            },
+                            error: true
+                        });
+                        
+                        if (attempt < maxRetries) {
+                            // Wait before retrying
+                            await new Promise(resolve => 
+                                setTimeout(resolve, backoffFactor * 1000 * Math.pow(2, attempt))
+                            );
+                        } else {
+                            // Final failure
+                            await captureAgentNode({
+                                agentNodeSlug: `${nodeId}-final-failure`,
+                                requestBody: { totalAttempts: maxRetries + 1 },
+                                responseBody: { finalError: error.message },
+                                error: true
+                            });
+                            throw lastException;
+                        }
+                    }
+                }
+                
+                throw lastException;
+            }
+        });
+    };
+}
+
+// Usage examples
+const callExternalAPI = traceWithRetry('external-api-call', 3)(
+    async (endpoint, payload) => {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+        
+        return await response.json();
+    }
+);
+
+const callLLMWithRetry = traceWithRetry('llm-inference', 2)(
+    async (prompt) => {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'gpt-4',
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.choices || result.choices.length === 0) {
+            throw new Error('Empty LLM response');
+        }
+        
+        return result.choices[0].message.content;
+    }
+);
+
+// Circuit breaker pattern with tracing
+class TracedCircuitBreaker {
+    constructor(nodeId, failureThreshold = 5, recoveryTimeout = 60000) {
+        this.nodeId = nodeId;
+        this.failureThreshold = failureThreshold;
+        this.recoveryTimeout = recoveryTimeout;
+        this.failureCount = 0;
+        this.lastFailureTime = null;
+        this.state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
+    }
+    
+    wrap(callback) {
+        return traceAgentNode({
+            agentNodeId: `${this.nodeId}-circuit-protected`,
+            callback: async (...args) => {
+                if (this.state === 'OPEN') {
+                    if (this.shouldAttemptReset()) {
+                        this.state = 'HALF_OPEN';
+                    } else {
+                        // Log circuit breaker blocking the call
+                        await captureAgentNode({
+                            agentNodeSlug: `${this.nodeId}-circuit-breaker-blocked`,
+                            requestBody: { 
+                                state: this.state, 
+                                failureCount: this.failureCount 
+                            },
+                            responseBody: { blocked: true },
+                            error: true
+                        });
+                        throw new Error('Circuit breaker is OPEN');
+                    }
+                }
+                
+                try {
+                    const result = await callback(...args);
+                    await this.onSuccess();
+                    return result;
+                } catch (error) {
+                    await this.onFailure();
+                    throw error;
+                }
+            }
+        });
+    }
+    
+    async onSuccess() {
+        if (this.state === 'HALF_OPEN') {
+            this.state = 'CLOSED';
+            await captureAgentNode({
+                agentNodeSlug: `${this.nodeId}-circuit-breaker-reset`,
+                requestBody: { previousState: 'HALF_OPEN' },
+                responseBody: { newState: 'CLOSED' }
+            });
+        }
+        this.failureCount = 0;
+    }
+    
+    async onFailure() {
+        this.failureCount++;
+        this.lastFailureTime = Date.now();
+        
+        if (this.failureCount >= this.failureThreshold) {
+            this.state = 'OPEN';
+            await captureAgentNode({
+                agentNodeSlug: `${this.nodeId}-circuit-breaker-opened`,
+                requestBody: { failureCount: this.failureCount },
+                responseBody: { state: 'OPEN' }
+            });
+        }
+    }
+    
+    shouldAttemptReset() {
+        return (Date.now() - this.lastFailureTime) > this.recoveryTimeout;
+    }
+}
+
+// Usage
+const circuitBreaker = new TracedCircuitBreaker('unreliable-service', 5, 60000);
+
+const unreliableExternalService = circuitBreaker.wrap(async (data) => {
+    // Your unreliable service call
+    const response = await fetch('https://unreliable-api.com/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Service unavailable: ${response.status}`);
+    }
+    
+    return await response.json();
+});
+
+// Graceful degradation with tracing
+const processWithFallback = traceAgentNode({
+    agentNodeId: 'process-with-fallback',
+    callback: async (data) => {
+        try {
+            // Try primary processing
+            const primaryResult = await primaryProcessingService(data);
+            
+            await captureAgentNode({
+                agentNodeSlug: 'primary-processing-success',
+                requestBody: { dataSize: data.length },
+                responseBody: { method: 'primary', result: primaryResult }
+            });
+            
+            return { result: primaryResult, method: 'primary' };
+            
+        } catch (primaryError) {
+            // Log primary failure
+            await captureAgentNode({
+                agentNodeSlug: 'primary-processing-failed',
+                requestBody: { dataSize: data.length },
+                responseBody: { error: primaryError.message },
+                error: true
+            });
+            
+            try {
+                // Try fallback processing
+                const fallbackResult = await fallbackProcessingService(data);
+                
+                await captureAgentNode({
+                    agentNodeSlug: 'fallback-processing-success',
+                    requestBody: { dataSize: data.length },
+                    responseBody: { method: 'fallback', result: fallbackResult }
+                });
+                
+                return { result: fallbackResult, method: 'fallback' };
+                
+            } catch (fallbackError) {
+                // Both failed
+                await captureAgentNode({
+                    agentNodeSlug: 'all-processing-failed',
+                    requestBody: { dataSize: data.length },
+                    responseBody: { 
+                        primaryError: primaryError.message,
+                        fallbackError: fallbackError.message 
+                    },
+                    error: true
+                });
+                
+                throw new Error('All processing methods failed');
+            }
+        }
+    }
+});
+```
+</Tabs.Tab>
+</Tabs>
+
+## Best Practices
+
+**When to Use Node Decorators:**
+
+| **Use Case** | **Why Node Decorators** |
+|--------------|------------------------|
+| **Individual function optimization** | Focus on specific components without affecting the entire workflow |
+| **Component-level monitoring** | Track performance and behavior of key functions independently |
+| **Gradual tracing implementation** | Add tracing incrementally to existing codebases without major refactoring |
+| **Legacy code integration** | Integrate with existing systems without disrupting current architecture |
+| **Function-specific error handling** | Implement targeted error recovery and monitoring for critical functions |
+
+**Implementation Guidelines:**
+
+1. **Use descriptive node IDs** - Choose clear, meaningful identifiers that match your system architecture
+2. **Keep decorators lightweight** - Minimize overhead by focusing on essential tracking data
+3. **Combine with circuit breakers** - Add resilience patterns for external dependencies and unreliable services
+4. **Implement proper error boundaries** - Handle tracing failures gracefully without affecting business logic
+5. **Monitor performance impact** - Balance tracing detail with system performance requirements
+
+<Callout type="success">
+  Node decorators provide the perfect balance between automation and control. They're ideal for gradually adding tracing to existing codebases and focusing on specific components.
+</Callout>
+
+<Callout type="warning">
+  Be mindful of performance when using many decorators. Consider conditional tracing for non-critical functions or high-frequency operations.
+</Callout>
+
+## Next Steps
+
+- Explore [Agent Wrapper/Decorator](/tracing/guide/agent_wrapper) for complete workflow tracing
+- Learn about [Manual Agent Tracing](/tracing/guide/manual_agent) for maximum control
+- Check [Node Function Tracing](/tracing/guide/node_function) for programmatic approaches 

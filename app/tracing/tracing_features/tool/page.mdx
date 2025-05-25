@@ -6,23 +6,29 @@ sidebarTitle: 'Tool Tracing'
 import { Callout } from "nextra/components"
 import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
+import { Cards } from "nextra/components"
 
 # Tool Tracing
 
-Tool Tracing is the silent guardian of your utility functions. This powerful tracker ensures you never miss a beat when monitoring your helper functions and custom tools. It's essential for understanding how your tools interact with the rest of your system.
+> **Track every action your agent takes.** Tool Tracing monitors all your custom functions, API calls, and utility operations, providing complete visibility into how your agent's tools perform.
+
+Perfect for tracking custom functions, RAG systems, database queries, API integrations, and any supporting operations that power your AI agent.
 
 <Callout type="info">
-  Tool Tracing works similarly to Model Tracing but is specifically designed for utility functions, RAGs, and other helper tools. It automatically tracks all inputs, outputs, and execution details.
+  Tool Tracing automatically captures inputs, outputs, execution time, and error details for all your agent's supporting functions and tools.
 </Callout>
 
-## How It Works
+## What Gets Tracked
 
-Tool Tracing wraps your utility functions to:
+Every tool execution is captured with complete context:
 
-- Track all function inputs and outputs
-- Monitor execution time and performance
-- Capture error cases and stack traces
-- Maintain detailed logs of tool interactions
+| **Data Type** | **What's Captured** | **Why It Matters** |
+|---------------|-------------------|-------------------|
+| **📥 Function Inputs** | All parameters and arguments passed to tools | Debug issues and validate data flow |
+| **📤 Function Outputs** | Return values and results from tool execution | Verify tool behavior and output quality |
+| **⏱️ Performance** | Execution time and resource usage | Identify slow tools and bottlenecks |
+| **❌ Errors** | Exception details, stack traces, and failure context | Quickly diagnose and fix tool issues |
+| **🔗 Context** | Tool relationships and execution order | Understand how tools work together |
 
 ## Implementation
 
@@ -107,7 +113,7 @@ Tool Tracing wraps your utility functions to:
 
 ## Common Use Cases
 
-### 1. Utility Function Tracking
+### Utility Function Tracking
 
 <Tabs items={['Python', 'JavaScript']}>
   <Tabs.Tab>
@@ -260,7 +266,7 @@ Tool Tracing wraps your utility functions to:
   </Tabs.Tab>
 </Tabs>
 
-### 2. RAG Tool Tracking
+### RAG Tool Tracking
 
 <Tabs items={['Python', 'JavaScript']}>
   <Tabs.Tab>
@@ -404,331 +410,63 @@ Tool Tracing wraps your utility functions to:
   </Tabs.Tab>
 </Tabs>
 
-### 3. API Tool Tracking
-
-<Tabs items={['Python', 'JavaScript']}>
-  <Tabs.Tab>
-    ```python filename="api_tracking.py"
-    from handit_service import tracker
-    from typing import Dict, Any, Optional
-    import aiohttp
-    import logging
-
-    # API tool tracking with request handling
-    class APITool:
-        def __init__(self, base_url: str):
-            self.base_url = base_url
-            self.request = tracker.track_tool(
-                self._make_request,
-                "api-request"
-            )
-            self.validate = tracker.track_tool(
-                self._validate_response,
-                "response-validator"
-            )
-
-        async def _make_request(
-            self,
-            endpoint: str,
-            method: str = "GET",
-            data: Optional[Dict[str, Any]] = None
-        ) -> Dict[str, Any]:
-            """Make HTTP request to API endpoint."""
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.request(
-                        method,
-                        f"{self.base_url}/{endpoint}",
-                        json=data
-                    ) as response:
-                        return await response.json()
-            except Exception as e:
-                logging.error(f"Request error: {str(e)}")
-                raise
-
-        def _validate_response(
-            self,
-            response: Dict[str, Any]
-        ) -> bool:
-            """Validate API response."""
-            return (
-                isinstance(response, dict) and
-                "status" in response and
-                response["status"] == "success"
-            )
-
-        async def call(
-            self,
-            endpoint: str,
-            method: str = "GET",
-            data: Optional[Dict[str, Any]] = None
-        ) -> Dict[str, Any]:
-            try:
-                # Make request
-                response = await self.request(endpoint, method, data)
-                
-                # Validate response
-                if not self.validate(response):
-                    raise ValueError("Invalid API response")
-                
-                return response
-            except Exception as e:
-                logging.error(f"API call error: {str(e)}")
-                raise
-
-    # Usage
-    async def main():
-        api = APITool("https://api.example.com")
-        result = await api.call(
-            "users",
-            method="POST",
-            data={"name": "John Doe"}
-        )
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```javascript filename="api_tracking.js"
-    const { trackTool } = require('handit-service');
-    const axios = require('axios');
-    const logger = require('./logger');
-
-    // API tool tracking with request handling
-    class APITool {
-        constructor(baseUrl) {
-            this.baseUrl = baseUrl;
-            this.request = trackTool(
-                this._makeRequest.bind(this),
-                'api-request'
-            );
-            this.validate = trackTool(
-                this._validateResponse.bind(this),
-                'response-validator'
-            );
-        }
-
-        async _makeRequest(endpoint, method = 'GET', data = null) {
-            // Make HTTP request to API endpoint
-            try {
-                const response = await axios({
-                    method,
-                    url: `${this.baseUrl}/${endpoint}`,
-                    data
-                });
-                return response.data;
-            } catch (error) {
-                logger.error(`Request error: ${error.message}`);
-                throw error;
-            }
-        }
-
-        _validateResponse(response) {
-            // Validate API response
-            return (
-                typeof response === 'object' &&
-                'status' in response &&
-                response.status === 'success'
-            );
-        }
-
-        async call(endpoint, method = 'GET', data = null) {
-            try {
-                // Make request
-                const response = await this.request(endpoint, method, data);
-                
-                // Validate response
-                if (!this.validate(response)) {
-                    throw new Error('Invalid API response');
-                }
-                
-                return response;
-            } catch (error) {
-                logger.error(`API call error: ${error.message}`);
-                throw error;
-            }
-        }
-    }
-
-    // Usage
-    const main = async () => {
-        const api = new APITool('https://api.example.com');
-        const result = await api.call(
-            'users',
-            'POST',
-            { name: 'John Doe' }
-        );
-    };
-    ```
-  </Tabs.Tab>
-</Tabs>
-
 ## Best Practices
 
-1. **Tool Configuration**
-   - Use meaningful tool IDs
-   - Include environment information
-   - Track tool parameters
+### Implementation Guidelines
+
+1. **Use Meaningful Tool IDs**
+   - Choose descriptive names that identify the tool's purpose
+   - Include context like "data-validator" or "api-client"
+   - Make IDs consistent across environments
 
 2. **Error Handling**
-   - Implement proper error boundaries
-   - Log detailed error information
-   - Handle tool-specific errors
+   - Let errors propagate naturally through your code
+   - Implement proper error boundaries for critical tools
+   - Log detailed error information for debugging
 
-3. **Performance Monitoring**
-   - Track execution time
-   - Monitor resource usage
-   - Identify bottlenecks
+3. **Performance Considerations**
+   - Track execution time for performance-critical tools
+   - Monitor resource usage for expensive operations
+   - Identify and optimize bottlenecks
 
 4. **Data Management**
-   - Sanitize sensitive data
-   - Handle large inputs
-   - Manage tool state
+   - Sanitize sensitive data before logging
+   - Handle large inputs and outputs appropriately
+   - Manage tool state and lifecycle properly
 
 <Callout type="warning">
   Always implement proper error handling and logging when tracking tools to ensure you can debug issues effectively.
 </Callout>
 
-## Advanced Usage
+## Dashboard Insights
 
-### 1. Tool Performance Tracking
+When you trace tools, you get comprehensive analytics in your Handit.ai dashboard:
 
-<Tabs items={['Python', 'JavaScript']}>
-  <Tabs.Tab>
-    ```python filename="performance_tracking.py"
-    from handit_service import tracker
-    from typing import Dict, Any
-    import time
-    import logging
+**📊 Performance Metrics**
+- Function execution time and latency trends
+- Resource usage for each tool operation
+- Request volume and frequency patterns
+- Tool efficiency and throughput analysis
 
-    # Tool performance tracking
-    class PerformanceTracker:
-        def __init__(self, tool, tool_id: str):
-            self.tool = tracker.track_tool(tool, tool_id)
-            self.metrics: Dict[str, Any] = {}
+**🔍 Complete Tracing Data**
+- Full function input and output inspection
+- Tool execution order and call hierarchy
+- Data transformations and processing flow
+- Function parameter and return value tracking
 
-        async def track_performance(
-            self,
-            *args: Any,
-            **kwargs: Any
-        ) -> Any:
-            try:
-                start_time = time.time()
-                result = await self.tool(*args, **kwargs)
-                end_time = time.time()
-
-                # Track metrics
-                self.metrics.update({
-                    "execution_time": end_time - start_time,
-                    "input_size": len(str(args)) + len(str(kwargs)),
-                    "output_size": len(str(result))
-                })
-
-                return result
-            except Exception as e:
-                logging.error(f"Performance tracking error: {str(e)}")
-                raise
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```javascript filename="performance_tracking.js"
-    const { trackTool } = require('handit-service');
-    const logger = require('./logger');
-
-    // Tool performance tracking
-    class PerformanceTracker {
-        constructor(tool, toolId) {
-            this.tool = trackTool(tool, toolId);
-            this.metrics = {};
-        }
-
-        async trackPerformance(...args) {
-            try {
-                const startTime = Date.now();
-                const result = await this.tool(...args);
-                const endTime = Date.now();
-
-                // Track metrics
-                this.metrics = {
-                    executionTime: endTime - startTime,
-                    inputSize: JSON.stringify(args).length,
-                    outputSize: JSON.stringify(result).length
-                };
-
-                return result;
-            } catch (error) {
-                logger.error(`Performance tracking error: ${error.message}`);
-                throw error;
-            }
-        }
-    }
-    ```
-  </Tabs.Tab>
-</Tabs>
-
-### 2. Tool Chain Tracking
-
-<Tabs items={['Python', 'JavaScript']}>
-  <Tabs.Tab>
-    ```python filename="chain_tracking.py"
-    from handit_service import tracker
-    from typing import List, Dict, Any
-    import logging
-
-    # Tool chain tracking
-    class ToolChain:
-        def __init__(self, tools: List[Any], chain_id: str):
-            self.tools = [
-                tracker.track_tool(tool, f"{chain_id}-{i}")
-                for i, tool in enumerate(tools)
-            ]
-
-        async def process(
-            self,
-            input_data: Dict[str, Any]
-        ) -> Dict[str, Any]:
-            try:
-                result = input_data
-                for tool in self.tools:
-                    result = await tool(result)
-                return result
-            except Exception as e:
-                logging.error(f"Chain processing error: {str(e)}")
-                raise
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```javascript filename="chain_tracking.js"
-    const { trackTool } = require('handit-service');
-    const logger = require('./logger');
-
-    // Tool chain tracking
-    class ToolChain {
-        constructor(tools, chainId) {
-            this.tools = tools.map((tool, i) => 
-                trackTool(tool, `${chainId}-${i}`)
-            );
-        }
-
-        async process(inputData) {
-            try {
-                let result = inputData;
-                for (const tool of this.tools) {
-                    result = await tool(result);
-                }
-                return result;
-            } catch (error) {
-                logger.error(`Chain processing error: ${error.message}`);
-                throw error;
-            }
-        }
-    }
-    ```
-  </Tabs.Tab>
-</Tabs>
-
-<Callout type="info">
-  Tool Tracing provides comprehensive tracking capabilities for all your utility functions and tools, helping you monitor performance and debug issues effectively.
-</Callout>
+**🚨 Error Detection & Flagging**
+- Automatic detection of tool failures and exceptions
+- Error pattern analysis and failure rate tracking
+- Stack trace capture and error context
+- Tool reliability monitoring and alerts
 
 <Callout type="success">
-  By implementing Tool Tracing in your application, you can gain valuable insights into your tools' behavior and optimize their performance.
+  Tool Tracing provides the visibility you need to optimize your agent's supporting functions, reduce errors, and improve overall performance.
 </Callout>
+
+## Next Steps
+
+Ready to complete your tracing setup?
+
+- Learn about [Agent Tracing](/tracing/tracing_features/agent) for end-to-end workflow monitoring
+- Explore [LLM Node Tracing](/tracing/tracing_features/llm_node) for AI model interaction tracking

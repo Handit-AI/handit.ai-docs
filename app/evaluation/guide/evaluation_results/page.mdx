@@ -1,0 +1,195 @@
+---
+title: 'Viewing Evaluation Results'
+sidebarTitle: 'Viewing Results'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components" 
+
+# Viewing Evaluation Results
+
+> **Monitor your AI quality in real-time.** View evaluation results through failed agent runs in tracing and quality metrics in your agent performance dashboard.
+
+Access and understand evaluation results that help you monitor your AI's quality performance.
+
+<Callout type="info">
+  Evaluation results appear in real-time as your evaluators assess production interactions. All viewing happens through the Handit.ai platform dashboard.
+</Callout>
+
+## How Evaluation Results Work
+
+Evaluation results are displayed in two key ways:
+
+<Steps>
+### Failed Agent Runs in Tracing
+See which agent runs failed due to evaluator-detected quality issues
+
+### Quality Metrics in Agent Performance
+View calculated metrics like accuracy, coherence, and completeness per evaluator
+</Steps>
+
+## Method 1: Failed Agent Runs in Tracing
+
+When an evaluator detects quality issues, the agent run is marked as failed in your tracing dashboard.
+
+**1. Navigate to Tracing**
+- Go to your **Tracing** page
+- Look for agent runs marked with failure indicators
+
+*[Image placeholder: Tracing page showing failed agent runs]*
+
+**2. Identify Failed Runs**
+- Failed runs are visually highlighted
+- Failure indicators show which runs had quality issues
+- Quick overview of failure reasons
+
+*[Image placeholder: Failed agent run indicators in tracing list]*
+
+**3. View Failure Details**
+- Click on a failed agent run
+- See detailed tracing information
+- Visual indicators show which LLM node failed
+- View the specific failure detected by the evaluator
+
+*[Image placeholder: Detailed tracing view showing failed LLM node and evaluator failure details]*
+
+**Example Failure Detail:**
+```
+Agent Run: Customer Support Interaction
+Status: ❌ Failed
+
+Failed Node: Customer Response Generator
+Evaluator: Customer Support Quality
+Failure Reason: "Response lacked empathy and did not address the customer's specific concern about delivery delay"
+Quality Score: 2.1/5.0
+```
+
+*[Image placeholder: Evaluator failure detail popup or section]*
+
+## Method 2: Quality Metrics in Agent Performance
+
+Evaluation results are calculated into metrics that appear in your Agent Performance dashboard.
+
+**1. Navigate to Agent Performance**
+- Go to **Agent Performance** dashboard
+- View your agents and their associated LLM nodes
+
+*[Image placeholder: Agent Performance dashboard overview]*
+
+**2. View Quality Metrics**
+Each evaluator generates specific metrics based on its evaluation criteria:
+
+**Example Metrics Display:**
+```
+Customer Support Agent
+
+LLM Node: Response Generator
+├── Customer Support Quality Evaluator
+│   ├── Helpfulness: 4.2/5.0
+│   ├── Accuracy: 4.5/5.0
+│   ├── Professionalism: 4.1/5.0
+│   └── Overall: 4.3/5.0
+│
+├── Safety Compliance Evaluator  
+│   ├── Content Safety: 4.8/5.0
+│   ├── Brand Compliance: 4.6/5.0
+│   └── Overall: 4.7/5.0
+│
+└── Response Completeness Evaluator
+    ├── Completeness: 4.0/5.0
+    ├── Coherence: 4.3/5.0
+    └── Overall: 4.2/5.0
+```
+
+*[Image placeholder: Agent Performance dashboard showing quality metrics per evaluator]*
+
+**3. Monitor Trends**
+- Track quality metrics over time
+- See how different evaluators rate your AI's performance
+- Identify patterns and areas for improvement
+
+*[Image placeholder: Quality metrics trends over time]*
+
+## Understanding Quality Metrics
+
+### How Metrics Are Generated
+
+**Per Evaluator Metrics:**
+- Each evaluator calculates its own set of metrics
+- Metrics are based on the evaluation criteria defined in the evaluator prompt
+- Scores are aggregated over time to show trends
+
+**Example: Customer Support Quality Evaluator**
+```
+Evaluation Criteria → Generated Metrics
+├── Helpfulness (1-10) → Helpfulness: 4.2/5.0
+├── Accuracy (1-10) → Accuracy: 4.5/5.0  
+├── Professionalism (1-10) → Professionalism: 4.1/5.0
+└── Completeness (1-10) → Completeness: 4.0/5.0
+```
+
+*[Image placeholder: How evaluation criteria map to metrics]*
+
+### Common Metric Types
+
+**Typical Quality Dimensions:**
+- **Accuracy**: How correct and factual are the responses
+- **Coherence**: How logical and well-structured are the responses  
+- **Completeness**: How thoroughly questions are answered
+- **Helpfulness**: How useful responses are to users
+- **Professionalism**: How appropriate the tone and language are
+- **Safety**: How well responses avoid harmful content
+
+*[Image placeholder: Metric categories visualization]*
+
+## Monitoring and Analysis
+
+### Dashboard Views
+
+**Agent-Level Overview:**
+- Compare performance across different agents
+- Identify which agents need attention
+- View overall quality trends
+
+**Node-Level Details:**
+- Drill down into specific LLM nodes
+- See metrics from all associated evaluators
+- Track performance trends for individual nodes
+
+**Evaluator-Specific Insights:**
+- Each evaluator provides its own quality perspective
+- Compare how different evaluators rate the same AI responses
+- Understand which quality dimensions are strongest/weakest
+
+*[Image placeholder: Multi-level dashboard view comparison]*
+
+### Using Results for Improvement
+
+**Failed Runs Analysis:**
+- Review failed agent runs to understand quality problems
+- Look for patterns in evaluator failures
+- Identify specific LLM nodes that frequently fail
+
+**Metric Trends:**
+- Monitor declining quality metrics
+- Spot quality issues before they become major problems
+- Track improvement after making changes
+
+**Common Quality Patterns:**
+- Low accuracy scores may indicate knowledge gaps
+- Poor coherence might suggest prompt engineering needs
+- Low helpfulness could mean responses aren't user-focused
+
+*[Image placeholder: Quality pattern analysis examples]*
+
+## Next Steps
+
+Use your evaluation results to improve AI quality:
+
+- Review failed agent runs to understand specific quality issues
+- Monitor quality metrics trends in Agent Performance dashboard
+- Use insights to guide optimization efforts (covered in our Optimization guides)
+
+<Callout type="success">
+  **You now understand how to view evaluation results!** Use failed runs and quality metrics to monitor and improve your AI's performance.
+</Callout> 

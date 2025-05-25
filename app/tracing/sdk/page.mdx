@@ -9,119 +9,148 @@ import { Tabs } from "nextra/components"
 
 # SDK Overview
 
-Welcome to the Handit.ai SDK documentation. Our SDKs provide comprehensive tracking and monitoring capabilities for your AI applications, helping you understand and optimize your AI systems' performance.
+> **Comprehensive AI agent observability made simple.** The Handit.ai SDKs provide powerful tracking and monitoring capabilities for your AI applications, helping you understand performance, debug issues, and optimize your AI systems.
+
+Our SDKs are designed to give you complete visibility into your AI agent workflows with minimal setup and maximum insight.
 
 <Callout type="info">
-  The Handit.ai SDKs automatically track HTTP requests, agent executions, and custom events, providing detailed insights into your AI application's behavior and performance.
+  The Handit.ai SDKs automatically capture agent executions, LLM interactions, tool usage, and performance metrics, providing detailed insights into your AI application's behavior.
 </Callout>
 
-## Python SDK
+## Available SDKs
 
-The Python SDK is designed for AI applications built with Python, offering seamless integration with popular frameworks and libraries.
+### Python SDK
+**For AI applications built with Python**
 
-<Callout type="info">
-  Key features of the Python SDK:
-  - Automatic request tracking
-  - Agent execution monitoring
-  - Model performance tracking
-  - Custom event tracking
-  - Performance optimization
-</Callout>
+Designed for seamless integration with popular AI frameworks like LangChain, OpenAI, and custom Python applications.
 
-<Callout type="warning">
-  The Python SDK requires Python 3.7+ and supports both synchronous and asynchronous operations.
-</Callout>
+**Requirements:** Python 3.7+ | **Support:** Sync & Async operations
 
-### Core Capabilities
+### JavaScript SDK  
+**For Node.js AI applications**
 
-- **Agent Tracing**: Track complete agent execution flows
-- **Node Tracing**: Monitor individual components and tools
-- **Model Tracking**: Capture model inputs, outputs, and performance
-- **Request Interception**: Automatically track HTTP requests
-- **Performance Monitoring**: Measure and optimize system performance
-- **Custom Events**: Track any custom events in your application
+Built for modern JavaScript/TypeScript applications with comprehensive tracking capabilities.
 
-<Callout type="info">
-  The Python SDK integrates seamlessly with popular AI frameworks like LangChain, providing automatic tracking of agent executions and model calls.
-</Callout>
+**Requirements:** Node.js 14+ | **Support:** CommonJS & ES modules
 
-## JavaScript SDK
+## Core Tracing Methods
 
-The JavaScript SDK is built for Node.js applications, offering powerful tracking capabilities for your AI systems.
+Both SDKs provide the same core tracing capabilities through different method signatures:
 
-<Callout type="info">
-  Key features of the JavaScript SDK:
-  - Automatic HTTP request tracking
-  - Agent execution monitoring
-  - Model performance tracking
-  - Custom event tracking
-  - Performance optimization
-</Callout>
+### Agent-Level Tracing
 
-<Callout type="warning">
-  The JavaScript SDK requires Node.js 14+ and supports both CommonJS and ES modules.
-</Callout>
+**Purpose:** Track complete AI agent workflows from start to finish
 
-### Core Capabilities
+| **Method** | **Python** | **JavaScript** | **Use Case** |
+|------------|------------|----------------|--------------|
+| **Agent Wrapper** | `@start_agent_tracing()` | `startAgentTracing()` | Wrap entire agent functions for automatic tracing |
+| **Manual Agent** | `_send_tracked_data()` | `captureAgentNode()` | Custom control over agent execution tracking |
 
-- **Agent Tracing**: Track complete agent execution flows
-- **Node Tracing**: Monitor individual components and tools
-- **Model Tracking**: Capture model inputs, outputs, and performance
-- **Request Interception**: Automatically track HTTP requests
-- **Performance Monitoring**: Measure and optimize system performance
-- **Custom Events**: Track any custom events in your application
+### Function-Level Tracing
 
-<Callout type="info">
-  The JavaScript SDK provides automatic tracking for both Axios and Fetch API requests, making it easy to monitor all HTTP communications in your application.
-</Callout>
+**Purpose:** Monitor individual components, tools, and LLM calls
 
-## Common Features
+| **Method** | **Python** | **JavaScript** | **Use Case** |
+|------------|------------|----------------|--------------|
+| **Node Decorator** | `@trace_agent_node()` | `traceAgentNode()` | Automatic tracing of specific functions |
+| **Node Function** | `trace_agent_node_func()` | `captureAgentNode()` | Programmatic function tracing |
+| **Model Tracking** | `track_model()` | `captureModel()` | LLM interaction monitoring |
+| **Tool Tracking** | `track_tool()` | `trackTool()` | Custom tool and API call tracing |
 
-Both SDKs share several key features:
+### Configuration & Setup
 
-<Callout type="info">
-  Shared capabilities across both SDKs:
-  - Automatic request tracking
-  - Agent execution monitoring
-  - Model performance tracking
-  - Custom event tracking
-  - Performance optimization
-  - Error handling and reporting
-</Callout>
+**Purpose:** Initialize and configure SDK behavior
 
-### Key Benefits
+| **Method** | **Python** | **JavaScript** | **Use Case** |
+|------------|------------|----------------|--------------|
+| **Configuration** | `tracker.config()` | `config()` | Set API keys and SDK options |
+| **Context Management** | `endAgentTracing()` | `endAgentTracing()` | Manual session management |
 
-1. **Comprehensive Monitoring**
-   - Track all aspects of your AI application
-   - Monitor performance and errors
-   - Understand system behavior
+## What Gets Tracked
 
-2. **Easy Integration**
-   - Simple setup process
-   - Minimal code changes required
-   - Automatic tracking capabilities
+### Automatic Tracking
+- **Agent Executions** - Complete workflow timing and status
+- **Function Calls** - Input parameters and return values  
+- **LLM Interactions** - Prompts, responses, token usage, and performance
+- **Tool Usage** - Custom function executions and API calls
+- **Error Handling** - Exception details and stack traces
+- **Performance Metrics** - Execution time and resource usage
 
-3. **Performance Optimization**
-   - Identify bottlenecks
-   - Optimize model usage
-   - Improve system efficiency
+### Custom Tracking
+- **Business Events** - Domain-specific metrics and KPIs
+- **User Context** - User IDs, session data, and custom metadata
+- **External Services** - Third-party API calls and database queries
+- **Conditional Logic** - Environment-based and user-tier tracking
 
-4. **Error Handling**
-   - Automatic error tracking
-   - Detailed error reports
-   - Stack trace capture
+## Key Capabilities by Use Case
 
-<Callout type="warning">
-  Both SDKs require a valid Handit.ai API key for operation. Make sure to keep your API key secure and never expose it in client-side code.
-</Callout>
+### 🔍 **Debugging & Troubleshooting**
+- **Complete execution traces** - See exactly what your agent did
+- **Error context capture** - Full stack traces with input data
+- **Performance bottleneck identification** - Find slow operations
+- **Data flow visualization** - Track data transformations
+
+### 📊 **Performance Monitoring**
+- **Response time tracking** - Monitor agent and LLM latency
+- **Resource usage monitoring** - Track memory and CPU usage
+- **Token usage analysis** - Monitor LLM costs and efficiency
+- **Success rate monitoring** - Track completion and failure rates
+
+### 🎯 **Optimization & Insights**
+- **Prompt performance analysis** - Compare different prompts
+- **Model comparison** - Evaluate different LLM models
+- **Tool effectiveness tracking** - Monitor tool success rates
+- **User experience metrics** - Track user satisfaction indicators
+
+### 🏗️ **Development & Testing**
+- **Gradual rollout support** - Test new features safely
+- **A/B testing integration** - Compare different approaches
+- **Environment-specific tracking** - Different behavior per environment
+- **Custom event tracking** - Monitor business-specific metrics
+
+## Integration Patterns
+
+### Automatic Integration
+- **Framework Detection** - Automatic integration with LangChain, OpenAI
+- **HTTP Request Interception** - Automatic API call tracking
+- **Error Boundary Creation** - Automatic error capture and reporting
+
+### Manual Integration  
+- **Custom Workflows** - Track proprietary agent architectures
+- **Third-Party Services** - Monitor external API dependencies
+- **Legacy Systems** - Add observability to existing applications
+
+### Hybrid Approach
+- **Selective Tracing** - Combine automatic and manual tracking
+- **Conditional Logic** - Environment and user-based tracing decisions
+- **Performance Optimization** - Balance detail with system performance
+
+## SDK-Specific Features
+
+### Python SDK Advantages
+- **Deep Framework Integration** - Native LangChain and OpenAI support
+- **Async/Await Support** - Full asynchronous operation tracking
+- **Scientific Computing** - Integration with NumPy, Pandas, and ML libraries
+- **Decorator Patterns** - Pythonic function decoration for tracing
+
+### JavaScript SDK Advantages  
+- **Modern JavaScript Support** - ES6+, TypeScript, and module systems
+- **HTTP Library Integration** - Automatic Axios and Fetch tracking
+- **Event-Driven Architecture** - WebSocket and event-based tracing
+- **Microservice Ready** - Built for distributed Node.js applications
 
 ## Getting Started
 
-Choose your preferred SDK to begin:
+Ready to add comprehensive observability to your AI applications?
 
-- [Python SDK Documentation](/tracing/sdk/Python)
-- [JavaScript SDK Documentation](/tracing/sdk/JavaScript)
+**Choose your SDK:**
+- [Python SDK Documentation](/tracing/sdk/Python) - Complete Python integration guide
+- [JavaScript SDK Documentation](/tracing/sdk/JavaScript) - Complete JavaScript integration guide
 
-<Callout type="info">
-  Each SDK's documentation includes detailed examples, use cases, and best practices to help you get the most out of Handit.ai's tracking capabilities.
+**Or explore tracing approaches:**
+- [Tracing Guide Overview](/tracing/guide) - Compare different tracing methods
+- [Quick Start Guide](/tracing/quickstart) - Get tracing working in 5 minutes
+
+<Callout type="success">
+  Both SDKs are designed to provide maximum insight with minimal performance impact. Start with basic tracing and gradually add more detailed monitoring as needed.
 </Callout>

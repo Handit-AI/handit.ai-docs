@@ -6,15 +6,16 @@ sidebarTitle: 'Agent Tracing'
 import { Callout } from "nextra/components"
 import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
+import { Cards } from "nextra/components"
 
 # Agent Tracing
 
-This powerful tool gives you complete visibility into your entire workflow, from start to finish. It acts as the root of your tracing tree, important to automatically collecting and correlating all operations within your application.
+> **The foundation of AI agent observability.** Agent Tracing wraps your entire agent workflow, creating the root trace that connects all operations together and gives you complete visibility from start to finish.
 
-Agent Tracing is The main API endpoint processing requests. (The endpoint or the main function that executes the entire workflow)
+Agent Tracing is designed for your main API endpoints and entry points—the functions that process incoming requests and orchestrate your entire agent workflow.
 
 <Callout type="warning">
-  Golden Rule: Every request that enters your system must start with Agent Tracing. Without this wrapper, the root context won't be created and inner nodes won't be linked together.
+  **Golden Rule:** Every request that enters your system must start with Agent Tracing. Without this wrapper, the root context won't be created and inner nodes won't be linked together.
 </Callout>
 
 ## How It Works
@@ -105,35 +106,9 @@ Agent Tracing creates a root context for your entire workflow, allowing you to:
    - Maintains parent-child relationships
    - Provides end-to-end visibility
 
-## Best Practices
+## Real-World Examples
 
-1. **Always Start with Agent Tracing**
-   - Wrap your main entry points
-   - Include API endpoints and webhooks
-   - Cover scheduled tasks and background jobs
-
-2. **Use Meaningful Keys**
-   - Choose descriptive names for your agents
-   - Include version information if applicable
-   - Make keys consistent across environments
-
-3. **Handle Errors Properly**
-   - Let errors propagate naturally
-   - Don't suppress exceptions
-   - Use try-catch blocks when needed
-
-4. **Keep Traces Clean**
-   - Avoid unnecessary nesting
-   - Use appropriate granularity
-   - Remove sensitive information
-
-<Callout type="info">
-  Agent Tracing is the foundation of your observability strategy. It provides the context needed to understand your application's behavior and performance.
-</Callout>
-
-## Common Use Cases
-
-Agent Tracing is essential for any entry point that processes requests or executes workflows. Here are the most common scenarios:
+Agent Tracing is essential for any entry point that processes requests or executes workflows. Here are common scenarios:
 
 <Tabs items={['Python', 'JavaScript']}>
   <Tabs.Tab>
@@ -311,118 +286,33 @@ Agent Tracing is essential for any entry point that processes requests or execut
   </Tabs.Tab>
 </Tabs>
 
-### Real-World Agent Examples
+## Best Practices
 
-1. **Chat Agent**
-   - Customer service chatbot
-   - AI assistant for user support
-   - Interactive knowledge base
-   - Multi-turn conversation handling
+### Implementation Guidelines
 
-2. **Scheduler Agent**
-   - Meeting scheduling and optimization
-   - Resource allocation
-   - Calendar management
-   - Conflict resolution
+1. **Always Start with Agent Tracing**
+   - Wrap your main entry points (API endpoints, webhooks, scheduled tasks)
+   - Use meaningful keys that describe your agent's purpose
+   - Make keys consistent across environments
 
-3. **Call Agent**
-   - Voice call processing
-   - Real-time transcription
-   - Intent recognition
-   - Call summarization
+2. **Error Handling**
+   - Let errors propagate naturally through your code
+   - Don't suppress exceptions within the traced function
+   - Use try-catch blocks when needed for specific error handling
 
-4. **Document Agent**
-   - Document analysis
-   - Content extraction
-   - Classification and tagging
-   - Summary generation
+3. **Keep Traces Clean**
+   - Avoid unnecessary nesting of agent traces
+   - Use appropriate granularity for your workflow
+   - Remove sensitive information from trace data
 
-<Callout type="info">
-  Each agent type has specific tracking needs. Agent Tracing helps you understand how these complex workflows behave and perform in production.
-</Callout>
-
-### Agent-Specific Best Practices
-
-1. **Chat Agents**
-   - Track conversation context
-   - Monitor response times
-   - Log user interactions
-   - Track model performance
-
-2. **Scheduler Agents**
-   - Monitor optimization time
-   - Track constraint satisfaction
-   - Log scheduling conflicts
-   - Measure user satisfaction
-
-3. **Call Agents**
-   - Track audio processing
-   - Monitor transcription accuracy
-   - Log intent recognition
-   - Measure response latency
-
-4. **Document Agents**
-   - Track processing time
-   - Monitor extraction accuracy
-   - Log classification results
-   - Measure summary quality
-
-<Callout type="warning">
-  Remember to track agent-specific metrics and context to get the most value from your tracing implementation.
-</Callout>
-
-### Key Characteristics of Entry Points
-
-1. **Request Processing**
-   - Handles incoming requests or commands
-   - Creates a new tracing context
-   - Manages the entire workflow lifecycle
-
-2. **Context Creation**
-   - Establishes the root trace
-   - Sets up correlation IDs
-   - Initializes tracking metadata
-
-3. **Workflow Management**
-   - Orchestrates the execution flow
-   - Coordinates between components
-   - Handles error propagation
-
-4. **Resource Management**
-   - Manages request lifecycle
-   - Handles cleanup and teardown
-   - Ensures proper resource allocation
-
-<Callout type="warning">
-  Remember: Agent Tracing should be applied at the entry point of your application, where requests or commands first enter your system. This ensures proper tracking of the entire workflow.
-</Callout>
-
-### Best Practices for Entry Points
-
-1. **Consistent Implementation**
-   - Apply Agent Tracing to all entry points
-   - Use meaningful tracing keys
-   - Maintain consistent error handling
-
-2. **Context Management**
-   - Capture relevant request metadata
-   - Include user and session information
-   - Track request parameters and headers
-
-3. **Error Handling**
-   - Implement proper error boundaries
-   - Capture and propagate errors
-   - Include error context in traces
-
-4. **Performance Monitoring**
-   - Track request duration
-   - Monitor resource usage
-   - Identify bottlenecks
-
-<Callout type="info">
-  Each entry point in your application should be wrapped with Agent Tracing to ensure complete visibility into your system's behavior and performance.
-</Callout>
 
 <Callout type="success">
   With Agent Tracing in place, you'll have complete visibility into your application's behavior, making it easier to debug issues and optimize performance.
 </Callout>
+
+## Next Steps
+
+Ready to add more detailed tracing to your agent components?
+
+- Learn about [LLM Node Tracing](/tracing/tracing_features/llm_node) for AI model interaction tracking
+- Explore [Tool Tracing](/tracing/tracing_features/tool) for function and tool execution monitoring

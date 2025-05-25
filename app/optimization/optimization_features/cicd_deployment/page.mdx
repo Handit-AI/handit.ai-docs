@@ -1,0 +1,213 @@
+---
+title: 'CI/CD Deployment'
+sidebarTitle: 'CI/CD Deployment'
+---
+
+import { Callout } from "nextra/components"
+import { Steps } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Release Hub & SDK Integration
+
+Deploy optimized prompts through a simple two-step process: compare and select prompts in the Release Hub, then fetch them in your applications using the SDK.
+
+<Callout type="info">
+  Handit.ai stores and serves optimized prompts. You select which prompt to mark as "production" in the Release Hub, then your applications fetch that prompt via SDK for use in their own LLM calls.
+</Callout>
+
+## How It Works
+
+The deployment process is straightforward:
+
+<Steps>
+### Compare in Release Hub
+View A/B testing results and compare current vs optimized prompts side-by-side
+
+### Mark as Production
+Select which prompt version to deploy by marking it as your production prompt
+
+### Fetch via SDK
+Your applications automatically get the selected prompt when they call the SDK
+
+### Monitor Performance
+Track how the deployed prompt performs in your applications
+</Steps>
+
+*[Image placeholder: Release Hub to SDK workflow]*
+
+## Release Hub - Prompt Selection
+
+### Viewing Optimization Results
+
+The Release Hub shows you all available optimizations with their performance metrics:
+
+**Available Optimizations:**
+- Current production prompt with its performance baseline
+- New optimizations with A/B testing results and confidence levels
+- Clear improvement percentages for each quality metric
+- Statistical significance indicators
+
+**Comparison View:**
+- Side-by-side prompt text comparison
+- Performance metrics comparison
+- A/B testing sample size and confidence levels
+- Recommendation status (ready for deployment or needs more testing)
+
+*[Image placeholder: Release Hub optimization comparison interface]*
+
+### Deployment Decision
+
+When you're ready to deploy an optimization:
+
+**Mark as Production:**
+- Click "Mark as Production" on your chosen optimization
+- The prompt immediately becomes available via SDK
+- Previous version remains accessible for rollback
+- Change is logged with timestamp and user information
+
+**Deployment Confirmation:**
+- Instant activation (no deployment delays)
+- SDK immediately serves the new prompt
+- Version history updated
+- Team notifications sent (if configured)
+
+*[Image placeholder: Marking prompt as production in Release Hub]*
+
+## SDK Integration
+
+### Fetching Production Prompts
+
+Your applications fetch the currently marked production prompt using the SDK:
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+
+```python
+from handit import HanditTracker
+
+# Initialize the tracker
+tracker = HanditTracker(api_key="your-api-key", project_id="your-project")
+
+# Fetch the current production prompt
+def get_production_prompt(model_id: str) -> str:
+    """
+    Fetch the currently marked production prompt.
+    This will be whatever prompt is marked as production in Release Hub.
+    """
+    try:
+        production_prompt = tracker.fetch_optimized_prompt(model_id=model_id)
+        return production_prompt
+    except Exception as e:
+        # Fallback to default if service unavailable
+        print(f"Using fallback prompt: {e}")
+        return get_default_prompt(model_id)
+
+# Use in your application
+def generate_response(user_query: str) -> str:
+    # Get the current production prompt from Release Hub
+    system_prompt = get_production_prompt("customer-support-llm")
+    
+    # Use with your LLM
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_query}
+        ],
+        temperature=0.7
+    )
+    
+    return response.choices[0].message.content
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```javascript
+import { HanditClient } from '@handit/sdk';
+
+// Initialize the client
+const handit = new HanditClient({ 
+  apiKey: 'your-api-key',
+  projectId: 'your-project' 
+});
+
+// Fetch the current production prompt
+async function getProductionPrompt(modelId) {
+  try {
+    const productionPrompt = await handit.fetchOptimizedPrompt({ 
+      modelId: modelId 
+    });
+    return productionPrompt;
+  } catch (error) {
+    // Fallback to default if service unavailable
+    console.warn('Using fallback prompt:', error.message);
+    return getDefaultPrompt(modelId);
+  }
+}
+
+// Use in your application
+async function generateResponse(userQuery) {
+  // Get the current production prompt from Release Hub
+  const systemPrompt = await getProductionPrompt('customer-support-llm');
+  
+  // Use with your LLM API
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userQuery }
+    ],
+    temperature: 0.7
+  });
+  
+  return response.choices[0].message.content;
+}
+
+// React Hook for easy integration
+import { useOptimizedPrompt } from '@handit/sdk/react';
+
+function CustomerSupportComponent() {
+  const { prompt, loading, error } = useOptimizedPrompt('customer-support-llm');
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Using fallback prompt</div>;
+  
+  // Use the production prompt in your component
+  return <ChatInterface systemPrompt={prompt} />;
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
+### Automatic Updates
+
+When you mark a new prompt as production in Release Hub:
+
+**Immediate Availability:**
+- SDK calls immediately return the new prompt
+- No application restarts required
+- No code changes needed
+- Seamless transition for users
+
+**Caching & Performance:**
+- SDK caches prompts for performance
+- Cache automatically refreshes when prompts change
+- Fallback to previous version if service unavailable
+- Minimal latency impact
+
+*[Image placeholder: SDK automatic update flow]*
+
+## Next Steps
+
+Ready to integrate Release Hub with your applications?
+
+- [Set up your first prompt in Release Hub](/optimization/guide/release_hub)
+- [Install and configure the SDK](/optimization/guide/sdk_integration)
+- [View A/B testing results](/optimization/optimization_features/ab_testing) to make deployment decisions
+- Monitor prompt performance in your applications
+
+<Callout type="success">
+  **Deployment is instant.** When you mark a prompt as production in Release Hub, it's immediately available via SDK with no downtime or code changes required.
+</Callout> 
