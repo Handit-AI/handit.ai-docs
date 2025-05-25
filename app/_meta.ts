@@ -1,7 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  "overview": "Overview",
+  "index": "Overview",
   "quickstart": "Quickstart",
   "tracing": "Tracing",
   "evaluation": "Evaluation",
