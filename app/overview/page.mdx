@@ -11,6 +11,8 @@ import { Cards } from 'nextra/components'
 
 > Handit.ai is an **open-source optimization platform** for AI agents. It offers **end-to-end monitoring**, **automatic evaluation**, and **continuous self-optimization** to deploy the best-performing models and prompts.
 
+![Handit.ai Platform Overview](/assets/overview/general-handit.png)
+
 <details>
 <summary>**Why Handit.ai?**</summary>
 
@@ -29,11 +31,11 @@ import { Cards } from 'nextra/components'
 <details>
 <summary>**AI App Nightmares: What No One Tells You**</summary>
 
-Imagine it’s 3 AM and you’re staring at your console—again. You just fixed that one prompt for the tenth time, only to discover your AI replied to “Uncle Bob” instead of your manager. 😱
+Imagine it's 3 AM and you're staring at your console—again. You just fixed that one prompt for the tenth time, only to discover your AI replied to "Uncle Bob" instead of your manager. 😱
 
-At first, you laugh it off. It’s “just a glitch.” Then it happens again: sometimes it ghosts you completely, sometimes it hijacks the CC line, and once it even quoted a message from two weeks ago like a deranged time traveler. You tweak the prompt, pray to the data gods, and whisper “please and thank you” like a mantra… but two weeks later, the ghost is back.
+At first, you laugh it off. It's "just a glitch." Then it happens again: sometimes it ghosts you completely, sometimes it hijacks the CC line, and once it even quoted a message from two weeks ago like a deranged time traveler. You tweak the prompt, pray to the data gods, and whisper "please and thank you" like a mantra… but two weeks later, the ghost is back.
 
-This isn’t a haunted house—it’s your AI pipeline. And yes, LLMs can gaslight you. They’ll whisper “I didn’t do it,” even as they rewrite your email thread into gibberish. You patch one leak and another springs open. You think, “There has to be a better way.”
+This isn't a haunted house—it's your AI pipeline. And yes, LLMs can gaslight you. They'll whisper "I didn't do it," even as they rewrite your email thread into gibberish. You patch one leak and another springs open. You think, "There has to be a better way."
 
 Handit.ai is the open-source Ghostbuster for your AI nightmares. With live monitoring, automated A/B hunting, and AI-as-Judge evaluations on real traffic, it spots phantom failures and banishes them before they strike again. No more 3 AM panics or unsent apologies.
 
@@ -42,13 +44,15 @@ Handit.ai is the open-source Ghostbuster for your AI nightmares. With live monit
 </details>
 
 <Callout type="info">
-  Explore Handit.ai’s capabilities. For more details, visit the individual
+  Explore Handit.ai's capabilities. For more details, visit the individual
   documentation pages.
 </Callout>
 
 ## Real-Time Monitoring
 
 Continuously ingest logs from every model, prompt, and agent in your stack. Instantly visualize performance trends, detect anomalies, and set custom alerts for drift or failures—live.
+
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
 <details>
 <summary>**Benefits**</summary>
@@ -64,6 +68,10 @@ Continuously ingest logs from every model, prompt, and agent in your stack. Inst
 
 Run evaluation pipelines on production traffic with custom LLM-as-Judge prompts, business KPI thresholds (accuracy, latency, etc.), and get automated quality scores in real time. Results feed directly into your optimization workflows—no manual grading required.
 
+![Evaluation Hub Dashboard](/assets/overview/evaluation-hub.png)
+
+![Error Detection and Analysis](/assets/overview/evaluation-error-detection.png)
+
 <details>
 <summary>**Benefits**</summary>
 
@@ -74,9 +82,11 @@ Run evaluation pipelines on production traffic with custom LLM-as-Judge prompts,
 
 </details>
 
-## Self-Optimization A/B Testing
+## Self-Optimization & Prompt Management
 
-Spin up experiments on different model versions, prompts, or agent configurations in production. Handit automatically routes traffic, collects performance and ROI metrics, and promotes the winning variant—seamlessly and without human intervention.
+Spin up experiments on different model versions, prompts, or agent configurations in production. Handit automatically routes traffic, collects performance and ROI metrics, and promotes the winning variant—seamlessly and without human intervention. Manage prompt templates and versions with built-in version control, tag and categorize prompts, and collaborate as a team while tracking performance over time.
+
+![Prompt Performance Comparison](/assets/overview/prompt-comparison.png)
 
 <details>
 <summary>**Benefits**</summary>
@@ -85,30 +95,6 @@ Spin up experiments on different model versions, prompts, or agent configuration
 - Automatically route traffic and gather performance data
 - Compare ROI metrics to identify top performers
 - Promote winning variants without manual effort
-
-</details>
-
-## Business-Impact Metrics
-
-Go beyond technical KPIs: tie AI performance to revenue gains, cost savings, conversion lifts, and customer satisfaction. Stakeholders can measure ROI in hours, not weeks, via intuitive dashboards and reports.
-
-<details>
-<summary>**Benefits**</summary>
-
-- Link AI performance to revenue gains and cost savings
-- Measure conversion lifts and customer satisfaction
-- Generate stakeholder-ready reports quickly
-- Monitor ROI over time with intuitive visualizations
-
-</details>
-
-## Prompt Management
-
-Manage prompt templates and versions. Tag, categorize, and collaborate on prompts with built-in version control. Track prompt performance over time, roll back to proven prompts instantly, and iterate faster as a team.
-
-<details>
-<summary>**Benefits**</summary>
-
 - Centralize prompt templates and version histories
 - Tag, categorize, and collaborate on prompts
 - Track prompt performance trends over time
@@ -121,7 +107,6 @@ Manage prompt templates and versions. Tag, categorize, and collaborate on prompt
 Integrate into your stack in minutes:
 
 <Cards.Card title="Quickstart" href="/quickstart" arrow />
-
 
 ## Get in Touch
 

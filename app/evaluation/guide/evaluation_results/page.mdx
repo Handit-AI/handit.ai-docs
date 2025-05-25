@@ -36,22 +36,18 @@ When an evaluator detects quality issues, the agent run is marked as failed in y
 - Go to your **Tracing** page
 - Look for agent runs marked with failure indicators
 
-*[Image placeholder: Tracing page showing failed agent runs]*
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
 **2. Identify Failed Runs**
 - Failed runs are visually highlighted
 - Failure indicators show which runs had quality issues
 - Quick overview of failure reasons
 
-*[Image placeholder: Failed agent run indicators in tracing list]*
-
 **3. View Failure Details**
 - Click on a failed agent run
 - See detailed tracing information
 - Visual indicators show which LLM node failed
 - View the specific failure detected by the evaluator
-
-*[Image placeholder: Detailed tracing view showing failed LLM node and evaluator failure details]*
 
 **Example Failure Detail:**
 ```
@@ -64,8 +60,6 @@ Failure Reason: "Response lacked empathy and did not address the customer's spec
 Quality Score: 2.1/5.0
 ```
 
-*[Image placeholder: Evaluator failure detail popup or section]*
-
 ## Method 2: Quality Metrics in Agent Performance
 
 Evaluation results are calculated into metrics that appear in your Agent Performance dashboard.
@@ -73,8 +67,6 @@ Evaluation results are calculated into metrics that appear in your Agent Perform
 **1. Navigate to Agent Performance**
 - Go to **Agent Performance** dashboard
 - View your agents and their associated LLM nodes
-
-*[Image placeholder: Agent Performance dashboard overview]*
 
 **2. View Quality Metrics**
 Each evaluator generates specific metrics based on its evaluation criteria:
@@ -101,14 +93,10 @@ LLM Node: Response Generator
     └── Overall: 4.2/5.0
 ```
 
-*[Image placeholder: Agent Performance dashboard showing quality metrics per evaluator]*
-
 **3. Monitor Trends**
 - Track quality metrics over time
 - See how different evaluators rate your AI's performance
 - Identify patterns and areas for improvement
-
-*[Image placeholder: Quality metrics trends over time]*
 
 ## Understanding Quality Metrics
 
@@ -128,8 +116,6 @@ Evaluation Criteria → Generated Metrics
 └── Completeness (1-10) → Completeness: 4.0/5.0
 ```
 
-*[Image placeholder: How evaluation criteria map to metrics]*
-
 ### Common Metric Types
 
 **Typical Quality Dimensions:**
@@ -139,8 +125,6 @@ Evaluation Criteria → Generated Metrics
 - **Helpfulness**: How useful responses are to users
 - **Professionalism**: How appropriate the tone and language are
 - **Safety**: How well responses avoid harmful content
-
-*[Image placeholder: Metric categories visualization]*
 
 ## Monitoring and Analysis
 
@@ -161,8 +145,6 @@ Evaluation Criteria → Generated Metrics
 - Compare how different evaluators rate the same AI responses
 - Understand which quality dimensions are strongest/weakest
 
-*[Image placeholder: Multi-level dashboard view comparison]*
-
 ### Using Results for Improvement
 
 **Failed Runs Analysis:**
@@ -179,8 +161,6 @@ Evaluation Criteria → Generated Metrics
 - Low accuracy scores may indicate knowledge gaps
 - Poor coherence might suggest prompt engineering needs
 - Low helpfulness could mean responses aren't user-focused
-
-*[Image placeholder: Quality pattern analysis examples]*
 
 ## Next Steps
 

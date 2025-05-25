@@ -68,7 +68,17 @@ npm install @handit.ai/node
 2. Go to **Settings** → **Integrations**
 3. Copy your integration token
 
-*[Image placeholder: Integration token in dashboard settings]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/integration_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Step 3: Create Your Agent Structure
 
@@ -79,7 +89,17 @@ npm install @handit.ai/node
    - **Visual Builder**: Drag and drop to build your workflow
 4. Download your `handit.config.json` file
 
-*[Image placeholder: Agent creation interface]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/create_agent.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Step 4: Add Basic Tracing
 
@@ -163,7 +183,19 @@ Now let's add automated evaluation to continuously assess quality across multipl
 2. Add your OpenAI or other model credentials
 3. These models will act as "judges" to evaluate responses
 
-*[Image placeholder: Model token configuration]*
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 
 ### Step 2: Create Focused Evaluators
 
@@ -214,27 +246,47 @@ Score: [1-10]
 Reasoning: [Brief explanation]
 ```
 
-*[Image placeholder: Evaluator creation interface]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/evaluator_creation.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Step 3: Associate Evaluators to Your LLM Nodes
 
-1. Go to **Tracing** → **Nodes**
+1. Go to **Agent Performance**
 2. Select your LLM node (e.g., "response-generator")
-3. Navigate to **Evaluation** tab
-4. Add your evaluators with sampling percentages:
-   - Completeness: 10%
-   - Accuracy: 15%
-   - Format: 5%
+3. Click on Manage Evaluators on the menu
+4. Add your evaluators
 
-*[Image placeholder: Evaluator association interface]*
-
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/associate_evaluator.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 ### Step 4: Monitor Results
 
 View real-time evaluation results in:
 - **Tracing** tab: Individual evaluation scores
 - **Agent Performance**: Quality trends over time
 
-*[Image placeholder: Evaluation results dashboard]*
+**Tracing Dashboard - Individual Evaluation Scores:**
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
+
+**Agent Performance Dashboard - Quality Trends:**
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
 
 <Callout type="success">
   **Phase 2 Complete!** 🎉 Continuous evaluation is now running across multiple quality dimensions with real-time insights into performance trends.
@@ -248,11 +300,21 @@ Finally, let's enable automatic optimization that generates better prompts and p
 
 ### Step 1: Connect Optimization Models
 
-1. Go to **Optimization** → **Settings** → **Model Tokens**
-2. Add or select optimization model tokens
+1. Go to **Settings** → **Model Tokens**
+2. Select optimization model tokens
 3. Self-improving AI automatically activates once configured
 
-*[Image placeholder: Optimization model configuration]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 <Callout type="tip">
   **Automatic Activation**: Once optimization tokens are configured, the system automatically begins analyzing evaluation data and generating optimizations. No additional setup required!
@@ -267,12 +329,14 @@ The system is now automatically generating and testing improved prompts. Monitor
 - Compare current vs optimized versions
 - See improvement percentages
 
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
+
 **Release Hub:**
 - Go to **Optimization** → **Release Hub**
 - View detailed prompt comparisons
 - See statistical confidence and recommendations
 
-*[Image placeholder: Release Hub with optimization recommendations]*
+![Release Hub - Prompt Performance Comparison](/assets/overview/prompt-comparison.png)
 
 ### Step 3: Deploy Optimizations
 
@@ -280,6 +344,18 @@ The system is now automatically generating and testing improved prompts. Monitor
 2. **Compare Performance** between current and optimized prompts
 3. **Mark as Production** for prompts you want to deploy
 4. **Fetch via SDK** in your application
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/ci:cd.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 **Fetch Optimized Prompts:**
 

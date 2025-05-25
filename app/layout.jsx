@@ -113,7 +113,6 @@ export default async function RootLayout({ children }) {
           editLink="Edit this page on GitHub"
           sidebar={{ defaultMenuCollapseLevel: 2 }}
           footer={footer}
-          // ...Your additional theme config options
         >
           {children}
         </Layout>

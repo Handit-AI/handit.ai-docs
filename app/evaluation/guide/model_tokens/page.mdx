@@ -18,6 +18,18 @@ This guide covers setting up tokens for our supported providers through the plat
 
 ## Setup Process
 
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 <Steps>
 ### Get API Key
 Obtain an API key from your AI provider (OpenAI or Together AI)
@@ -62,14 +74,10 @@ OpenAI models are the most popular choice for LLM-as-Judge evaluation due to the
 - Sign in to your OpenAI account
 - Click **Create new secret key**
 
-*[Image placeholder: OpenAI API keys page with "Create new secret key" button]*
-
 **2. Create and Copy Key**
 - Give your key a descriptive name (e.g., "Handit Evaluation")
 - Copy the key (starts with `sk-`)
 - Store it securely—you won't see it again
-
-*[Image placeholder: OpenAI API key creation dialog showing the generated key]*
 
 ### Add Token to Handit.ai
 
@@ -78,25 +86,17 @@ OpenAI models are the most popular choice for LLM-as-Judge evaluation due to the
 - Go to **Settings** → **Model Tokens**
 - Click **Add New Token**
 
-*[Image placeholder: Handit.ai dashboard with Settings > Model Tokens highlighted]*
-
 **2. Configure Token**
-
-*[Image placeholder: Model token configuration form showing OpenAI setup]*
 
 **3. Test and Save**
 - Click **Test Connection** to verify functionality
 - Save the token configuration once verified
-
-*[Image placeholder: Successful connection test result with green checkmark]*
 
 ### Model Selection Guide
 
 **GPT-4o** - Best for complex evaluations requiring nuanced reasoning
 **GPT-3.5-turbo** - Ideal for high-volume evaluation with good quality
 **GPT-4-turbo** - Balanced option with fast response times
-
-*[Image placeholder: Model selection dropdown showing OpenAI options]*
 
 ## Together AI Configuration
 
@@ -109,22 +109,16 @@ Together AI provides access to open-source models like Llama, offering cost-effe
 - Sign up or sign in to your account
 - Navigate to **API Keys** section
 
-*[Image placeholder: Together AI dashboard with API keys section]*
-
 **2. Create API Key**
 - Click **Create new API key**
 - Give it a descriptive name
 - Copy your API key securely
-
-*[Image placeholder: Together AI API key creation interface]*
 
 ### Add Token to Handit.ai
 
 **1. Configure Together AI Token**
 - In your Handit.ai dashboard, go to **Settings** → **Model Tokens**
 - Click **Add New Token**
-
-*[Image placeholder: Model token form showing Together AI configuration]*
 
 **2. Test and Save**
 - Verify connection with **Test Connection**
@@ -135,8 +129,6 @@ Together AI provides access to open-source models like Llama, offering cost-effe
 **Llama v4 Scout** - High-quality reasoning for complex evaluation tasks
 **Llama v4 Maverick** - Fast processing for high-volume evaluation
 **CodeLlama** - Specialized for technical content assessment
-
-*[Image placeholder: Together AI model selection showing Llama options]*
 
 ## Security Best Practices
 
@@ -158,8 +150,6 @@ Together AI provides access to open-source models like Llama, offering cost-effe
   </div>
 </div>
 
-*[Image placeholder: Token security best practices checklist]*
-
 ## Common Issues & Solutions
 
 **"Invalid API Key" Error**
@@ -177,8 +167,6 @@ Together AI provides access to open-source models like Llama, offering cost-effe
 - Check if the model is available in your region
 - Ensure your API key has access to the selected model
 
-*[Image placeholder: Error message and troubleshooting steps]*
-
 ## Using Tokens in Evaluators
 
 Once configured, tokens are used when creating evaluators:
@@ -195,8 +183,6 @@ Once configured, tokens are used when creating evaluators:
 - Track token usage through the platform
 - Optimize token assignment based on results
 
-*[Image placeholder: Evaluator creation showing token selection dropdown]*
-
 ## Next Steps
 
 Ready to create your first evaluators?
@@ -207,6 +193,4 @@ Ready to create your first evaluators?
 
 <Callout type="success">
   Your model tokens are now ready! Next, create single-purpose evaluators that use these tokens to assess specific quality dimensions of your AI's performance.
-</Callout>
-
-*[Image placeholder: Next steps workflow preview showing evaluator creation]* 
+</Callout> 

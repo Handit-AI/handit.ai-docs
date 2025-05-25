@@ -43,13 +43,21 @@ Connect the AI models that will act as "judges" to evaluate your LLM responses.
 - Click **Settings** → **Model Tokens**
 - Click **Add New Token**
 
-*[Image placeholder: Model Tokens page with "Add New Token" button highlighted]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Configure Your Judge Model
 
 Add your OpenAI or Together AI credentials to connect evaluation models.
-
-*[Image placeholder: Model token configuration form showing OpenAI setup]*
 
 <Callout type="success">
   **Recommended Models**: GPT-4o (highest accuracy), GPT-3.5-turbo (cost-effective), Llama v4 Scout (open source alternative)
@@ -63,7 +71,17 @@ Create focused evaluators in the Evaluation Suite. Remember: **one evaluator = o
 - Go to **Evaluation** → **Evaluation Suite**
 - Click **Create New Evaluator**
 
-*[Image placeholder: Evaluation Suite main page with "Create New Evaluator" button]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/evaluator_creation.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Example 1: Completeness Evaluator
 
@@ -90,8 +108,6 @@ Score: [1-10]
 Reasoning: [Brief explanation]
 ```
 
-*[Image placeholder: Evaluator creation form showing the completeness evaluator setup]*
-
 ### Example 2: Hallucination Detection Evaluator
 
 **Evaluation Prompt:**
@@ -114,8 +130,6 @@ Output format:
 Score: [1-10]
 Reasoning: [Brief explanation of any concerns]
 ```
-
-*[Image placeholder: Second evaluator creation showing hallucination detection setup]*
 
 ### Example 3: Format Compliance Evaluator
 
@@ -141,8 +155,6 @@ Score: [1-10]
 Reasoning: [Brief format assessment]
 ```
 
-*[Image placeholder: Third evaluator showing format compliance setup]*
-
 <Callout type="info">
   **Why Separate Evaluators?** Each evaluator focuses on one aspect, making evaluation more reliable and providing clear insights. You can see exactly which quality dimensions are performing well or need attention.
 </Callout>
@@ -155,14 +167,22 @@ Connect your evaluators to the specific LLM nodes you want to monitor.
 - Go to **Tracing** → **Nodes**
 - Identify the LLM nodes you want to evaluate (e.g., "customer-response-generation")
 
-*[Image placeholder: Tracing nodes page showing available LLM nodes]*
-
 ### Associate Evaluators
 - Click on your target LLM node
 - Navigate to **Evaluation** tab
 - Click **Add Evaluator**
 
-*[Image placeholder: LLM node page with Evaluation tab and "Add Evaluator" button]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/associate_evaluator.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Configure Evaluation Settings
 
@@ -186,8 +206,6 @@ Evaluation Percentage: 5% (lower for less critical aspects)
 Priority: Normal
 ```
 
-*[Image placeholder: Evaluator association configuration showing multiple evaluators being added]*
-
 <Callout type="tip">
   **Sampling Strategy**: Start with 5-15% evaluation percentage. You can always increase it later. Use higher percentages for critical quality aspects.
 </Callout>
@@ -195,8 +213,6 @@ Priority: Normal
 ### Save Configuration
 - Review your evaluator associations
 - Click **Save** to activate evaluation
-
-*[Image placeholder: Final configuration summary showing all evaluators associated]*
 
 ## Step 4: Monitor Evaluation Results
 
@@ -207,18 +223,16 @@ Your evaluation system is now active! Here's how to monitor the results.
 - View evaluation scores as they happen
 - Monitor quality trends across different aspects
 
-*[Image placeholder: Live evaluation dashboard showing real-time results]*
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
 ### Quality Analytics
 - Access **Agent Performance** tab in your dashboard
 - View trends for each agent with their associated evaluators
 - Understand which quality aspects are performing well or need attention for each agent
 
-*[Image placeholder: Analytics dashboard showing trends for different evaluators]*
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
 
 ### Sample Result Display
-
-*[Image placeholder: Detailed evaluation result showing scores for each aspect]*
 
 ## Additional Evaluator Examples
 
@@ -261,8 +275,6 @@ Scale: 1-10 (1-2=potentially dangerous, 9-10=completely safe)
 Focus: Does the response follow logical troubleshooting steps?
 Scale: 1-10 (1-2=illogical flow, 9-10=perfect troubleshooting sequence)
 ```
-
-*[Image placeholder: Examples of different evaluator types in the platform]*
 
 ## Best Practices
 

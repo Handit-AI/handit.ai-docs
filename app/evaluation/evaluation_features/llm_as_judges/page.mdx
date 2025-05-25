@@ -18,7 +18,7 @@ LLM-as-Judge uses one AI model to evaluate the outputs of another AI model. Inst
   **Key Insight**: Advanced language models like GPT-4o have developed sophisticated understanding of quality, context, and human preferences through training on vast amounts of human feedback and expert-rated content.
 </Callout>
 
-*[Image placeholder: LLM-as-Judge concept diagram showing one AI evaluating another]*
+![LLM as Judge Concept Diagram](/assets/llm_as_judge/llm_as_judge.png)
 
 ### How It Works in Handit.ai
 
@@ -35,8 +35,6 @@ Connect evaluators to your LLM nodes through the platform interface
 ### Monitor Results
 View evaluation scores and insights in real-time through the dashboard
 </Steps>
-
-*[Image placeholder: Platform workflow showing the 4 steps visually]*
 
 ## Why LLM-as-Judge is Superior
 
@@ -60,8 +58,6 @@ Traditional evaluation relies on keyword matching, length checks, or simple patt
     - **Detailed reasoning** - Explains exactly why a score was given
   </div>
 </div>
-
-*[Image placeholder: Comparison between rule-based and LLM judge evaluation results]*
 
 ### Human-Level Reasoning
 
@@ -92,7 +88,17 @@ LLM judges replicate key aspects of human evaluation by assessing:
 - **Llama v4 Maverick** - Faster processing for high-volume needs
 - **CodeLlama** - Specialized for technical/code evaluation
 
-*[Image placeholder: Model selection interface showing different judge models]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Single-Purpose Evaluator Design
 
@@ -120,7 +126,6 @@ Score: [1-10]
 Reasoning: [Brief explanation]"
 ```
 
-*[Image placeholder: Single-purpose evaluator creation interface]*
 
 #### ❌ Ineffective Multi-Purpose Evaluator
 
@@ -138,14 +143,23 @@ Problems with "Overall Quality" evaluators:
 - Navigate to **Evaluation** → **Evaluation Suite**
 - Click **Create New Evaluator**
 
-*[Image placeholder: Evaluation Suite main interface]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/evaluator_creation.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 **2. Configure Single-Purpose Evaluator**
 - Enter evaluator name and specific focus
 - Write focused evaluation prompt
 - Select appropriate judge model token
 
-*[Image placeholder: Evaluator configuration form with single-purpose example]*
 
 **3. Associate to LLM Nodes**
 - Go to **Tracing** → **Nodes**
@@ -153,7 +167,17 @@ Problems with "Overall Quality" evaluators:
 - Add your evaluator with percentage sampling
 - Monitor results in real-time
 
-*[Image placeholder: Node association interface showing evaluator assignment]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/associate_evaluator.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ## Domain-Specific Examples
 
@@ -205,8 +229,6 @@ Score: [1-10]
 Reasoning: [Specific clarity factors]"
 ```
 
-*[Image placeholder: Customer service empathy evaluator results]*
-
 ### Technical Support Evaluators
 
 **Technical Accuracy:**
@@ -255,7 +277,6 @@ Score: [1-10]
 Reasoning: [Safety assessment details]"
 ```
 
-*[Image placeholder: Technical accuracy evaluator results showing specific technical issues found]*
 
 ## Analytics & Insights
 
@@ -263,13 +284,13 @@ Reasoning: [Safety assessment details]"
 
 View detailed results for each evaluation through the platform:
 
-*[Image placeholder: Individual evaluation result showing score, reasoning, and context]*
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
 ### Aggregate Analytics
 
 Monitor trends across all your evaluators:
 
-*[Image placeholder: Analytics dashboard showing trends for multiple single-purpose evaluators]*
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
 
 **Quality Trends by Dimension:**
 - Completeness: 8.4/10 (↗ +0.6 this week)
@@ -331,8 +352,6 @@ Monitor trends across all your evaluators:
 "Score: [1-10]
 Reasoning: [Brief explanation]"
 ```
-
-*[Image placeholder: Prompt engineering best practices visual guide]*
 
 ## Next Steps
 

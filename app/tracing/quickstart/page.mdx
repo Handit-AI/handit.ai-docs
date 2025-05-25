@@ -44,7 +44,17 @@ View complete traces, debug issues, and optimize performance
 2. Go to **"My Agents"** in the navigation menu
 3. Click **"Create New Agent"**
 
-*[Image placeholder: Screenshot of Handit.ai Dashboard showing the "My Agents" section with the "Create New Agent" button highlighted]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/create_agent.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 ### Step 2: Choose Your Creation Method
 
@@ -62,8 +72,6 @@ Perfect if you already have your agent structure documented or want to quickly i
 3. **Handit's AI analyzes** your structure and normalizes it
 4. **Review and confirm** the generated agent configuration
 5. **Download your config** with proper slugs and IDs
-
-*[Image placeholder: Screenshot of the JSON upload interface showing the file upload area and "Upload & Analyze" button]*
 
 **Example JSON structure to upload:**
 ```json filename="my-agent-structure.json"
@@ -93,8 +101,6 @@ Perfect if you already have your agent structure documented or want to quickly i
 }
 ```
 
-*[Image placeholder: Screenshot showing the AI analysis results with the normalized agent structure and confirmation dialog]*
-
 <Callout type="tip">
   **Pro tip:** Your JSON doesn't need to be perfect! Handit's AI will understand various formats and structures, then normalize everything into the proper configuration format.
 </Callout>
@@ -114,8 +120,6 @@ Perfect for building your agent structure visually and understanding the relatio
    - **Tool Nodes:** Function name, description, input/output types
 6. **Download your config** when complete
 
-*[Image placeholder: Screenshot of the visual builder interface showing the drag-and-drop canvas with component library on the left and a sample agent workflow]*
-
 **What you'll configure for each node:**
 
 | **Node Type** | **Required Info** | **Example** |
@@ -123,8 +127,6 @@ Perfect for building your agent structure visually and understanding the relatio
 | **LLM Node** | Model, purpose, temperature | GPT-4 for intent classification |
 | **Tool Node** | Function name, description, I/O | `search_knowledge_base()` for RAG |
 | **API Node** | Endpoint, method, purpose | External service integration |
-
-*[Image placeholder: Screenshot of a node configuration panel showing the form fields for configuring an LLM node with model selection, purpose, and parameters]*
 
 **Visual Builder Benefits:**
 - See your agent's flow visually
@@ -141,8 +143,6 @@ Perfect for building your agent structure visually and understanding the relatio
 ### Step 3: Download Your Configuration
 
 Once your agent is created (either method), you'll get a `handit.config.json` file that looks like this:
-
-*[Image placeholder: Screenshot showing the completed agent overview page with the "Download Config" button and a preview of the generated configuration]*
 
 ```json filename="handit.config.json"
 {
@@ -220,15 +220,23 @@ Before installing the SDK, you need to get your integration token to connect you
 1. In your [Handit.ai Dashboard](https://app.handit.ai), click on **"Settings"** in the navigation menu
 2. Go to the **"Integrations"** section
 
-*[Image placeholder: Screenshot of the Handit.ai Dashboard showing the Settings menu expanded with "Integrations" highlighted]*
-
 ### Step 2: Generate Your Token
 
 1. **Find the SDK Integration** section
 2. **Copy your integration token** - this is your API key for the SDK
 3. **Keep it secure** - treat this like a password
 
-*[Image placeholder: Screenshot of the Integrations page showing the SDK Integration section with the integration token field and copy button]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/integration_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 <Callout type="warning">
   **Security Note:** Your integration token gives access to your Handit.ai account. Never commit it to version control or share it publicly. Always use environment variables in production.
@@ -1041,6 +1049,10 @@ const result = await processor.processInvoice({
 <Callout type="success">
   **Congratulations!** 🎉 You now have complete observability into your AI agent. Every LLM call, tool execution, and operation is being captured with full context.
 </Callout>
+
+**View Your Results in the Dashboard:**
+
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
 **Now you can:**
 - **Debug issues faster** - See exactly where and why your agent fails

@@ -42,13 +42,21 @@ Connect the AI models that will analyze your evaluation data and generate optimi
 - Click **Optimization** → **Settings** → **Model Tokens**
 - Click **Add Optimization Token** or select an existing token
 
-*[Image placeholder: Optimization settings page with token selection interface]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 **2. Configure Your Optimization Model**
 
 Select or configure your optimization model:
-
-*[Image placeholder: Optimization token configuration form]*
 
 **3. Save Configuration**
 - Save the optimization token configuration
@@ -67,7 +75,7 @@ Your AI is now automatically generating and testing improved prompts. Monitor th
 - View how your agents and LLM nodes are performing
 - Compare current vs optimized versions
 
-*[Image placeholder: Agent Performance dashboard showing optimization results]*
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
 
 **Example Metrics:**
 ```
@@ -89,7 +97,7 @@ Recent Optimizations:
 - View detailed metrics for each prompt per LLM node
 - See performance comparisons and deployment recommendations
 
-*[Image placeholder: Release Hub showing prompt metrics per LLM node]*
+![Release Hub - Prompt Performance Comparison](/assets/overview/prompt-comparison.png)
 
 **Example Release Hub View:**
 ```
@@ -109,8 +117,6 @@ Statistical Confidence: 95%
 Recommendation: Ready for production
 ```
 
-*[Image placeholder: Detailed prompt comparison in Release Hub]*
-
 ## Step 3: Deploy Optimizations
 
 Select winning optimizations in the Release Hub and integrate them into your applications via SDK.
@@ -118,8 +124,6 @@ Select winning optimizations in the Release Hub and integrate them into your app
 **1. Navigate to Release Hub**
 - Go to **Optimization** → **Release Hub**
 - View recommended optimizations for each LLM node
-
-*[Image placeholder: Release Hub main interface showing recommended optimizations]*
 
 **2. Compare and Select**
 ```
@@ -139,7 +143,17 @@ Status: Ready for production
 - Click **Mark as Production**
 - Prompt becomes immediately available via SDK
 
-*[Image placeholder: Marking prompt as production in Release Hub]*
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+>
+  <source src="/assets/quickstart/ci:cd.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 **4. Fetch via SDK**
 
@@ -187,14 +201,10 @@ const response = await openai.chat.completions.create({
 });
 ```
 
-*[Image placeholder: Code examples showing SDK integration]*
-
 **5. Monitor Performance**
 - Track the performance of deployed prompts in Agent Performance
 - Monitor for any issues in your applications
 - Continue the optimization cycle
-
-*[Image placeholder: Prompt performance monitoring in Agent Performance dashboard]*
 
 ## Next Steps
 
