@@ -43,7 +43,7 @@ export default {
     extraContent: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <a
-          href="https://discord.gg/handit"
+          href="https://discord.gg/M6su47HZ"
           target="_blank"
           rel="noopener noreferrer"
           style={{

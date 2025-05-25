@@ -41,7 +41,7 @@ const navbar = (
   <Navbar
     logo={<img src="/assets/logo.png" alt="Handit.ai" style={{ width: '50px', height: 'auto' }} />}
     projectLink="https://github.com/Handit-AI/handit.ai.git"
-    chatLink="https://discord.gg/handit"
+    chatLink="https://discord.gg/M6su47HZ"
     chatIcon={
       <svg
         xmlns="http://www.w3.org/2000/svg"
