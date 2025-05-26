@@ -103,65 +103,171 @@ npm install @handit.ai/node
 
 ### Step 4: Add Basic Tracing
 
+Follow next steps for tracing:
+
+<Steps>
+
+### Create a service file to initialize the tracker
+### Set up the main agent function with tracing
+### Add manual tracking for LLM calls or tool usage
+
+</Steps>
+
+Create a service file to initialize the tracker:
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="handit_service.py"
+"""
+Handit.ai service initialization.
+This file creates a singleton tracker instance that can be imported across your application.
+"""
+from handit import HanditTracker
+
+# Create a singleton tracker instance
+tracker = HanditTracker()
+# Configure with your API key from environment variables
+tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="handit_service.js"
+/**
+ * Handit.ai service initialization.
+ * This file creates a singleton configuration that can be imported across your application.
+ */
+import { config } from '@handit.ai/node';
+
+// Configure with your API key from environment variables
+config({ apiKey: process.env.HANDIT_API_KEY });
+```
+</Tabs.Tab>
+</Tabs>
+
+Then implement your agent code:
+
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
 ```python filename="agent_tracing.py"
-from handit import HanditTracker
-import os
-
-# Initialize tracker
-tracker = HanditTracker()
-tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
+"""
+Agent tracing implementation with Handit.ai.
+This example shows how to:
+1. Track the main agent function
+2. Manually track authentication
+3. Manually track intent classification
+"""
+from handit_service import tracker
+import time
 
 # Trace your main agent function
 @tracker.start_agent_tracing()
-async def process_user_request(user_message: str):
+async def process_user_request(user_message: str, user_id: str):
+    """
+    Process a user request with comprehensive tracing.
+    
+    Args:
+        user_message (str): The message from the user
+        user_id (str): The ID of the user making the request
+        
+    Returns:
+        str: The generated response
+    """
     # Your agent logic here
+    auth_start = time.time()
+    
+    # Manual tracking of authentication
+    await tracker._send_tracked_data(
+        model_id="user-authentication",
+        request_body={
+            "user_id": user_id,
+            "action_type": "login",
+            "timestamp": auth_start
+        },
+        response_body={
+            "authenticated": True,
+            "user_tier": "premium",
+            "processing_time": time.time() - auth_start
+        }
+    )
+
+    intent_start = time.time()
     intent = await classify_intent(user_message)
+    
+    # Manual tracking of intent classification
+    await tracker._send_tracked_data(
+        model_id="intent-classification",
+        request_body={
+            "user_message": user_message,
+            "user_id": user_id,
+            "timestamp": intent_start
+        },
+        response_body={
+            "intent": intent,
+            "confidence": intent.get("confidence", 0.0),
+            "processing_time": time.time() - intent_start
+        }
+    )
+
     response = await generate_response(intent, user_message)
-    return response
-
-# Trace individual components
-@tracker.trace_agent_node("intent-classifier")
-async def classify_intent(message: str):
-    # Your intent classification logic
-    return intent
-
-@tracker.trace_agent_node("response-generator")
-async def generate_response(intent: str, message: str):
-    # Your response generation logic
     return response
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```javascript filename="agent_tracing.js"
-import { config, startAgentTracing, traceAgentNode } from '@handit.ai/node';
+/**
+ * Agent tracing implementation with Handit.ai.
+ * This example shows how to:
+ * 1. Track the main agent function
+ * 2. Manually track authentication
+ * 3. Manually track response generation
+ */
+import { startAgentTracing, captureAgentNode } from '@handit.ai/node';
 
-// Initialize
-config({ apiKey: process.env.HANDIT_API_KEY });
+/**
+ * Process a user request with comprehensive tracing.
+ * @param {string} userMessage - The message from the user
+ * @param {string} userId - The ID of the user making the request
+ * @returns {Promise<string>} The generated response
+ */
+const processUserRequest = startAgentTracing(async (userMessage, userId) => {
+    const authStart = Date.now();
+    
+    // Manual tracking of authentication
+    await captureAgentNode({
+        agentNodeSlug: 'user-authentication',
+        requestBody: {
+            userId,
+            actionType: 'login',
+            timestamp: authStart
+        },
+        responseBody: {
+            authenticated: true,
+            userTier: 'premium',
+            processingTime: Date.now() - authStart
+        }
+    });
 
-// Trace your main agent function
-const processUserRequest = startAgentTracing(async (userMessage) => {
     const intent = await classifyIntent(userMessage);
+    
+    // Manual tracking of response generation
+    const responseStart = Date.now();
     const response = await generateResponse(intent, userMessage);
+    await captureAgentNode({
+        agentNodeSlug: 'response-generation',
+        requestBody: {
+            intent,
+            userMessage,
+            userId,
+            timestamp: responseStart
+        },
+        responseBody: {
+            response,
+            processingTime: Date.now() - responseStart,
+            tokensUsed: response.tokens || 0
+        }
+    });
+
     return response;
-});
-
-// Trace individual components
-const classifyIntent = traceAgentNode({
-    agentNodeId: "intent-classifier",
-    callback: async (message) => {
-        // Your intent classification logic
-        return intent;
-    }
-});
-
-const generateResponse = traceAgentNode({
-    agentNodeId: "response-generator", 
-    callback: async (intent, message) => {
-        // Your response generation logic
-        return response;
-    }
 });
 ```
 </Tabs.Tab>
