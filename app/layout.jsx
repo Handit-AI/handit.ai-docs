@@ -39,7 +39,18 @@ const banner = <Banner storageKey="some-key">🎉 Welcome to handit.ai Documenta
 
 const navbar = (
   <Navbar
-    logo={<img src="/assets/logo.png" alt="Handit.ai" style={{ width: '50px', height: 'auto' }} />}
+    logo={
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <img src="/assets/logo.png" alt="Handit.ai" style={{ width: '50px', height: 'auto' }} />
+        <span style={{ 
+          fontSize: '1.25rem', 
+          fontWeight: '600',
+          color: 'var(--nextra-colors-text-primary)'
+        }}>
+          Handit.ai
+        </span>
+      </div>
+    }
     projectLink="https://github.com/Handit-AI/handit.ai.git"
     chatLink="https://discord.gg/M6su47HZ"
     chatIcon={
