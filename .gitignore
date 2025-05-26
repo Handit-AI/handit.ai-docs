@@ -32,4 +32,5 @@ yarn.lock
 pnpm-lock.yaml
 
 # Misc
-*.local 
+*.local # Large files
+public/assets/demo/demo.mp4
