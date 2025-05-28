@@ -102,20 +102,24 @@ npm install @handit.ai/node
 
 5. Example of handit.config.json, this is an example, yours will be different:
 
+```json filename="handit.config.json"
+{
+    "nodes": [
+        {"slug": "customer-service-interaction", "type": "agent"},
+        {"slug": "knowledge-base-search", "type": "tool"},
+        {"slug": "response-generator", "type": "llm"}
+    ]
+}
+```
 
 ### Step 4: Add Basic Tracing
 
-Follow next steps for tracing:
+Now, let's implement the main agent function with tracing. You'll need to set up three key components:
+1. Main orchestration function with `start_agent_tracing()`
+2. LLM calls tracking with `_send_tracked_data()`
+3. Tool usage tracking with `_send_tracked_data()`
 
-<Steps>
-
-### Create a service file to initialize the tracker
-### Set up the main agent function with tracing
-### Add manual tracking for LLM calls or tool usage
-
-</Steps>
-
-Create a service file to initialize the tracker:
+Make sure you have your `handit.config.json` ready with the correct slugs for each component [See Step 3](#step-3-create-your-agent-structure). These slugs will be used to identify and track each part of your agent's workflow.
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
@@ -146,10 +150,26 @@ config({ apiKey: process.env.HANDIT_API_KEY });
 </Tabs.Tab>
 </Tabs>
 
-Now, set up your main agent function with tracing. For manual tracking of LLM calls and tool usage, use `tracker._send_tracked_data(model_id, request_body, response_body)`. The `model_id` should match the slug from your `handit.config.json` [See Step 3](#step-3-create-your-agent-structure).
+Now, set up your main agent function, LLM calls and tool usage. By this part you will need your slugs, `handit.config.json` [See Step 3](#step-3-create-your-agent-structure).
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
+Functions used for this example: 
+
+- `@tracker.start_agent_tracing()`
+   - Type: Decorator
+   - Usage: Applied to main orchestration function
+   - Parameters: None
+   - Purpose: Marks start of agent tracing for entire request flow
+
+- `tracker._send_tracked_data()`
+   - Type: Async function
+   - Parameters:
+     - `model_id`: str (required) - Must match slug from handit.config.json
+     - `request_body`: dict (required) - Input data for operation
+     - `response_body`: dict (required) - Output data from operation
+   - Purpose: Tracks individual component executions (LLMs/Tools)
+
 ```python filename="customer_service_agent.py"
 """
 Customer Service Agent with comprehensive tracing.
@@ -270,21 +290,6 @@ async def handle_customer_request(user_message: str, user_id: str) -> Dict[str, 
         "kb_results": kb_results
     })
     
-    # Track the complete interaction
-    await tracker._send_tracked_data(
-        model_id="customer-service-interaction",  # Must match slug in handit.config.json
-        request_body={
-            "user_id": user_id,
-            "message": user_message,
-            "timestamp": start_time
-        },
-        response_body={
-            "response": response,
-            "processing_time": time.time() - start_time,
-            "kb_results_used": len(kb_results["results"])
-        }
-    )
-    
     return {
         "response": response,
         "processing_time": time.time() - start_time,
@@ -312,6 +317,22 @@ async def main():
 ```
 </Tabs.Tab>
 <Tabs.Tab>
+Functions used for this example: 
+
+- `startAgentTracing()`
+  - Type: Function wrapper
+  - Usage: Wraps main orchestration function
+  - Parameters: None
+  - Purpose: Marks start of agent tracing for entire request flow
+
+- `captureAgentNode()`
+  - Type: Async function
+  - Parameters:
+    - `agentNodeSlug`: string (required) - Must match slug from handit.config.json
+    - `requestBody`: object (required) - Input data for operation
+    - `responseBody`: object (required) - Output data from operation
+  - Purpose: Tracks individual component executions (LLMs/Tools)
+
 ```javascript filename="customer_service_agent.js"
 /**
  * Customer Service Agent with comprehensive tracing.
@@ -418,21 +439,6 @@ const handleCustomerRequest = startAgentTracing(async (userMessage, userId) => {
     const response = await generateResponse({
         userMessage,
         kbResults
-    });
-    
-    // Track the complete interaction
-    await captureAgentNode({
-        agentNodeSlug: 'customer-service-interaction',  // Must match slug in handit.config.json
-        requestBody: {
-            userId,
-            message: userMessage,
-            timestamp: startTime
-        },
-        responseBody: {
-            response,
-            processingTime: Date.now() - startTime,
-            kbResultsUsed: kbResults.results.length
-        }
     });
     
     return {

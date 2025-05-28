@@ -401,22 +401,21 @@ Next, add tracing to your individual LLM calls, tools, and functions. Choose the
 **Choose the right method for your use case:**
 
 ```python filename="node_tracing.py"
-# Method 1: Using trace_agent_node_func for async functions
+# Method 1: Manual tracking with _send_tracked_data
+# This is the most direct way to track individual component executions
+await tracker._send_tracked_data(
+    model_id="your-node-slug",     # Must match slug from handit.config.json
+    request_body={"input": "data"}, # Input data for the operation
+    response_body={"output": "data"} # Output data from the operation
+)
+
+# Method 2: Using trace_agent_node_func for async functions
 # This is useful for one-off async function calls that need tracing
 result = await tracker.trace_agent_node_func(
     search_documents,           # func: The async function to trace
     query="customer support",   # *args: Positional arguments for the function
     limit=5,                    # **kwargs: Keyword arguments for the function
     key="document-search"       # key: Unique identifier for this node in analytics
-)
-
-# Method 2: Using trace_agent_node_func_sync for sync functions
-# This is useful for one-off sync function calls that need tracing
-result = tracker.trace_agent_node_func_sync(
-    process_text,              # func: The sync function to trace
-    text="Hello world",        # *args: Positional arguments for the function
-    language="en",             # **kwargs: Keyword arguments for the function
-    key="text-processor"       # key: Unique identifier for this node in analytics
 )
 
 # Method 3: Using trace_agent_node decorator for async functions
@@ -465,8 +464,8 @@ tracked_tool = tracker.track_tool(
 ```
 
 **When to use each method:**
+- **`_send_tracked_data`** - Direct manual tracking of individual component executions (LLMs/Tools)
 - **`trace_agent_node_func`** - One-off async function calls you need to trace
-- **`trace_agent_node_func_sync`** - One-off sync function calls you need to trace  
 - **`trace_agent_node` decorator** - Reusable functions you want to trace every time
 - **`track_model`** - LLM models where you want to capture all interactions
 - **`track_tool`** - Tools, RAG systems, and API calls you want to monitor
@@ -479,25 +478,23 @@ tracked_tool = tracker.track_tool(
 **Choose the right method for your use case:**
 
 ```javascript filename="node_tracing.js"
-const { traceAgentNode, captureModel } = require('@handit.ai/node');
+const { traceAgentNode, captureAgentNode } = require('@handit.ai/node');
 
-// Method 1: Using traceAgentNode for async functions
+// Method 1: Manual tracking with captureAgentNode
+// This is the most direct way to track individual component executions
+await captureAgentNode({
+    agentNodeSlug: "your-node-slug",    // Must match slug from handit.config.json
+    requestBody: { input: "data" },     // Input data for the operation
+    responseBody: { output: "data" }    // Output data from the operation
+});
+
+// Method 2: Using traceAgentNode for async functions
 // This is useful for reusable async functions that need tracing
 const searchDocuments = traceAgentNode({
     agentNodeId: "vector-search",    // Unique identifier from config
     callback: async (query, limit = 5) => {
         // Your vector search logic here
         return results;
-    }
-});
-
-// Method 2: Using traceAgentNode for sync functions
-// This is useful for reusable sync functions that need tracing
-const processText = traceAgentNode({
-    agentNodeId: "text-processor",   // Unique identifier from config
-    callback: (text, language = "en") => {
-        // Your text processing logic here
-        return processedText;
     }
 });
 
@@ -545,6 +542,7 @@ const trackedTool = traceAgentNode({
 ```
 
 **When to use each method:**
+- **`captureAgentNode`** - Direct manual tracking of individual component executions (LLMs/Tools)
 - **`traceAgentNode`** - For wrapping reusable functions (both async and sync)
 - **`captureModel`** - For tracking individual LLM model interactions
 - **`startAgentTracing`** - For wrapping the main agent function
@@ -609,7 +607,7 @@ tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
 __all__ = ['tracker']
 ```
 
-**Step 2:** Create your `handit.config.json` file for this example:
+**Step 2:** The `handit.config.json` file for this example:
 
 ```json filename="handit.config.json"
 {
