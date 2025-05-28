@@ -39,8 +39,7 @@ Enable automatic optimization that generates better prompts, tests them, and pro
 
 Before we start, make sure you have:
 
-- An active AI application with LLM calls
-- A [Handit.ai account](https://beta.handit.ai) (sign up if needed)
+- A [Handit.ai Account](https://beta.handit.ai) (sign up if needed)
 - 15-30 minutes to complete the setup
 
 ## Phase 1: AI Observability (5 minutes)
@@ -101,6 +100,9 @@ npm install @handit.ai/node
   Your browser does not support the video tag.
 </video>
 
+5. Example of handit.config.json, this is an example, yours will be different:
+
+
 ### Step 4: Add Basic Tracing
 
 Follow next steps for tracing:
@@ -144,131 +146,321 @@ config({ apiKey: process.env.HANDIT_API_KEY });
 </Tabs.Tab>
 </Tabs>
 
-Then implement your agent code:
+Now, set up your main agent function with tracing. For manual tracking of LLM calls and tool usage, use `tracker._send_tracked_data(model_id, request_body, response_body)`. The `model_id` should match the slug from your `handit.config.json` [See Step 3](#step-3-create-your-agent-structure).
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
-```python filename="agent_tracing.py"
+```python filename="customer_service_agent.py"
 """
-Agent tracing implementation with Handit.ai.
-This example shows how to:
-1. Track the main agent function
-2. Manually track authentication
-3. Manually track intent classification
+Customer Service Agent with comprehensive tracing.
+
+This example demonstrates the correct pattern for implementing tracing in a customer service agent:
+1. Use @tracker.start_agent_tracing() ONLY on the main orchestration function
+2. Use tracker._send_tracked_data() for tracking individual component executions
+3. Each component should track its own execution with appropriate model_id
+
+The main orchestration function (handle_customer_request) is the only entry point that should
+use start_agent_tracing. All other components should use _send_tracked_data directly.
+
+Example handit.config.json slugs used in this code:
+{
+    "nodes": [
+        {"slug": "customer-service-interaction", "type": "agent"},
+        {"slug": "knowledge-base-search", "type": "tool"},
+        {"slug": "response-generator", "type": "llm"}
+    ]
+}
 """
 from handit_service import tracker
 import time
+from typing import Dict, Any
 
-# Trace your main agent function
-@tracker.start_agent_tracing()
-async def process_user_request(user_message: str, user_id: str):
+async def search_knowledge_base(query: str) -> Dict[str, Any]:
     """
-    Process a user request with comprehensive tracing.
+    Search the knowledge base for relevant information.
+    
+    This function demonstrates how to track a tool execution:
+    1. Execute the tool logic
+    2. Track the execution using _send_tracked_data
+    3. Return the results
     
     Args:
-        user_message (str): The message from the user
-        user_id (str): The ID of the user making the request
+        query (str): The search query
         
     Returns:
-        str: The generated response
+        Dict[str, Any]: Search results with confidence score
     """
-    # Your agent logic here
-    auth_start = time.time()
+    # Simulate knowledge base search
+    await asyncio.sleep(0.5)  # Simulate API call
+    results = {
+        "results": [
+            {"title": "Refund Policy", "content": "Customers can request refunds within 30 days..."},
+            {"title": "Shipping Info", "content": "Standard shipping takes 3-5 business days..."}
+        ],
+        "confidence": 0.85
+    }
     
-    # Manual tracking of authentication
+    # Track the knowledge base search
     await tracker._send_tracked_data(
-        model_id="user-authentication",
-        request_body={
-            "user_id": user_id,
-            "action_type": "login",
-            "timestamp": auth_start
-        },
-        response_body={
-            "authenticated": True,
-            "user_tier": "premium",
-            "processing_time": time.time() - auth_start
-        }
+        model_id="knowledge-base-search",  # Must match slug in handit.config.json
+        request_body={"query": query},
+        response_body=results
     )
-
-    intent_start = time.time()
-    intent = await classify_intent(user_message)
     
-    # Manual tracking of intent classification
-    await tracker._send_tracked_data(
-        model_id="intent-classification",
-        request_body={
-            "user_message": user_message,
-            "user_id": user_id,
-            "timestamp": intent_start
-        },
-        response_body={
-            "intent": intent,
-            "confidence": intent.get("confidence", 0.0),
-            "processing_time": time.time() - intent_start
-        }
-    )
+    return results
 
-    response = await generate_response(intent, user_message)
+async def generate_response(context: Dict[str, Any]) -> str:
+    """
+    Generate a response using LLM.
+    
+    This function demonstrates how to track an LLM call:
+    1. Execute the LLM call
+    2. Track the execution using _send_tracked_data
+    3. Return the response
+    
+    Args:
+        context (Dict[str, Any]): Context including user message and KB results
+        
+    Returns:
+        str: Generated response
+    """
+    # Simulate LLM call
+    await asyncio.sleep(1)  # Simulate API call
+    response = "Based on our policies, you can request a refund within 30 days of purchase..."
+    
+    # Track the LLM response generation
+    await tracker._send_tracked_data(
+        model_id="response-generator",  # Must match slug in handit.config.json
+        request_body=context,
+        response_body={"response": response}
+    )
+    
     return response
+
+# Main customer service agent - this is the only function that uses start_agent_tracing
+@tracker.start_agent_tracing()
+async def handle_customer_request(user_message: str, user_id: str) -> Dict[str, Any]:
+    """
+    Process a customer service request with comprehensive tracing.
+    
+    This is the main orchestration function that:
+    1. Uses @tracker.start_agent_tracing() to track the entire request flow
+    2. Coordinates between different components (KB search, LLM)
+    3. Tracks the complete interaction
+    
+    The start_agent_tracing decorator should ONLY be used on this main function,
+    as it's the entry point that orchestrates the entire flow.
+    
+    Args:
+        user_message (str): The customer's message
+        user_id (str): The customer's ID
+        
+    Returns:
+        Dict[str, Any]: Response with answer and metadata
+    """
+    # Track the start of processing
+    start_time = time.time()
+    
+    # Search knowledge base
+    kb_results = await search_knowledge_base(user_message)
+    
+    # Generate response using LLM
+    response = await generate_response({
+        "user_message": user_message,
+        "kb_results": kb_results
+    })
+    
+    # Track the complete interaction
+    await tracker._send_tracked_data(
+        model_id="customer-service-interaction",  # Must match slug in handit.config.json
+        request_body={
+            "user_id": user_id,
+            "message": user_message,
+            "timestamp": start_time
+        },
+        response_body={
+            "response": response,
+            "processing_time": time.time() - start_time,
+            "kb_results_used": len(kb_results["results"])
+        }
+    )
+    
+    return {
+        "response": response,
+        "processing_time": time.time() - start_time,
+        "confidence": kb_results["confidence"]
+    }
+
+# Usage example
+async def main():
+    """
+    Example usage of the customer service agent.
+    
+    This demonstrates how to:
+    1. Call the main orchestration function
+    2. Handle the response
+    3. Process any errors
+    """
+    try:
+        result = await handle_customer_request(
+            "I want to return my order, it's been 20 days",
+            "user_123"
+        )
+        print(result)
+    except Exception as e:
+        print(f"Error processing request: {e}")
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-```javascript filename="agent_tracing.js"
+```javascript filename="customer_service_agent.js"
 /**
- * Agent tracing implementation with Handit.ai.
- * This example shows how to:
- * 1. Track the main agent function
- * 2. Manually track authentication
- * 3. Manually track response generation
+ * Customer Service Agent with comprehensive tracing.
+ * 
+ * This example demonstrates the correct pattern for implementing tracing in a customer service agent:
+ * 1. Use startAgentTracing() ONLY on the main orchestration function
+ * 2. Use captureAgentNode() for tracking individual component executions
+ * 3. Each component should track its own execution with appropriate agentNodeSlug
+ * 
+ * The main orchestration function (handleCustomerRequest) is the only entry point that should
+ * use startAgentTracing. All other components should use captureAgentNode directly.
+ * 
+ * Example handit.config.json slugs used in this code:
+ * {
+ *     "nodes": [
+ *         {"slug": "customer-service-interaction", "type": "agent"},
+ *         {"slug": "knowledge-base-search", "type": "tool"},
+ *         {"slug": "response-generator", "type": "llm"}
+ *     ]
+ * }
  */
 import { startAgentTracing, captureAgentNode } from '@handit.ai/node';
 
 /**
- * Process a user request with comprehensive tracing.
- * @param {string} userMessage - The message from the user
- * @param {string} userId - The ID of the user making the request
- * @returns {Promise<string>} The generated response
+ * Search the knowledge base for relevant information.
+ * 
+ * This function demonstrates how to track a tool execution:
+ * 1. Execute the tool logic
+ * 2. Track the execution using captureAgentNode
+ * 3. Return the results
+ * 
+ * @param {string} query - The search query
+ * @returns {Promise<Object>} Search results with confidence score
  */
-const processUserRequest = startAgentTracing(async (userMessage, userId) => {
-    const authStart = Date.now();
+async function searchKnowledgeBase(query) {
+    // Simulate knowledge base search
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+    const results = {
+        results: [
+            { title: 'Refund Policy', content: 'Customers can request refunds within 30 days...' },
+            { title: 'Shipping Info', content: 'Standard shipping takes 3-5 business days...' }
+        ],
+        confidence: 0.85
+    };
     
-    // Manual tracking of authentication
+    // Track the knowledge base search
     await captureAgentNode({
-        agentNodeSlug: 'user-authentication',
-        requestBody: {
-            userId,
-            actionType: 'login',
-            timestamp: authStart
-        },
-        responseBody: {
-            authenticated: true,
-            userTier: 'premium',
-            processingTime: Date.now() - authStart
-        }
+        agentNodeSlug: 'knowledge-base-search',  // Must match slug in handit.config.json
+        requestBody: { query },
+        responseBody: results
     });
-
-    const intent = await classifyIntent(userMessage);
     
-    // Manual tracking of response generation
-    const responseStart = Date.now();
-    const response = await generateResponse(intent, userMessage);
+    return results;
+}
+
+/**
+ * Generate a response using LLM.
+ * 
+ * This function demonstrates how to track an LLM call:
+ * 1. Execute the LLM call
+ * 2. Track the execution using captureAgentNode
+ * 3. Return the response
+ * 
+ * @param {Object} context - Context including user message and KB results
+ * @returns {Promise<string>} Generated response
+ */
+async function generateResponse(context) {
+    // Simulate LLM call
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+    const response = 'Based on our policies, you can request a refund within 30 days of purchase...';
+    
+    // Track the LLM response generation
     await captureAgentNode({
-        agentNodeSlug: 'response-generation',
+        agentNodeSlug: 'response-generator',  // Must match slug in handit.config.json
+        requestBody: context,
+        responseBody: { response }
+    });
+    
+    return response;
+}
+
+/**
+ * Process a customer service request with comprehensive tracing.
+ * 
+ * This is the main orchestration function that:
+ * 1. Uses startAgentTracing() to track the entire request flow
+ * 2. Coordinates between different components (KB search, LLM)
+ * 3. Tracks the complete interaction
+ * 
+ * The startAgentTracing wrapper should ONLY be used on this main function,
+ * as it's the entry point that orchestrates the entire flow.
+ * 
+ * @param {string} userMessage - The customer's message
+ * @param {string} userId - The customer's ID
+ * @returns {Promise<Object>} Response with answer and metadata
+ */
+const handleCustomerRequest = startAgentTracing(async (userMessage, userId) => {
+    const startTime = Date.now();
+    
+    // Search knowledge base
+    const kbResults = await searchKnowledgeBase(userMessage);
+    
+    // Generate response using LLM
+    const response = await generateResponse({
+        userMessage,
+        kbResults
+    });
+    
+    // Track the complete interaction
+    await captureAgentNode({
+        agentNodeSlug: 'customer-service-interaction',  // Must match slug in handit.config.json
         requestBody: {
-            intent,
-            userMessage,
             userId,
-            timestamp: responseStart
+            message: userMessage,
+            timestamp: startTime
         },
         responseBody: {
             response,
-            processingTime: Date.now() - responseStart,
-            tokensUsed: response.tokens || 0
+            processingTime: Date.now() - startTime,
+            kbResultsUsed: kbResults.results.length
         }
     });
-
-    return response;
+    
+    return {
+        response,
+        processingTime: Date.now() - startTime,
+        confidence: kbResults.confidence
+    };
 });
+
+/**
+ * Example usage of the customer service agent.
+ * 
+ * This demonstrates how to:
+ * 1. Call the main orchestration function
+ * 2. Handle the response
+ * 3. Process any errors
+ */
+async function main() {
+    try {
+        const result = await handleCustomerRequest(
+            'I want to return my order, it\'s been 20 days',
+            'user_123'
+        );
+        console.log(result);
+    } catch (error) {
+        console.error('Error processing request:', error);
+    }
+}
 ```
 </Tabs.Tab>
 </Tabs>
