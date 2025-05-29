@@ -32,7 +32,9 @@ Handit.ai provides three core tracing capabilities that work together to give yo
 - Error propagation tracking - See how errors flow through your system
 - Performance overview - Total execution time and resource usage
 
-```python
+<Tabs items={['Python', 'JavaScript']}>
+<Tabs.Tab>
+```python filename="process_customer_request.py"
 @tracker.start_agent_tracing()
 async def process_customer_request(request):
     # Everything inside here is automatically traced
@@ -41,6 +43,19 @@ async def process_customer_request(request):
     response = await generate_response(context)
     return response
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="processCustomerRequest.js"
+const processCustomerRequest = startAgentTracing(async (request) => {
+    // Everything inside here is automatically traced
+    const intent = await classifyIntent(request);
+    const context = await searchKnowledgeBase(intent);
+    const response = await generateResponse(context);
+    return response;
+});
+```
+</Tabs.Tab>
+</Tabs>
 
 ### 🧠 LLM Node Tracing: Understanding AI Decisions
 
@@ -54,13 +69,29 @@ async def process_customer_request(request):
 - Model parameters - Temperature, max tokens, and other settings
 - Error handling - Failed calls and retry attempts
 
-```python
+<Tabs items={['Python', 'JavaScript']}>
+<Tabs.Tab>
+```python filename="classify_intent.py"
 @tracker.trace_agent_node("intent-classifier")
 async def classify_intent(user_message):
     # LLM call is automatically captured with full context
     response = await llm.generate(f"Classify intent: {user_message}")
     return response
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="classifyIntent.js"
+const classifyIntent = traceAgentNode({
+    agentNodeId: "intent-classifier",
+    callback: async (userMessage) => {
+        // LLM call is automatically captured with full context
+        const response = await llm.generate(`Classify intent: ${userMessage}`);
+        return response;
+    }
+});
+```
+</Tabs.Tab>
+</Tabs>
 
 ### 🛠️ Tool Tracing: Monitoring Actions
 
@@ -74,13 +105,29 @@ async def classify_intent(user_message):
 - Error tracking - Detailed error context and stack traces
 - Resource usage - Memory, CPU, and network utilization
 
-```python
+<Tabs items={['Python', 'JavaScript']}>
+<Tabs.Tab>
+```python filename="search_knowledge_base.py"
 @tracker.trace_agent_node("knowledge-search")
 async def search_knowledge_base(query):
     # Tool execution is captured with timing and results
     results = await vector_db.similarity_search(query)
     return results
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="searchKnowledgeBase.js"
+const searchKnowledgeBase = traceAgentNode({
+    agentNodeId: "knowledge-search",
+    callback: async (query) => {
+        // Tool execution is captured with timing and results
+        const results = await vectorDb.similaritySearch(query);
+        return results;
+    }
+});
+```
+</Tabs.Tab>
+</Tabs>
 
 ## How They Work Together
 
