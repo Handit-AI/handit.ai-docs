@@ -5,5 +5,6 @@ export default {
   "quickstart": "Quickstart",
   "tracing": "Tracing",
   "evaluation": "Evaluation",
-  "optimization": "Optimization"
+  "optimization": "Optimization",
+  "more": "More"
 } satisfies MetaRecord

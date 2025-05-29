@@ -79,50 +79,20 @@ npm install @handit.ai/node
   Your browser does not support the video tag.
 </video>
 
-### Step 3: Create Your Agent Structure
+### Step 3: Add Basic Tracing
 
-1. Navigate to **"My Agents"** in the dashboard
-2. Click **"Create New Agent"**
-3. Define your agent's workflow using either:
-   - **AI-Powered Creation**: Upload a JSON description of your agent
-   - **Visual Builder**: Drag and drop to build your workflow
-4. Download your `handit.config.json` file
+Now, let's set up your main agent function, LLM calls and tool usage with tracing. You'll need to set up four key components:
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/create_agent.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-5. Example of handit.config.json, this is an example, yours will be different:
-
-```json filename="handit.config.json"
-{
-    "nodes": [
-        {"slug": "customer-service-interaction", "type": "agent"},
-        {"slug": "knowledge-base-search", "type": "tool"},
-        {"slug": "response-generator", "type": "llm"}
-    ]
-}
-```
-
-### Step 4: Add Basic Tracing
-
-Now, let's implement the main agent function with tracing. You'll need to set up three key components:
-1. Main orchestration function with `start_agent_tracing()`
-2. LLM calls tracking with `_send_tracked_data()`
-3. Tool usage tracking with `_send_tracked_data()`
-
-Make sure you have your `handit.config.json` ready with the correct slugs for each component [See Step 3](#step-3-create-your-agent-structure). These slugs will be used to identify and track each part of your agent's workflow.
+1. Initialize Handit.ai service
+2. Set up main orchestration with `startAgentTracing()`
+3. Track LLM calls with `captureModel()`
+4. Track tool usage with `traceAgentNode()`
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
+
+Create a `handit_service.py` file to initialize the Handit.ai tracker
+
 ```python filename="handit_service.py"
 """
 Handit.ai service initialization.
@@ -137,6 +107,9 @@ tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
 ```
 </Tabs.Tab>
 <Tabs.Tab>
+
+Create a `handit_service.js` file to initialize the Handit.ai tracker
+
 ```javascript filename="handit_service.js"
 /**
  * Handit.ai service initialization.
@@ -150,7 +123,7 @@ config({ apiKey: process.env.HANDIT_API_KEY });
 </Tabs.Tab>
 </Tabs>
 
-Now, set up your main agent function, LLM calls and tool usage. By this part you will need your slugs, `handit.config.json` [See Step 3](#step-3-create-your-agent-structure).
+Now, set up your main agent function, LLM calls and tool usage.
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
@@ -165,31 +138,24 @@ Functions used for this example:
 - `tracker._send_tracked_data()`
    - Type: Async function
    - Parameters:
-     - `model_id`: str (required) - Must match slug from handit.config.json
+     - `model_id`: str (required) - Unique identifier for the Tool or LLM you want to track
      - `request_body`: dict (required) - Input data for operation
      - `response_body`: dict (required) - Output data from operation
    - Purpose: Tracks individual component executions (LLMs/Tools)
 
-```python filename="customer_service_agent.py"
+```python {14, 44-48,72-76, 81} filename="customer_service_agent.py"
 """
 Customer Service Agent with comprehensive tracing.
 
 This example demonstrates the correct pattern for implementing tracing in a customer service agent:
 1. Use @tracker.start_agent_tracing() ONLY on the main orchestration function
-2. Use tracker._send_tracked_data() for tracking individual component executions
-3. Each component should track its own execution with appropriate model_id
+2. Use tracker._send_tracked_data() for tracking individual component executions (LLMs/Tools)
+3. Each component should track its own execution with a unique model_id
+  (Create unique identifiers for each component. They must be unique across all nodes)
 
 The main orchestration function (handle_customer_request) is the only entry point that should
 use start_agent_tracing. All other components should use _send_tracked_data directly.
 
-Example handit.config.json slugs used in this code:
-{
-    "nodes": [
-        {"slug": "customer-service-interaction", "type": "agent"},
-        {"slug": "knowledge-base-search", "type": "tool"},
-        {"slug": "response-generator", "type": "llm"}
-    ]
-}
 """
 from handit_service import tracker
 import time
@@ -222,7 +188,7 @@ async def search_knowledge_base(query: str) -> Dict[str, Any]:
     
     # Track the knowledge base search
     await tracker._send_tracked_data(
-        model_id="knowledge-base-search",  # Must match slug in handit.config.json
+        model_id="knowledge-base-search",  # Create your own unique identifier for your component. Must be unique across all nodes
         request_body={"query": query},
         response_body=results
     )
@@ -250,7 +216,7 @@ async def generate_response(context: Dict[str, Any]) -> str:
     
     # Track the LLM response generation
     await tracker._send_tracked_data(
-        model_id="response-generator",  # Must match slug in handit.config.json
+        model_id="response-generator",  # Unique identifier
         request_body=context,
         response_body={"response": response}
     )
@@ -328,31 +294,24 @@ Functions used for this example:
 - `captureAgentNode()`
   - Type: Async function
   - Parameters:
-    - `agentNodeSlug`: string (required) - Must match slug from handit.config.json
+    - `agentNodeSlug`: string (required) - Unique identifier for the Tool or LLM you want to track
     - `requestBody`: object (required) - Input data for operation
     - `responseBody`: object (required) - Output data from operation
   - Purpose: Tracks individual component executions (LLMs/Tools)
 
-```javascript filename="customer_service_agent.js"
+```javascript {13,38-42, 64-68, 89} filename="customer_service_agent.js"
 /**
  * Customer Service Agent with comprehensive tracing.
  * 
  * This example demonstrates the correct pattern for implementing tracing in a customer service agent:
  * 1. Use startAgentTracing() ONLY on the main orchestration function
  * 2. Use captureAgentNode() for tracking individual component executions
- * 3. Each component should track its own execution with appropriate agentNodeSlug
+ * 3. Each component should track its own execution with a unique model_id
+ *    (Create unique identifiers for each component. They must be unique across all nodes)
  * 
  * The main orchestration function (handleCustomerRequest) is the only entry point that should
  * use startAgentTracing. All other components should use captureAgentNode directly.
  * 
- * Example handit.config.json slugs used in this code:
- * {
- *     "nodes": [
- *         {"slug": "customer-service-interaction", "type": "agent"},
- *         {"slug": "knowledge-base-search", "type": "tool"},
- *         {"slug": "response-generator", "type": "llm"}
- *     ]
- * }
  */
 import { startAgentTracing, captureAgentNode } from '@handit.ai/node';
 
@@ -380,7 +339,7 @@ async function searchKnowledgeBase(query) {
     
     // Track the knowledge base search
     await captureAgentNode({
-        agentNodeSlug: 'knowledge-base-search',  // Must match slug in handit.config.json
+        agentNodeSlug: 'knowledge-base-search',  // Create your own unique identifier for your component. Must be unique across all nodes
         requestBody: { query },
         responseBody: results
     });
@@ -406,7 +365,7 @@ async function generateResponse(context) {
     
     // Track the LLM response generation
     await captureAgentNode({
-        agentNodeSlug: 'response-generator',  // Must match slug in handit.config.json
+        agentNodeSlug: 'response-generator',  // Unique identifier
         requestBody: context,
         responseBody: { response }
     });
@@ -758,8 +717,7 @@ Congratulations! You now have a complete AI observability and optimization syste
 
 **Tracing Not Working?**
 - Verify your API key is correct and set as environment variable
-- Check that your agent structure matches your `handit.config.json`
-- Ensure you're using the correct node slugs in your tracing code
+- Ensure you're using the functions correct
 
 **Evaluations Not Running?**
 - Confirm model tokens are valid and have sufficient credits
