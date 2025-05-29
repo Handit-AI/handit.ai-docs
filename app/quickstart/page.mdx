@@ -114,15 +114,19 @@ npm install @handit.ai/node
 
 ### Step 4: Add Basic Tracing
 
-Now, let's implement the main agent function with tracing. You'll need to set up three key components:
-1. Main orchestration function with `start_agent_tracing()`
-2. LLM calls tracking with `_send_tracked_data()`
-3. Tool usage tracking with `_send_tracked_data()`
+Now, let's set up your main agent function, LLM calls and tool usage with tracing. You'll need to set up four key components:
+1. Initialize Handit.ai service
+2. Set up main orchestration with `startAgentTracing()`
+3. Track LLM calls with `captureModel()`
+4. Track tool usage with `traceAgentNode()`
 
 Make sure you have your `handit.config.json` ready with the correct slugs for each component [See Step 3](#step-3-create-your-agent-structure). These slugs will be used to identify and track each part of your agent's workflow.
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
+
+Create a `handit_service.py` file to initialize the Handit.ai tracker
+
 ```python filename="handit_service.py"
 """
 Handit.ai service initialization.
@@ -137,6 +141,9 @@ tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
 ```
 </Tabs.Tab>
 <Tabs.Tab>
+
+Create a `handit_service.js` file to initialize the Handit.ai tracker
+
 ```javascript filename="handit_service.js"
 /**
  * Handit.ai service initialization.
@@ -772,6 +779,6 @@ Congratulations! You now have a complete AI observability and optimization syste
 - Confirm sufficient evaluation data has been collected
 
 **Need Help?**
-- Visit our [Support](/support) page
+- Visit our [Support](/more/contact) page
 - Join our [Discord community](https://discord.gg/M6su47HZ)
 - Check individual quickstart guides for detailed troubleshooting
