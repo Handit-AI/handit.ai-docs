@@ -49,16 +49,34 @@ Associate the token with your single-purpose evaluators
 <div className="grid grid-cols-2 gap-4 mt-4">
   <div>
     <h4>🤖 OpenAI</h4>
-    - **GPT-4o** - Highest accuracy for complex evaluations
+    - **GPT-4** - Highest accuracy for complex evaluations
+      - Best for nuanced reasoning and complex analysis
+      - Ideal for critical evaluation tasks
+      - Higher cost but superior quality
     - **GPT-3.5-turbo** - Cost-effective for high-volume evaluation
+      - Fast response times for bulk processing
+      - Good balance of cost and quality
+      - Suitable for routine evaluations
     - **GPT-4-turbo** - Balanced performance and speed
+      - Improved speed over standard GPT-4
+      - Good for time-sensitive evaluations
+      - Moderate cost with good accuracy
     - Industry standard for evaluation tasks
   </div>
   <div>
     <h4>🦙 Together AI</h4>
     - **Llama v4 Scout** - High-quality open source alternative
+      - Strong reasoning capabilities
+      - Cost-effective for complex tasks
+      - Good for technical evaluations
     - **Llama v4 Maverick** - Faster, cost-effective processing
+      - Optimized for speed
+      - Lower cost per token
+      - Good for high-volume tasks
     - **CodeLlama** - Specialized for technical evaluation
+      - Excellent for code and technical content
+      - Strong understanding of programming concepts
+      - Ideal for technical documentation
     - Open source model alternatives
   </div>
 </div>
@@ -94,9 +112,11 @@ OpenAI models are the most popular choice for LLM-as-Judge evaluation due to the
 
 ### Model Selection Guide
 
-**GPT-4o** - Best for complex evaluations requiring nuanced reasoning
-**GPT-3.5-turbo** - Ideal for high-volume evaluation with good quality
-**GPT-4-turbo** - Balanced option with fast response times
+| Model | Best Use Case | Description |
+|-------|--------------|-------------|
+| **GPT-4** | Complex evaluations | Best for complex evaluations requiring nuanced reasoning |
+| **GPT-3.5-turbo** | High-volume evaluation | Ideal for high-volume evaluation with good quality |
+| **GPT-4-turbo** | Balanced performance | Balanced option with fast response times |
 
 ## Together AI Configuration
 
@@ -136,17 +156,44 @@ Together AI provides access to open-source models like Llama, offering cost-effe
   <div>
     <h4>✅ Token Security</h4>
     - Use dedicated API keys for evaluation only
+      - Separate from production keys
+      - Different keys for different evaluation types
+      - Clear naming convention for easy identification
     - Set usage limits on provider dashboards
+      - Daily/monthly token limits
+      - Cost thresholds
+      - Rate limiting
     - Rotate keys regularly (monthly/quarterly)
+      - Schedule regular rotations
+      - Maintain overlap period during rotation
+      - Update all evaluators with new keys
     - Monitor usage through the platform
+      - Track token consumption
+      - Set up alerts for unusual usage
+      - Regular usage reports
     - Use descriptive names for easy identification
+      - Include purpose in key name
+      - Add creation date
+      - Specify environment (dev/prod)
   </div>
   <div>
     <h4>🔒 Access Management</h4>
     - Limit team member access to sensitive tokens
+      - Role-based access control
+      - Minimum required permissions
+      - Regular access reviews
     - Use organization/project scoping when available
+      - Separate tokens per project
+      - Environment-specific tokens
+      - Clear ownership and responsibility
     - Keep backup tokens for critical evaluations
+      - Store securely
+      - Regular testing
+      - Clear rotation process
     - Review token usage regularly
+      - Usage patterns
+      - Cost analysis
+      - Performance metrics
   </div>
 </div>
 
@@ -154,18 +201,45 @@ Together AI provides access to open-source models like Llama, offering cost-effe
 
 **"Invalid API Key" Error**
 - Verify the API key is correct and hasn't expired
+  - Check key format
+  - Verify creation date
+  - Confirm key hasn't been revoked
 - Check if you've reached your usage limits
+  - Review current usage
+  - Check billing status
+  - Verify rate limits
 - Ensure the key has required permissions
+  - Model access permissions
+  - API access level
+  - Organization restrictions
 
 **"Rate Limit Exceeded"**
 - Check your provider's rate limits
+  - Per-minute limits
+  - Per-hour limits
+  - Daily quotas
 - Consider upgrading your provider plan
+  - Higher rate limits
+  - Priority access
+  - Dedicated capacity
 - Reduce evaluation frequency temporarily
+  - Implement backoff strategy
+  - Queue evaluations
+  - Batch processing
 
 **"Model Not Found"**
 - Verify the model name is exactly correct
+  - Check for typos
+  - Confirm model availability
+  - Verify model version
 - Check if the model is available in your region
+  - Regional restrictions
+  - Compliance requirements
+  - Data residency
 - Ensure your API key has access to the selected model
+  - Subscription level
+  - Organization settings
+  - Model permissions
 
 ## Using Tokens in Evaluators
 
