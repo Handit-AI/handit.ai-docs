@@ -24,22 +24,42 @@ A custom evaluator consists of:
 <Steps>
 ### Evaluation Criteria
 Define what constitutes quality for your specific use case
+- Identify key quality dimensions
+- Set clear scoring guidelines
+- Define minimum acceptable thresholds
 
 ### Evaluation Prompt  
 Instruction template that guides the judge model
+- Clear role definition
+- Specific evaluation criteria
+- Context requirements
+- Output format specifications
 
 ### Scoring Framework
 How to interpret and score responses consistently
+- Numerical scoring scale (e.g., 1-10)
+- Weighted criteria if needed
+- Confidence scoring
 
 ### Output Format
 Structured format for evaluation results and insights
+- JSON schema for consistency
+- Required fields and data types
+- Optional metadata fields
+- Error handling format
 </Steps>
+
+<Callout type="info">
+  **Pro tip:** Start with a simple evaluator focusing on 3-5 key criteria, then expand as you gather more data and insights about your AI's performance.
+</Callout>
 
 ## Creating Your First Evaluator
 
 **1. Navigate to Evaluators**
 - Go to **Evaluation Suite**
 - Click **Create New Evaluator**
+- Choose between template-based or custom creation
+- Consider your evaluation goals and requirements
 
 <video 
   width="100%" 
@@ -59,14 +79,19 @@ Structured format for evaluation results and insights
 ```
 Customer Support Quality
 ```
+- Use descriptive, purpose-specific names
+- Include version number if applicable
+- Consider environment prefix (dev/prod)
 
 **Model Token**
 - Select your configured judge model from the dropdown
 - Choose based on evaluation complexity and cost requirements
+- Consider model capabilities and limitations
+- Factor in response time requirements
 
 **3. Create Evaluation Prompt**
 
-This is where you define your evaluation criteria and instructions for the judge model:
+This is where you define your evaluation criteria and instructions for the judge model, example:
 
 ```
 You are evaluating customer service AI responses for quality.
@@ -113,6 +138,11 @@ Provide detailed, constructive feedback to help improve response quality.
 ```
 You are an expert evaluator specializing in [domain].
 Your goal is to assess [specific aspect] of AI responses.
+Your evaluation should be:
+- Objective and consistent
+- Based on defined criteria
+- Focused on actionable feedback
+- Considerate of business context
 ```
 
 **2. Specific Evaluation Criteria**
@@ -142,6 +172,22 @@ Rate the response on these dimensions:
 ```
 
 ## Domain-Specific Examples
+
+<Callout type="info">
+  **Real-world evaluation templates that you can use today!** These examples demonstrate how to create specialized evaluators for different industries, each with carefully crafted criteria and scoring frameworks. Use these as starting points and customize them for your specific needs.
+</Callout>
+
+These examples showcase how to adapt evaluation criteria for different domains:
+
+- **E-commerce**: Focus on product recommendations, customer satisfaction, and business impact
+- **Healthcare**: Prioritize medical accuracy, safety, and appropriate scope
+- **Education**: Emphasize learning effectiveness, clarity, and age-appropriate content
+- **Technical Support**: Concentrate on problem-solving accuracy and user safety
+
+Each example includes:
+- Domain-specific evaluation criteria
+- Industry-standard scoring guidelines
+- Practical implementation tips
 
 <Tabs items={["E-commerce", "Healthcare", "Education", "Technical Support"]} defaultIndex="0">
 <Tabs.Tab>

@@ -10,7 +10,8 @@ import { Tabs } from "nextra/components";
 
 # Complete Handit.ai Quickstart
 
-> **Transform your AI from black box to self-improving system in under 30 minutes.** This guide walks you through the complete Handit.ai journey: observability, evaluation, and automated optimization.
+> **The Open Source Engine that Auto-Improves Your AI.** <br />
+> Handit evaluates every agent decision, auto-generates better prompts and datasets, A/B-tests the fix, and lets you control what goes live.
 
 <Callout type="info">
   **What you'll build:** A fully observable, continuously evaluated, and automatically optimizing AI system that improves itself based on real production data.
@@ -39,8 +40,7 @@ Enable automatic optimization that generates better prompts, tests them, and pro
 
 Before we start, make sure you have:
 
-- An active AI application with LLM calls
-- A [Handit.ai account](https://beta.handit.ai) (sign up if needed)
+- A [Handit.ai Account](https://beta.handit.ai) (sign up if needed)
 - 15-30 minutes to complete the setup
 
 ## Phase 1: AI Observability (5 minutes)
@@ -52,7 +52,7 @@ Let's add comprehensive tracing to see exactly what your AI is doing.
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
 ```bash filename="terminal"
-pip install -U "handit-sdk>=1.9.0"
+pip install -U "handit-sdk>=1.16.0"
 ```
 </Tabs.Tab>
 <Tabs.Tab>
@@ -80,198 +80,255 @@ npm install @handit.ai/node
   Your browser does not support the video tag.
 </video>
 
-### Step 3: Create Your Agent Structure
+### Step 3: Add Basic Tracing
 
-1. Navigate to **"My Agents"** in the dashboard
-2. Click **"Create New Agent"**
-3. Define your agent's workflow using either:
-   - **AI-Powered Creation**: Upload a JSON description of your agent
-   - **Visual Builder**: Drag and drop to build your workflow
-4. Download your `handit.config.json` file
+Now, let's set up your main agent function, LLM calls and tool usage with tracing. You'll need to set up four key components:
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/create_agent.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+1. Initialize Handit.ai service
 
-### Step 4: Add Basic Tracing
+2. Set up your start tracing
 
-Follow next steps for tracing:
+3. **Track LLMs calls, tools in your workflow**
 
-<Steps>
-
-### Create a service file to initialize the tracker
-### Set up the main agent function with tracing
-### Add manual tracking for LLM calls or tool usage
-
-</Steps>
-
-Create a service file to initialize the tracker:
+4. Set up your end tracing 
 
 <Tabs items={["Python", "JavaScript"]} defaultIndex="0">
 <Tabs.Tab>
+
+Create a `handit_service.py` file to initialize the Handit.ai tracker:
+
 ```python filename="handit_service.py"
 """
-Handit.ai service initialization.
+Handit.ai service initialization and configuration.
 This file creates a singleton tracker instance that can be imported across your application.
 """
+import os
+from dotenv import load_dotenv
 from handit import HanditTracker
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Create a singleton tracker instance
-tracker = HanditTracker()
+tracker = HanditTracker()  # Creates a global tracker instance for consistent tracing across the app
+
 # Configure with your API key from environment variables
-tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
+tracker.config(api_key=os.getenv("HANDIT_API_KEY"))  # Sets up authentication for Handit.ai services
+
+```
+
+**Now, set up your main agent function with tracing:**
+
+**The example uses three main Handit.ai tracing functions:**
+
+1. `startTracing({ agentName })`: Starts a new trace session
+   - `agentName`: The name of your AI Application
+
+2. `trackNode({ input, output, nodeName, agentName, nodeType, executionId })`: Records individual operations
+   - `input`: The input data for the operation (e.g., user message)
+   - `output`: The result of the operation (e.g., generated response)
+   - `nodeName`: Unique identifier for this operation (e.g., "response_generator")
+   - `agentName`: The name of your AI Application
+   - `nodeType`: Type of operation ("llm" for language model, "tool" for functions)
+   - `executionId`: ID from startTracing to link operations together
+
+3. `endTracing({ executionId, agentName })`: Ends the trace session
+   - `executionId`: The ID from startTracing to end
+   - `agentName`: Must match the name used in startTracing
+
+```python filename="customer_service_agent.py"
+"""
+Simple customer service agent with Handit.ai tracing.
+"""
+from typing import Dict, Any
+from handit_service import tracker
+from langchain.chat_models import ChatOpenAI
+
+class CustomerServiceAgent:
+    def __init__(self):
+        # Initialize LLM for response generation
+        self.llm = ChatOpenAI(model="gpt-4")
+
+    async def generate_response(self, user_message: str) -> Dict[str, Any]:
+        """
+        Generate a response using LLM.
+        """
+        prompt = f"Generate a helpful response to: {user_message}"
+        try:
+            response = await self.llm.agenerate([prompt])
+            return response.generations[0][0].text
+        except Exception as e:
+            raise
+
+    async def process_customer_request(self, user_message: str, execution_id: str) -> Dict[str, Any]:
+        """
+        Process a customer request with Handit.ai tracing.
+        """
+        try:
+            # Generate response
+            response = await self.generate_response(user_message)
+            # Track the response generation
+            tracker.track_node(
+                input=user_message,           # The original user message
+                output=response,              # The generated response
+                node_name="response_generator", # Unique identifier for this operation
+                agent_name="customer_service_agent", # Name of this AI Application
+                node_type="llm",              # Indicates this is a language model operation
+                execution_id=execution_id     # Links this operation to the current trace session
+            )
+            
+            return {
+                "response": response
+            }
+            
+        except Exception as e:
+            raise
+
+async def main():
+    """Example of using the CustomerServiceAgent with Handit.ai tracing."""
+    # Initialize the agent
+    agent = CustomerServiceAgent()
+    
+    # Start a new trace session
+    tracing_response = tracker.start_tracing(
+        agent_name="customer_service_agent"  # Identifies this agent in the Handit.ai dashboard
+    )
+    execution_id = tracing_response.get("executionId")  # Unique ID for this trace session
+    
+    try:
+        # Process a customer request
+        result = await agent.process_customer_request(
+            user_message="I can't access my account",
+            execution_id=execution_id
+        )
+        print(f"Response: {result['response']}")
+    except Exception as e:
+        print(f"Error processing request: {e}")
+    finally:
+        # End the trace session
+        tracker.end_tracing(
+            execution_id=execution_id,           # The ID of the trace session to end
+            agent_name="customer_service_agent"  # Must match the name used in start_tracing
+        )
 ```
 </Tabs.Tab>
 <Tabs.Tab>
+
+Create a `handit_service.js` file to initialize the Handit.ai tracker:
+
 ```javascript filename="handit_service.js"
 /**
  * Handit.ai service initialization.
- * This file creates a singleton configuration that can be imported across your application.
  */
 import { config } from '@handit.ai/node';
 
-// Configure with your API key from environment variables
-config({ apiKey: process.env.HANDIT_API_KEY });
-```
-</Tabs.Tab>
-</Tabs>
-
-Then implement your agent code:
-
-<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
-<Tabs.Tab>
-```python filename="agent_tracing.py"
-"""
-Agent tracing implementation with Handit.ai.
-This example shows how to:
-1. Track the main agent function
-2. Manually track authentication
-3. Manually track intent classification
-"""
-from handit_service import tracker
-import time
-
-# Trace your main agent function
-@tracker.start_agent_tracing()
-async def process_user_request(user_message: str, user_id: str):
-    """
-    Process a user request with comprehensive tracing.
-    
-    Args:
-        user_message (str): The message from the user
-        user_id (str): The ID of the user making the request
-        
-    Returns:
-        str: The generated response
-    """
-    # Your agent logic here
-    auth_start = time.time()
-    
-    # Manual tracking of authentication
-    await tracker._send_tracked_data(
-        model_id="user-authentication",
-        request_body={
-            "user_id": user_id,
-            "action_type": "login",
-            "timestamp": auth_start
-        },
-        response_body={
-            "authenticated": True,
-            "user_tier": "premium",
-            "processing_time": time.time() - auth_start
-        }
-    )
-
-    intent_start = time.time()
-    intent = await classify_intent(user_message)
-    
-    # Manual tracking of intent classification
-    await tracker._send_tracked_data(
-        model_id="intent-classification",
-        request_body={
-            "user_message": user_message,
-            "user_id": user_id,
-            "timestamp": intent_start
-        },
-        response_body={
-            "intent": intent,
-            "confidence": intent.get("confidence", 0.0),
-            "processing_time": time.time() - intent_start
-        }
-    )
-
-    response = await generate_response(intent, user_message)
-    return response
-```
-</Tabs.Tab>
-<Tabs.Tab>
-```javascript filename="agent_tracing.js"
-/**
- * Agent tracing implementation with Handit.ai.
- * This example shows how to:
- * 1. Track the main agent function
- * 2. Manually track authentication
- * 3. Manually track response generation
- */
-import { startAgentTracing, captureAgentNode } from '@handit.ai/node';
-
-/**
- * Process a user request with comprehensive tracing.
- * @param {string} userMessage - The message from the user
- * @param {string} userId - The ID of the user making the request
- * @returns {Promise<string>} The generated response
- */
-const processUserRequest = startAgentTracing(async (userMessage, userId) => {
-    const authStart = Date.now();
-    
-    // Manual tracking of authentication
-    await captureAgentNode({
-        agentNodeSlug: 'user-authentication',
-        requestBody: {
-            userId,
-            actionType: 'login',
-            timestamp: authStart
-        },
-        responseBody: {
-            authenticated: true,
-            userTier: 'premium',
-            processingTime: Date.now() - authStart
-        }
-    });
-
-    const intent = await classifyIntent(userMessage);
-    
-    // Manual tracking of response generation
-    const responseStart = Date.now();
-    const response = await generateResponse(intent, userMessage);
-    await captureAgentNode({
-        agentNodeSlug: 'response-generation',
-        requestBody: {
-            intent,
-            userMessage,
-            userId,
-            timestamp: responseStart
-        },
-        responseBody: {
-            response,
-            processingTime: Date.now() - responseStart,
-            tokensUsed: response.tokens || 0
-        }
-    });
-
-    return response;
+// Configure Handit.ai with your API key
+config({ 
+    apiKey: process.env.HANDIT_API_KEY  // Sets up authentication for Handit.ai services
 });
 ```
+
+Now, set up your main agent function with tracing:
+
+The example uses three main Handit.ai tracing functions:
+
+1. `startTracing({ agentName })`: Starts a new trace session
+   - `agentName`: The name of your AI Application
+
+2. `trackNode({ input, output, nodeName, agentName, nodeType, executionId })`: Records individual operations
+   - `input`: The input data for the operation (e.g., user message)
+   - `output`: The result of the operation (e.g., generated response)
+   - `nodeName`: Unique identifier for this operation (e.g., "response_generator")
+   - `agentName`: Name of your agent AI Application
+   - `nodeType`: Type of operation ("llm" for language model, "tool" for functions)
+   - `executionId`: ID from startTracing to link operations together
+
+3. `endTracing({ executionId, agentName })`: Ends the trace session
+   - `executionId`: The ID from startTracing to end
+   - `agentName`: Must match the name used in startTracing
+
+```javascript filename="customer_service_agent.js"
+/**
+ * Simple customer service agent with Handit.ai tracing.
+ */
+import { startTracing, trackNode, endTracing } from '@handit.ai/node';
+import { ChatOpenAI } from 'langchain/chat_models';
+
+class CustomerServiceAgent {
+    constructor() {
+        // Initialize LLM for response generation
+        this.llm = new ChatOpenAI({ model: 'gpt-4' });
+    }
+
+    async generateResponse(userMessage) {
+        const prompt = `Generate a helpful response to: ${userMessage}`;
+        try {
+            const response = await this.llm.generate([prompt]);
+            return response.generations[0][0].text;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async processCustomerRequest(userMessage, executionId) {
+        try {
+            // Generate response
+            const response = await this.generateResponse(userMessage);
+            // Track the response generation
+            await trackNode({
+                input: userMessage,           // The original user message
+                output: response,             // The generated response
+                nodeName: 'response_generator', // Unique identifier for this operation
+                agentName: 'customer_service_agent', // Name of this AI Application
+                nodeType: 'llm',              // Indicates this is a language model operation
+                executionId                   // Links this operation to the current trace session
+            });
+            
+            return {
+                response
+            };
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+async function main() {
+    // Initialize the agent
+    const agent = new CustomerServiceAgent();
+    
+    // Start a new trace session
+    const tracingResponse = await startTracing({ 
+        agentName: 'customer_service_agent'  // Identifies this agent in the Handit.ai dashboard
+    });
+    const executionId = tracingResponse.executionId;  // Unique ID for this trace session
+    
+    try {
+        // Process a customer request
+        const result = await agent.processCustomerRequest(
+            "I can't access my account",
+            executionId
+        );
+        console.log('Response:', result.response);
+    } catch (error) {
+        console.error('Error processing request:', error);
+    } finally {
+        // End the trace session
+        await endTracing({ 
+            executionId,                         // The ID of the trace session to end
+            agentName: 'customer_service_agent'  // Must match the name used in startTracing
+        });
+    }
+}
+```
 </Tabs.Tab>
 </Tabs>
+
+
+<Callout type="warning">
+  **Important:** Each node in your workflow should have a unique `node_name` to properly track its execution in the dashboard.
+</Callout>
 
 <Callout type="success">
   **Phase 1 Complete!** 🎉 You now have full observability with every operation, timing, input, output, and error visible in your dashboard.
@@ -560,8 +617,7 @@ Congratulations! You now have a complete AI observability and optimization syste
 
 **Tracing Not Working?**
 - Verify your API key is correct and set as environment variable
-- Check that your agent structure matches your `handit.config.json`
-- Ensure you're using the correct node slugs in your tracing code
+- Ensure you're using the functions correct
 
 **Evaluations Not Running?**
 - Confirm model tokens are valid and have sufficient credits
@@ -574,6 +630,6 @@ Congratulations! You now have a complete AI observability and optimization syste
 - Confirm sufficient evaluation data has been collected
 
 **Need Help?**
-- Visit our [Support](/support) page
+- Visit our [Support](/more/contact) page
 - Join our [Discord community](https://discord.gg/M6su47HZ)
 - Check individual quickstart guides for detailed troubleshooting
