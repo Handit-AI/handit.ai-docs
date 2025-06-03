@@ -76,51 +76,153 @@ Whether you're building a new AI agent or adding observability to an existing sy
 ### E-commerce AI Assistant
 
 ```javascript
-// Agent Wrapper for main workflow
-const ecommerceAssistant = startAgentTracing(async (userQuery) => {
-  // Node Wrapper for specific functions
-  const intent = await classifyIntent(userQuery);
-  const products = await searchProducts(intent);
-  const recommendation = await generateRecommendation(products);
-  
-  return recommendation;
-});
-
-// Node Function for dynamic third-party calls
-async function processPayment(paymentData) {
-  return await traceAgentNodeFunc(
-    externalPaymentAPI.process,
-    paymentData,
-    key: "payment-processing"
-  );
+/**
+ * E-commerce AI Assistant example
+ * Demonstrates the use of basic Handit.ai tracing methods:
+ * - startTracing: Initiates a new trace session
+ * - trackNode: Records individual operations
+ * - endTracing: Completes the trace session
+ */
+async function processOrder(orderData) {
+    // Initialize a new trace session and get execution ID
+    // This ID will be used to link all operations in this workflow
+    const tracingResponse = await startTracing({ 
+        agentName: 'order_processor'  // Unique identifier for this agent
+    });
+    const executionId = tracingResponse.executionId;
+    
+    try {
+        // Track order validation step
+        const validation = await validateOrder(orderData);
+        await trackNode({
+            input: orderData,          // Input data for this example
+            output: validation,        // Result of the operation
+            nodeName: 'order_validation',  // Unique identifier for this operation
+            agentName: 'order_processor',  // Must match the agent name from startTracing
+            nodeType: 'tool',          // Type of operation (tool, llm, etc.)
+            executionId                // Links this operation to the trace session
+        });
+        
+        // Track payment processing step
+        const payment = await processPayment(orderData.payment);
+        await trackNode({
+            input: orderData.payment,
+            output: payment,
+            nodeName: 'payment_processing',
+            agentName: 'order_processor',
+            nodeType: 'tool',
+            executionId
+        });
+        
+        // Track confirmation generation using LLM
+        const confirmation = await generateConfirmation(orderData, payment);
+        await trackNode({
+            input: { order: orderData, payment },
+            output: confirmation,
+            nodeName: 'confirmation_generation',
+            agentName: 'order_processor',
+            nodeType: 'llm',          // Indicates this is an LLM operation
+            executionId
+        });
+        
+        return confirmation;
+        
+    } catch (error) {
+        // Track any errors that occur during processing
+        await trackNode({
+            input: orderData,
+            output: { error: error.message },
+            nodeName: 'error_handling',
+            agentName: 'order_processor',
+            nodeType: 'tool',
+            executionId
+        });
+        throw error;
+        
+    } finally {
+        // Always end the trace session to ensure proper cleanup
+        // This is crucial for maintaining accurate trace data
+        await endTracing({ 
+            executionId,
+            agentName: 'order_processor'
+        });
+    }
 }
 ```
 
 ### Data Science Pipeline
 
 ```python
-# Manual Agent for complex pipeline control
-async def data_science_pipeline(dataset_path):
-    pipeline_id = f"pipeline-{timestamp}"
-    
-    # Manual tracking with custom logic
-    await tracker._send_tracked_data(
-        model_id="pipeline-start",
-        request_body={"dataset": dataset_path, "pipeline_id": pipeline_id},
-        response_body={"status": "started"}
+"""
+Data Science Pipeline example
+Demonstrates the use of basic Handit.ai tracing methods:
+- start_tracing: Initiates a new trace session
+- track_node: Records individual operations
+- end_tracing: Completes the trace session
+"""
+async def process_dataset(dataset_path):
+    # Initialize a new trace session and get execution ID
+    # This ID will be used to link all operations in this workflow
+    tracing_response = tracker.start_tracing(
+        agent_name="data_processor"  # Unique identifier for this agent
     )
+    execution_id = tracing_response.get("executionId")
     
-    # Node Wrapper for individual steps
-    raw_data = await load_data(dataset_path)
-    cleaned_data = await clean_data(raw_data)
-    analysis = await analyze_data(cleaned_data)
-    
-    return analysis
-
-@tracker.trace_agent_node("data-cleaning")
-async def clean_data(raw_data):
-    # Automatic tracing of cleaning process
-    return cleaned_data
+    try:
+        # Track data loading step
+        data = await load_data(dataset_path)
+        tracker.track_node(
+            input={"path": dataset_path},  # Input data for this example
+            output={"records": len(data)},  # Result of the operation
+            node_name="data_loading",       # Unique identifier for this operation
+            agent_name="data_processor",    # Must match the agent name from start_tracing
+            node_type="tool",              # Type of operation (tool, llm, etc.)
+            execution_id=execution_id       # Links this operation to the trace session
+        )
+        
+        # Track data cleaning step
+        cleaned_data = await clean_data(data)
+        tracker.track_node(
+            input={"records": len(data)},
+            output={"cleaned_records": len(cleaned_data)},
+            node_name="data_cleaning",
+            agent_name="data_processor",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        
+        # Track data analysis step
+        analysis = await analyze_data(cleaned_data)
+        tracker.track_node(
+            input={"records": len(cleaned_data)},
+            output=analysis,
+            node_name="data_analysis",
+            agent_name="data_processor",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        
+        return analysis
+        
+    except Exception as e:
+        # Track any errors that occur during processing
+        tracker.track_node(
+            input={"path": dataset_path},
+            output={"error": str(e)},
+            node_name="error_handling",
+            agent_name="data_processor",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        raise
+        
+    finally:
+        # Always end the trace session to ensure proper cleanup
+        # This is crucial for maintaining accurate trace data
+        tracker.end_tracing(
+            execution_id=execution_id,
+            agent_name="data_processor"
+        )
 ```
 
 ## Best Practices

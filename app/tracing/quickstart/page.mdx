@@ -13,203 +13,26 @@ This guide walks you through adding Handit.ai tracing to your AI agents. You'll 
   **What you'll build:** Complete observability for your AI agent with automatic tracking of all LLM nodes and tools, capturing the full execution flow from user request to final response.
 </Callout>
 
+
 ## Quick Overview
 
 Here's what we'll accomplish:
 
 <Steps>
-### Create Your Agent
-Set up your agent structure in the Handit.ai Dashboard and get your configuration file
 
-### Get Your Integration Token
+### [Get Your Integration Token](#get-your-integration-token)
 Obtain your API key from Settings > Integrations to connect your code to Handit.ai
 
-### Install & Configure
+### [Install & Configure](#install-the-sdk)
 Set up the SDK and connect to Handit.ai with your integration token
 
-### Add Tracing
+### [Add Tracing](#add-tracing-to-your-agent)
 Wrap your agent functions to automatically capture execution details
 
-### See Results
+### [See Results](#whats-next)
 View complete traces, debug issues, and optimize performance
 </Steps>
 
-## Create Your Agent in Handit Dashboard
-
-**Start here first!** Before writing any code, you need to define your agent's structure in the Handit.ai Dashboard. This creates the blueprint that your tracing code will follow.
-
-### Step 1: Navigate to Your Agents
-
-1. Log into your [Handit.ai Dashboard](https://app.handit.ai)
-2. Go to **"My Agents"** in the navigation menu
-3. Click **"Create New Agent"**
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/create_agent.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-### Step 2: Choose Your Creation Method
-
-You have two powerful options to create your agent:
-
-<Tabs items={['🤖 AI-Powered Creation', '🎨 Visual Builder']}>
-<Tabs.Tab>
-**Upload JSON & Let AI Do the Work**
-
-Perfect if you already have your agent structure documented or want to quickly import an existing setup.
-
-**How it works:**
-1. **Prepare your JSON file** with your agent's structure (see example below)
-2. **Upload the file** in the dashboard
-3. **Handit's AI analyzes** your structure and normalizes it
-4. **Review and confirm** the generated agent configuration
-5. **Download your config** with proper slugs and IDs
-
-**Example JSON structure to upload:**
-```json filename="my-agent-structure.json"
-{
-  "name": "Customer Support Agent",
-  "description": "Handles customer inquiries with RAG and LLM",
-  "workflow": [
-    {
-      "name": "Intent Classification",
-      "type": "llm",
-      "model": "gpt-4",
-      "purpose": "Classify user intent from support request"
-    },
-    {
-      "name": "Knowledge Search", 
-      "type": "tool",
-      "function": "vector_search",
-      "purpose": "Search knowledge base for relevant information"
-    },
-    {
-      "name": "Response Generation",
-      "type": "llm", 
-      "model": "gpt-4",
-      "purpose": "Generate helpful response using context"
-    }
-  ]
-}
-```
-
-<Callout type="tip">
-  **Pro tip:** Your JSON doesn't need to be perfect! Handit's AI will understand various formats and structures, then normalize everything into the proper configuration format.
-</Callout>
-</Tabs.Tab>
-<Tabs.Tab>
-**Drag & Drop Visual Builder**
-
-Perfect for building your agent structure visually and understanding the relationships between components.
-
-**How it works:**
-1. **Start with a blank canvas** in the visual builder
-2. **Drag LLM nodes** from the component library
-3. **Add tool nodes** for your custom functions and APIs
-4. **Connect the nodes** to show your workflow
-5. **Configure each node** with required information:
-   - **LLM Nodes:** Model type, purpose, parameters
-   - **Tool Nodes:** Function name, description, input/output types
-6. **Download your config** when complete
-
-**What you'll configure for each node:**
-
-| **Node Type** | **Required Info** | **Example** |
-|---------------|------------------|-------------|
-| **LLM Node** | Model, purpose, temperature | GPT-4 for intent classification |
-| **Tool Node** | Function name, description, I/O | `search_knowledge_base()` for RAG |
-| **API Node** | Endpoint, method, purpose | External service integration |
-
-**Visual Builder Benefits:**
-- See your agent's flow visually
-- Understand node relationships
-- Validate your architecture before coding
-- Easy to modify and iterate
-
-<Callout type="info">
-  **Visual learner?** The drag-and-drop builder helps you understand how your agent's components work together before you start coding.
-</Callout>
-</Tabs.Tab>
-</Tabs>
-
-### Step 3: Download Your Configuration
-
-Once your agent is created (either method), you'll get a `handit.config.json` file that looks like this:
-
-```json filename="handit.config.json"
-{
-  "agent": {
-    "name": "Customer Support Agent",           // Your agent's display name
-    "slug": "customer-support-agent",          // Unique identifier for your agent
-    "description": "Handles customer inquiries with RAG and LLM"
-  },
-  "nodes": [
-    {
-      "name": "Intent Classification",          // Display name for the node
-      "slug": "intent-classifier",             // 🔑 This slug is what you'll use in code
-      "type": "model",                        // Node type (model, tool, etc.)
-      "problem_type": "classification",       // Type of problem it solves
-      "description": "Classifies user intent from support request",
-      "next_nodes": ["knowledge-search"]      // Connected nodes in workflow
-    },
-    {
-      "name": "Knowledge Search",
-      "slug": "knowledge-search",              // 🔑 This slug is what you'll use in code
-      "type": "tool",
-      "problem_type": "retrieval",
-      "description": "Searches knowledge base for relevant information",
-      "next_nodes": ["response-generator"]
-    },
-    {
-      "name": "Response Generator",
-      "slug": "response-generator",            // 🔑 This slug is what you'll use in code
-      "type": "model",
-      "problem_type": "generation",
-      "description": "Generates helpful response using context",
-      "next_nodes": []
-    }
-  ]
-}
-```
-
-<Callout type="warning">
-  **Important:** Save this config file in your project! The `slug` values are what you'll use to identify nodes in your tracing code. Keep this file version-controlled with your code.
-</Callout>
-
-**Using slugs in your code:**
-The `slug` values become the identifiers in your tracing implementation:
-
-```python
-# Using the intent-classifier slug from config
-@tracker.trace_agent_node("intent-classifier")
-async def classify_intent(user_message: str):
-    # Your intent classification logic here
-    return intent
-
-# Using the knowledge-search slug from config  
-@tracker.trace_agent_node("knowledge-search")
-async def search_knowledge_base(intent: str, query: str):
-    # Your knowledge search logic here
-    return relevant_docs
-
-# Using the response-generator slug from config
-@tracker.trace_agent_node("response-generator") 
-async def generate_response(context: str, user_query: str):
-    # Your response generation logic here
-    return response
-```
-
-<Callout type="success">
-  **Ready to code?** Now that you have your agent structure defined and your config file downloaded, let's set up the SDK and add tracing to your code.
-</Callout>
 
 ## Get Your Integration Token
 
@@ -217,7 +40,7 @@ Before installing the SDK, you need to get your integration token to connect you
 
 ### Step 1: Navigate to Settings
 
-1. In your [Handit.ai Dashboard](https://app.handit.ai), click on **"Settings"** in the navigation menu
+1. In your [Handit.ai Dashboard](https://beta.handit.ai/), click on **"Settings"** in the navigation menu
 2. Go to the **"Integrations"** section
 
 ### Step 2: Generate Your Token
@@ -256,7 +79,7 @@ Before installing the SDK, you need to get your integration token to connect you
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
 ```bash filename="terminal"
-pip install -U "handit-sdk>=1.9.0"
+pip install -U "handit-sdk>=1.16.0"
 ```
 </Tabs.Tab>
 <Tabs.Tab>
@@ -272,7 +95,9 @@ Now let's configure the SDK with the integration token you obtained from the das
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
+<Callout>
 **Best Practice:** Create a dedicated service file to centralize your tracker configuration.
+</Callout>
 
 First, create a `handit_service.py` file to initialize the tracker:
 
@@ -295,7 +120,9 @@ from handit_service import tracker
 </Callout>
 </Tabs.Tab>
 <Tabs.Tab>
+<Callout>
 **Best Practice:** Initialize Handit.ai once in your application's entry point.
+</Callout>
 
 Initialize Handit.ai in your entry file (e.g., `index.js` or `server.js`):
 
@@ -324,6 +151,7 @@ Now for the fun part! Let's add tracing to capture everything your agent does.
 ### Step 1: Trace Your Main Agent Function
 
 Start by wrapping your main agent function—this is the entry point that handles user requests and orchestrates the entire workflow.
+
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
@@ -361,7 +189,7 @@ async def process_message(self, user_message: str, conversation_history: list):
 <Tabs.Tab>
 Wrap your main agent function with `startAgentTracing`:
 
-```javascript filename="agent_function.js"
+```javascript {3} filename="agent_function.js"
 const { startAgentTracing } = require('@handit.ai/node');
 
 const processMessage = startAgentTracing(async (userMessage, conversationHistory) => {
@@ -398,25 +226,56 @@ Next, add tracing to your individual LLM calls, tools, and functions. Choose the
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
+
+<Callout type="info">
+  **Key Tracing Methods:**
+  
+  1. **Basic Tracing** (`start_tracing`, `track_node`, `end_tracing`)
+     - Use these for simple, direct tracing of your agent's workflow
+     - Perfect for getting started and basic monitoring
+     - Provides complete visibility of inputs, outputs, and timing
+  
+  2. **Advanced Tracing** (`trace_agent_node`, `track_model`, `track_tool`)
+     - Use these for more complex scenarios and reusable components
+     - Great for tracking specific LLM models or custom tools
+     - Enables detailed monitoring of individual components
+  
+  **Best Practice:** Start with basic tracing, then add advanced methods as needed for specific components.
+</Callout>
+
 **Choose the right method for your use case:**
 
 ```python filename="node_tracing.py"
-# Method 1: Using trace_agent_node_func for async functions
+# Method 1: Using the three main tracing functions
+# Start a new trace session
+tracing_response = tracker.start_tracing(
+    agent_name="your-agent-name"  # The name of your AI Application
+)
+execution_id = tracing_response.get("executionId")  # Unique ID for this trace session
+
+# Track individual operations
+tracker.track_node(
+    input=user_message,           # The input data for the operation
+    output=response,              # The result of the operation
+    node_name="response_generator", # Unique identifier for this operation
+    agent_name="your-agent-name", # The name of your AI Application
+    node_type="llm",              # Type of operation ("llm" or "tool")
+    execution_id=execution_id     # Links this operation to the current trace session
+)
+
+# End the trace session
+tracker.end_tracing(
+    execution_id=execution_id,    # The ID of the trace session to end
+    agent_name="your-agent-name"  # Must match the name used in start_tracing
+)
+
+# Method 2: Using trace_agent_node_func for async functions
 # This is useful for one-off async function calls that need tracing
 result = await tracker.trace_agent_node_func(
     search_documents,           # func: The async function to trace
     query="customer support",   # *args: Positional arguments for the function
     limit=5,                    # **kwargs: Keyword arguments for the function
     key="document-search"       # key: Unique identifier for this node in analytics
-)
-
-# Method 2: Using trace_agent_node_func_sync for sync functions
-# This is useful for one-off sync function calls that need tracing
-result = tracker.trace_agent_node_func_sync(
-    process_text,              # func: The sync function to trace
-    text="Hello world",        # *args: Positional arguments for the function
-    language="en",             # **kwargs: Keyword arguments for the function
-    key="text-processor"       # key: Unique identifier for this node in analytics
 )
 
 # Method 3: Using trace_agent_node decorator for async functions
@@ -465,39 +324,68 @@ tracked_tool = tracker.track_tool(
 ```
 
 **When to use each method:**
+- **`start_tracing`, `track_node`, `end_tracing`** - The three main functions for tracing your AI application
 - **`trace_agent_node_func`** - One-off async function calls you need to trace
-- **`trace_agent_node_func_sync`** - One-off sync function calls you need to trace  
 - **`trace_agent_node` decorator** - Reusable functions you want to trace every time
 - **`track_model`** - LLM models where you want to capture all interactions
 - **`track_tool`** - Tools, RAG systems, and API calls you want to monitor
 
 <Callout type="tip">
-  **Key principle:** The `key` parameter should match the `slug` from your `handit.config.json` file for proper dashboard visualization.
+  **Key principle:** The `node_name` is a unique identifier you give to each operation that you want to track in your application. Think of it like a label that helps you identify and track what each part of your system is doing.
 </Callout>
 </Tabs.Tab>
 <Tabs.Tab>
 **Choose the right method for your use case:**
 
-```javascript filename="node_tracing.js"
-const { traceAgentNode, captureModel } = require('@handit.ai/node');
+<Callout type="info">
+  **Key Tracing Methods:**
+  
+  1. **Basic Tracing** (`startTracing`, `trackNode`, `endTracing`)
+     - Use these for simple, direct tracing of your agent's workflow
+     - Perfect for getting started and basic monitoring
+     - Provides complete visibility of inputs, outputs, and timing
+  
+  2. **Advanced Tracing** (`traceAgentNode`, `captureModel`, `trackTool`)
+     - Use these for more complex scenarios and reusable components
+     - Great for tracking specific LLM models or custom tools
+     - Enables detailed monitoring of individual components
+  
+  **Best Practice:** Start with basic tracing, then add advanced methods as needed for specific components.
+</Callout>
 
-// Method 1: Using traceAgentNode for async functions
+```javascript filename="node_tracing.js"
+const { startTracing, trackNode, endTracing, traceAgentNode, captureAgentNode } = require('@handit.ai/node');
+
+// Method 1: Using the three main tracing functions
+// Start a new trace session
+const tracingResponse = await startTracing({ 
+    agentName: 'your-agent-name'  // The name of your AI Application
+});
+const executionId = tracingResponse.executionId;  // Unique ID for this trace session
+
+// Track individual operations
+await trackNode({
+    input: userMessage,           // The input data for the operation
+    output: response,             // The result of the operation
+    nodeName: 'response_generator', // Unique identifier for this operation
+    agentName: 'your-agent-name', // The name of your AI Application
+    nodeType: 'llm',              // Type of operation ("llm" or "tool")
+    executionId                   // Links this operation to the current trace session
+});
+
+// End the trace session
+await endTracing({ 
+    executionId,                  // The ID of the trace session to end
+    agentName: 'your-agent-name'  // Must match the name used in startTracing
+});
+
+// Method 2: Using traceAgentNode for async functions
 // This is useful for reusable async functions that need tracing
 const searchDocuments = traceAgentNode({
-    agentNodeId: "vector-search",    // Unique identifier from config
+    agentNodeId: "vector-search",    // Unique identifier for this node
     callback: async (query, limit = 5) => {
         // Your vector search logic here
         return results;
-    }
-});
-
-// Method 2: Using traceAgentNode for sync functions
-// This is useful for reusable sync functions that need tracing
-const processText = traceAgentNode({
-    agentNodeId: "text-processor",   // Unique identifier from config
-    callback: (text, language = "en") => {
-        // Your text processing logic here
-        return processedText;
     }
 });
 
@@ -539,18 +427,19 @@ const searchDatabase = async (query) => {
 };
 
 const trackedTool = traceAgentNode({
-    agentNodeId: "db-search",       // Unique identifier from config
+    agentNodeId: "db-search",       // Unique identifier
     callback: searchDatabase
 });
 ```
 
 **When to use each method:**
+- **`startTracing`, `trackNode`, `endTracing`** - The three main functions for tracing your AI application
 - **`traceAgentNode`** - For wrapping reusable functions (both async and sync)
 - **`captureModel`** - For tracking individual LLM model interactions
 - **`startAgentTracing`** - For wrapping the main agent function
 
 <Callout type="tip">
-  **Key principle:** The `agentNodeId` parameter must match the `slug` in your `handit.config.json` file for proper dashboard visualization.
+  **Key principle:** The `nodeName` parameter is a unique identifier you give to each operation that you want to track in your application. Think of it like a label that helps you identify and track what each part of your system is doing.
 </Callout>
 </Tabs.Tab>
 </Tabs>
@@ -561,7 +450,6 @@ const trackedTool = traceAgentNode({
 ### Secure Configuration
 - Store your API key as an environment variable, never in code
 - Use a single initialization point for the tracker across your application
-- Keep your `handit.config.json` file version controlled with your code
 
 ### Smart Wrapping Strategy
 - **Always wrap** your main agent function (the entry point)
@@ -571,7 +459,7 @@ const trackedTool = traceAgentNode({
 
 ### Error Handling
 - Let errors propagate naturally through your code
-- Handit.ai automatically captures error details, stack traces, and context
+- [Handit.ai](https://beta.handit.ai/) automatically captures error details, stack traces, and context
 - Don't try to handle tracing errors - the SDK is designed to be fail-safe
 
 ### Performance Considerations
@@ -609,52 +497,20 @@ tracker.config(api_key=os.getenv("HANDIT_API_KEY"))
 __all__ = ['tracker']
 ```
 
-**Step 2:** Create your `handit.config.json` file for this example:
-
-```json filename="handit.config.json"
-{
-  "agent": {
-    "name": "Invoice Processing Assistant",
-    "slug": "invoice-assistant",
-    "description": "AI-powered invoice processing and analysis system"
-  },
-  "nodes": [
-    {
-      "name": "Vector Search",
-      "slug": "vector-search",
-      "type": "model",
-      "problem_type": "retrieval",
-      "description": "Searches for similar historical invoices",
-      "next_nodes": ["pattern-analyzer"]
-    },
-    {
-      "name": "Pattern Analyzer",
-      "slug": "pattern-analyzer",
-      "type": "model",
-      "problem_type": "analysis",
-      "description": "Analyzes patterns in similar invoices",
-      "next_nodes": ["llm-generator"]
-    },
-    {
-      "name": "LLM Generator",
-      "slug": "llm-generator",
-      "type": "model",
-      "problem_type": "generation",
-      "description": "Generates insights and recommendations",
-      "next_nodes": []
-    }
-  ],
-  "settings": {
-    "max_retries": 3,
-    "timeout": 30,
-    "cache_enabled": true
-  }
-}
-```
-
-**Step 3:** Here's the complete invoice processing agent:
+**Step 2:** Here's the complete invoice processing agent:
 
 ```python filename="invoice_agent.py"
+"""
+Invoice Processing Agent with Handit.ai Tracing
+
+This example demonstrates how to use Handit.ai for comprehensive tracing of an AI agent.
+Key concepts:
+1. Use start_tracing() to begin a trace session
+2. Use track_node() to record individual operations
+3. Use end_tracing() to complete the trace session
+
+Each operation should have a unique node_name for proper tracking.
+"""
 from typing import Dict, List, Optional
 from datetime import datetime
 import json
@@ -676,11 +532,9 @@ class InvoiceProcessor:
         self.vector_store = vector_store
         self.llm_model = llm_model
 
-    @tracker.start_agent_tracing(key="invoice-assistant")
     async def process_invoice(self, invoice_data: Dict) -> Dict:
         """
         Main method to process an invoice. This is the entry point for the agent.
-        The @tracker.start_agent_tracing decorator ensures all operations are traced.
         
         Args:
             invoice_data: Dictionary containing invoice information
@@ -689,63 +543,114 @@ class InvoiceProcessor:
         Returns:
             Dict containing processing results and recommendations
         """
+        # Start a new trace session
+        tracing_response = tracker.start_tracing(
+            agent_name="invoice_processor"  # Identifies this agent in the Handit.ai dashboard
+        )
+        execution_id = tracing_response.get("executionId")  # Unique ID for this trace session
+        
         try:
             # Step 1: Validate the input data
             validated_data = await self._validate_invoice(invoice_data)
+            # Track validation
+            tracker.track_node(
+                input=invoice_data,
+                output=validated_data,
+                node_name="invoice_validation",
+                agent_name="invoice_processor",
+                node_type="tool",
+                execution_id=execution_id
+            )
             
             # Step 2: Find similar historical invoices
-            similar_invoices = await tracker.trace_agent_node_func(
-                self._search_similar_invoices,
-                validated_data,
-                key="vector-search"  # This key must match the slug in handit.config.json
+            similar_invoices = await self._search_similar_invoices(validated_data)
+            # Track search
+            tracker.track_node(
+                input=validated_data,
+                output=similar_invoices,
+                node_name="similar_invoice_search",
+                agent_name="invoice_processor",
+                node_type="tool",
+                execution_id=execution_id
             )
             
             # Step 3: Analyze patterns in similar invoices
-            analysis = await tracker.trace_agent_node_func(
-                self._analyze_invoice_patterns,
-                similar_invoices,
-                key="pattern-analyzer"  # This key must match the slug in handit.config.json
+            analysis = await self._analyze_invoice_patterns(similar_invoices)
+            # Track analysis
+            tracker.track_node(
+                input=similar_invoices,
+                output=analysis,
+                node_name="pattern_analysis",
+                agent_name="invoice_processor",
+                node_type="tool",
+                execution_id=execution_id
             )
             
             # Step 4: Generate recommendations using LLM
-            response = await tracker.trace_agent_node_func(
-                self._generate_recommendations,
-                {
+            response = await self._generate_recommendations({
+                "invoice": validated_data,
+                "similar_invoices": similar_invoices,
+                "analysis": analysis
+            })
+            # Track LLM response
+            tracker.track_node(
+                input={
                     "invoice": validated_data,
                     "similar_invoices": similar_invoices,
                     "analysis": analysis
                 },
-                key="llm-generator"  # This key must match the slug in handit.config.json
+                output=response,
+                node_name="llm_recommendations",
+                agent_name="invoice_processor",
+                node_type="llm",
+                execution_id=execution_id
             )
             
             # Return successful response with timestamp
-            return {
+            result = {
                 "status": "success",
                 "data": response,
                 "timestamp": datetime.now().isoformat()
             }
             
+            # Track final result
+            tracker.track_node(
+                input=invoice_data,
+                output=result,
+                node_name="final_response",
+                agent_name="invoice_processor",
+                node_type="tool",
+                execution_id=execution_id
+            )
+            
+            return result
+            
         except Exception as e:
-            # Return error response with details
-            return {
+            # Track error
+            error_result = {
                 "status": "error",
                 "error": str(e),
                 "timestamp": datetime.now().isoformat()
             }
+            tracker.track_node(
+                input=invoice_data,
+                output=error_result,
+                node_name="error_handling",
+                agent_name="invoice_processor",
+                node_type="tool",
+                execution_id=execution_id
+            )
+            return error_result
+            
+        finally:
+            # End the trace session
+            tracker.end_tracing(
+                execution_id=execution_id,
+                agent_name="invoice_processor"
+            )
 
     async def _validate_invoice(self, invoice_data: Dict) -> Dict:
-        """
-        Validate the invoice data structure and required fields.
-        
-        Args:
-            invoice_data: Raw invoice data dictionary
-        
-        Returns:
-            Validated invoice data
-        
-        Raises:
-            ValueError: If required fields are missing
-        """
+        """Validate the invoice data structure and required fields."""
         required_fields = ["invoice_number", "amount", "date", "vendor"]
         for field in required_fields:
             if field not in invoice_data:
@@ -753,40 +658,20 @@ class InvoiceProcessor:
         return invoice_data
 
     async def _search_similar_invoices(self, invoice_data: Dict) -> List[Dict]:
-        """
-        Search for similar invoices in the vector store.
-        Uses semantic search to find invoices with similar characteristics.
-        
-        Args:
-            invoice_data: Validated invoice data
-        
-        Returns:
-            List of similar invoice metadata
-        """
-        # Construct a semantic search query
+        """Search for similar invoices in the vector store."""
         query = f"Invoice from {invoice_data['vendor']} for {invoice_data['amount']}"
         results = await self.vector_store.similarity_search(
             query,
-            k=5,  # Number of similar invoices to retrieve
-            filter={"vendor": invoice_data["vendor"]}  # Filter by same vendor
+            k=5,
+            filter={"vendor": invoice_data["vendor"]}
         )
         return [doc.metadata for doc in results]
 
     async def _analyze_invoice_patterns(self, similar_invoices: List[Dict]) -> Dict:
-        """
-        Analyze patterns in similar invoices to identify trends.
-        
-        Args:
-            similar_invoices: List of similar invoice metadata
-        
-        Returns:
-            Dictionary containing analysis results
-        """
-        # Calculate average amount and frequency
+        """Analyze patterns in similar invoices to identify trends."""
         total_amount = sum(inv["amount"] for inv in similar_invoices)
         avg_amount = total_amount / len(similar_invoices)
         
-        # Determine trend based on recent invoices
         return {
             "average_amount": avg_amount,
             "frequency": len(similar_invoices),
@@ -794,16 +679,7 @@ class InvoiceProcessor:
         }
 
     async def _generate_recommendations(self, context: Dict) -> Dict:
-        """
-        Generate recommendations using the LLM model.
-        
-        Args:
-            context: Dictionary containing invoice data, similar invoices, and analysis
-        
-        Returns:
-            Dictionary containing recommendations and confidence score
-        """
-        # Construct a detailed prompt for the LLM
+        """Generate recommendations using the LLM model."""
         prompt = f"""
         Analyze this invoice and provide recommendations:
         Invoice: {json.dumps(context['invoice'])}
@@ -811,11 +687,10 @@ class InvoiceProcessor:
         Analysis: {json.dumps(context['analysis'])}
         """
         
-        # Generate recommendations using the LLM
         response = await self.llm_model.generate(prompt)
         return {
             "recommendations": response,
-            "confidence_score": 0.95  # Confidence score for the recommendations
+            "confidence_score": 0.95
         }
 ```
 </Tabs.Tab>
@@ -829,68 +704,29 @@ const { config } = require('@handit.ai/node');
 
 // Configure Handit.ai with your API key
 config({ 
-    apiKey: process.env.HANDIT_API_KEY,
-    // Optional: Configure custom endpoints
-    trackingUrl: process.env.HANDIT_TRACKING_URL,
-    performanceUrl: process.env.HANDIT_PERFORMANCE_URL
+    apiKey: process.env.HANDIT_API_KEY
 });
 
 module.exports = { config };
 ```
 
-**Step 2:** The `handit.config.json` file for this example:
-
-```json filename="handit.config.json"
-{
-  "agent": {
-    "name": "Invoice Processing Assistant",
-    "slug": "invoice-assistant",
-    "description": "AI-powered invoice processing and analysis system"
-  },
-  "nodes": [
-    {
-      "name": "Vector Search",
-      "slug": "vector-search",
-      "type": "model",
-      "problem_type": "retrieval",
-      "description": "Searches for similar historical invoices",
-      "next_nodes": ["pattern-analyzer"]
-    },
-    {
-      "name": "Pattern Analyzer",
-      "slug": "pattern-analyzer",
-      "type": "model",
-      "problem_type": "analysis",
-      "description": "Analyzes patterns in similar invoices",
-      "next_nodes": ["llm-generator"]
-    },
-    {
-      "name": "LLM Generator",
-      "slug": "llm-generator",
-      "type": "model",
-      "problem_type": "generation",
-      "description": "Generates insights and recommendations",
-      "next_nodes": []
-    }
-  ],
-  "settings": {
-    "max_retries": 3,
-    "timeout": 30,
-    "cache_enabled": true
-  }
-}
-```
-
-**Step 3:** Here's the complete invoice processing agent:
+**Step 2:** Here's the complete invoice processing agent:
 
 ```javascript filename="invoice_agent.js"
-const { startAgentTracing, traceAgentNode } = require('@handit.ai/node');
+/**
+ * Invoice Processing Agent with Handit.ai Tracing
+ * 
+ * This example demonstrates how to use Handit.ai for comprehensive tracing of an AI agent.
+ * Key concepts:
+ * 1. Use startTracing() to begin a trace session
+ * 2. Use trackNode() to record individual operations
+ * 3. Use endTracing() to complete the trace session
+ * 
+ * Each operation should have a unique nodeName for proper tracking.
+ */
+const { startTracing, trackNode, endTracing } = require('@handit.ai/node');
 require('./setup');  // Import the configuration
 
-/**
- * InvoiceProcessor class for processing and analyzing invoices using AI.
- * This agent uses vector search to find similar invoices and LLM to generate insights.
- */
 class InvoiceProcessor {
     /**
      * Initialize the processor with required services.
@@ -904,65 +740,120 @@ class InvoiceProcessor {
 
     /**
      * Main method to process an invoice. This is the entry point for the agent.
-     * The startAgentTracing wrapper ensures all operations are traced.
      * @param {Object} invoiceData - Invoice information
      * @returns {Promise<Object>} Processing results and recommendations
      */
-    processInvoice = startAgentTracing(async (invoiceData) => {
+    async processInvoice(invoiceData) {
+        // Start a new trace session
+        const tracingResponse = await startTracing({ 
+            agentName: 'invoice_processor'  // Identifies this agent in the Handit.ai dashboard
+        });
+        const executionId = tracingResponse.executionId;  // Unique ID for this trace session
+        
         try {
             // Step 1: Validate the input data
             const validatedData = await this._validateInvoice(invoiceData);
+            // Track validation
+            await trackNode({
+                input: invoiceData,
+                output: validatedData,
+                nodeName: 'invoice_validation',
+                agentName: 'invoice_processor',
+                nodeType: 'tool',
+                executionId
+            });
             
             // Step 2: Find similar historical invoices
-            const searchNode = traceAgentNode({
-                agentNodeId: "vector-search",  // Must match slug in handit.config.json
-                callback: this._searchSimilarInvoices.bind(this)
+            const similarInvoices = await this._searchSimilarInvoices(validatedData);
+            // Track search
+            await trackNode({
+                input: validatedData,
+                output: similarInvoices,
+                nodeName: 'similar_invoice_search',
+                agentName: 'invoice_processor',
+                nodeType: 'tool',
+                executionId
             });
-            const similarInvoices = await searchNode(validatedData);
             
             // Step 3: Analyze patterns in similar invoices
-            const analyzeNode = traceAgentNode({
-                agentNodeId: "pattern-analyzer",  // Must match slug in handit.config.json
-                callback: this._analyzeInvoicePatterns.bind(this)
+            const analysis = await this._analyzeInvoicePatterns(similarInvoices);
+            // Track analysis
+            await trackNode({
+                input: similarInvoices,
+                output: analysis,
+                nodeName: 'pattern_analysis',
+                agentName: 'invoice_processor',
+                nodeType: 'tool',
+                executionId
             });
-            const analysis = await analyzeNode(similarInvoices);
             
             // Step 4: Generate recommendations using LLM
-            const generateNode = traceAgentNode({
-                agentNodeId: "llm-generator",  // Must match slug in handit.config.json
-                callback: this._generateRecommendations.bind(this)
-            });
-            const response = await generateNode({
+            const response = await this._generateRecommendations({
                 invoice: validatedData,
                 similarInvoices,
                 analysis
             });
+            // Track LLM response
+            await trackNode({
+                input: {
+                    invoice: validatedData,
+                    similarInvoices,
+                    analysis
+                },
+                output: response,
+                nodeName: 'llm_recommendations',
+                agentName: 'invoice_processor',
+                nodeType: 'llm',
+                executionId
+            });
             
             // Return successful response with timestamp
-            return {
-                status: "success",
+            const result = {
+                status: 'success',
                 data: response,
                 timestamp: new Date().toISOString()
             };
             
+            // Track final result
+            await trackNode({
+                input: invoiceData,
+                output: result,
+                nodeName: 'final_response',
+                agentName: 'invoice_processor',
+                nodeType: 'tool',
+                executionId
+            });
+            
+            return result;
+            
         } catch (error) {
-            // Return error response with details
-            return {
-                status: "error",
+            // Track error
+            const errorResult = {
+                status: 'error',
                 error: error.message,
                 timestamp: new Date().toISOString()
             };
+            await trackNode({
+                input: invoiceData,
+                output: errorResult,
+                nodeName: 'error_handling',
+                agentName: 'invoice_processor',
+                nodeType: 'tool',
+                executionId
+            });
+            return errorResult;
+            
+        } finally {
+            // End the trace session
+            await endTracing({ 
+                executionId,
+                agentName: 'invoice_processor'
+            });
         }
-    });
+    }
 
-    /**
-     * Validate the invoice data structure and required fields.
-     * @param {Object} invoiceData - Raw invoice data
-     * @returns {Promise<Object>} Validated invoice data
-     * @throws {Error} If required fields are missing
-     */
     async _validateInvoice(invoiceData) {
-        const requiredFields = ["invoiceNumber", "amount", "date", "vendor"];
+        const requiredFields = ['invoiceNumber', 'amount', 'date', 'vendor'];
         for (const field of requiredFields) {
             if (!invoiceData[field]) {
                 throw new Error(`Missing required field: ${field}`);
@@ -971,48 +862,28 @@ class InvoiceProcessor {
         return invoiceData;
     }
 
-    /**
-     * Search for similar invoices in the vector store.
-     * Uses semantic search to find invoices with similar characteristics.
-     * @param {Object} invoiceData - Validated invoice data
-     * @returns {Promise<Array>} List of similar invoice metadata
-     */
     async _searchSimilarInvoices(invoiceData) {
-        // Construct a semantic search query
         const query = `Invoice from ${invoiceData.vendor} for ${invoiceData.amount}`;
         const results = await this.vectorStore.similaritySearch(
             query,
-            5,  // Number of similar invoices to retrieve
-            { filter: { vendor: invoiceData.vendor } }  // Filter by same vendor
+            5,
+            { filter: { vendor: invoiceData.vendor } }
         );
         return results.map(doc => doc.metadata);
     }
 
-    /**
-     * Analyze patterns in similar invoices to identify trends.
-     * @param {Array} similarInvoices - List of similar invoice metadata
-     * @returns {Promise<Object>} Analysis results
-     */
     async _analyzeInvoicePatterns(similarInvoices) {
-        // Calculate average amount and frequency
         const totalAmount = similarInvoices.reduce((sum, inv) => sum + inv.amount, 0);
         const avgAmount = totalAmount / similarInvoices.length;
         
-        // Determine trend based on recent invoices
         return {
             averageAmount: avgAmount,
             frequency: similarInvoices.length,
-            trend: avgAmount > totalAmount / 2 ? "increasing" : "decreasing"
+            trend: avgAmount > totalAmount / 2 ? 'increasing' : 'decreasing'
         };
     }
 
-    /**
-     * Generate recommendations using the LLM model.
-     * @param {Object} context - Contains invoice data, similar invoices, and analysis
-     * @returns {Promise<Object>} Recommendations and confidence score
-     */
     async _generateRecommendations(context) {
-        // Construct a detailed prompt for the LLM
         const prompt = `
         Analyze this invoice and provide recommendations:
         Invoice: ${JSON.stringify(context.invoice)}
@@ -1020,26 +891,13 @@ class InvoiceProcessor {
         Analysis: ${JSON.stringify(context.analysis)}
         `;
         
-        // Generate recommendations using the LLM
         const response = await this.llmModel.generate(prompt);
         return {
             recommendations: response,
-            confidenceScore: 0.95  // Confidence score for the recommendations
+            confidenceScore: 0.95
         };
     }
 }
-
-// Usage example with sample data
-const processor = new InvoiceProcessor(vectorStore, llmModel);
-const result = await processor.processInvoice({
-    invoiceNumber: "INV-2024-001",
-    amount: 1500.00,
-    date: "2024-03-15",
-    vendor: "Tech Supplies Inc",
-    items: [
-        { description: "Laptop", quantity: 2, price: 750.00 }
-    ]
-});
 ```
 </Tabs.Tab>
 </Tabs>
