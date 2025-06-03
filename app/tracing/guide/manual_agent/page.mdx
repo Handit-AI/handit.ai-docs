@@ -44,134 +44,98 @@ tracker.config(api_key="your-api-key")
 async def manual_customer_service_agent(user_message, user_id):
     """Manually traced customer service agent with custom logic"""
     
-    agent_start_time = time.time()
-    execution_context = {
-        "user_id": user_id,
-        "start_time": agent_start_time,
-        "steps_completed": [],
-        "errors": []
-    }
+    # Start a new trace session
+    tracing_response = tracker.start_tracing(
+        agent_name="customer_service_agent"
+    )
+    execution_id = tracing_response.get("executionId")
     
     try:
-        # Step 1: Intent classification with custom tracking
-        intent_start = time.time()
+        # Step 1: Intent classification
         intent = await classify_intent(user_message)
         
-        # Manual tracking of intent classification
-        await tracker._send_tracked_data(
-            model_id="intent-classification",
-            request_body={
-                "user_message": user_message,
-                "user_id": user_id,
-                "timestamp": intent_start
-            },
-            response_body={
-                "intent": intent,
-                "confidence": intent.get("confidence", 0.0),
-                "processing_time": time.time() - intent_start
-            }
+        # Track intent classification
+        tracker.track_node(
+            input=user_message,
+            output=intent,
+            node_name="intent_classification",
+            agent_name="customer_service_agent",
+            node_type="llm",
+            execution_id=execution_id
         )
         
-        execution_context["steps_completed"].append("intent_classification")
-        
-        # Step 2: Knowledge retrieval with conditional tracking
+        # Step 2: Knowledge retrieval with conditional logic
         if intent["confidence"] > 0.8:
-            knowledge_start = time.time()
             knowledge = await retrieve_knowledge(user_message, intent["category"])
             
-            # Only track high-confidence knowledge retrieval
-            await tracker._send_tracked_data(
-                model_id="knowledge-retrieval",
-                request_body={
-                    "query": user_message,
-                    "intent": intent,
-                    "timestamp": knowledge_start
-                },
-                response_body={
-                    "knowledge_found": len(knowledge) > 0,
-                    "knowledge_count": len(knowledge),
-                    "processing_time": time.time() - knowledge_start
-                }
+            # Track knowledge retrieval
+            tracker.track_node(
+                input={"message": user_message, "intent": intent},
+                output=knowledge,
+                node_name="knowledge_retrieval",
+                agent_name="customer_service_agent",
+                node_type="tool",
+                execution_id=execution_id
             )
-            
-            execution_context["steps_completed"].append("knowledge_retrieval")
         else:
             # Use fallback for low confidence
             knowledge = await get_fallback_responses(intent["category"])
-            execution_context["steps_completed"].append("fallback_retrieval")
+            
+            # Track fallback retrieval
+            tracker.track_node(
+                input={"message": user_message, "intent": intent},
+                output=knowledge,
+                node_name="fallback_retrieval",
+                agent_name="customer_service_agent",
+                node_type="tool",
+                execution_id=execution_id
+            )
         
-        # Step 3: Response generation with detailed tracking
-        response_start = time.time()
+        # Step 3: Response generation
         response = await generate_response(user_message, intent, knowledge)
         
-        # Track response generation with quality metrics
-        await tracker._send_tracked_data(
-            model_id="response-generation",
-            request_body={
-                "user_message": user_message,
-                "intent": intent,
-                "knowledge_items": len(knowledge),
-                "timestamp": response_start
-            },
-            response_body={
-                "response": response,
-                "response_length": len(response),
-                "processing_time": time.time() - response_start,
-                "quality_score": calculate_response_quality(response)
-            }
+        # Track response generation
+        tracker.track_node(
+            input={"message": user_message, "intent": intent, "knowledge": knowledge},
+            output=response,
+            node_name="response_generation",
+            agent_name="customer_service_agent",
+            node_type="llm",
+            execution_id=execution_id
         )
         
-        execution_context["steps_completed"].append("response_generation")
-        
-        # Final tracking: Complete agent execution
-        total_time = time.time() - agent_start_time
-        await tracker._send_tracked_data(
-            model_id="customer-service-agent-complete",
-            request_body={
-                "user_id": user_id,
-                "user_message": user_message,
-                "execution_context": execution_context
-            },
-            response_body={
-                "response": response,
-                "intent": intent,
-                "total_execution_time": total_time,
-                "steps_completed": execution_context["steps_completed"],
-                "success": True
-            }
-        )
-        
-        return {
+        # Track final result
+        result = {
             "response": response,
             "intent": intent,
-            "execution_time": total_time,
             "success": True
         }
         
-    except Exception as e:
-        # Comprehensive error tracking
-        error_time = time.time()
-        execution_context["errors"].append({
-            "error": str(e),
-            "timestamp": error_time,
-            "step": execution_context["steps_completed"][-1] if execution_context["steps_completed"] else "startup"
-        })
+        tracker.track_node(
+            input=user_message,
+            output=result,
+            node_name="final_response",
+            agent_name="customer_service_agent",
+            node_type="tool",
+            execution_id=execution_id
+        )
         
-        # Track the error with full context
-        await tracker._send_tracked_data(
-            model_id="customer-service-agent-error",
-            request_body={
-                "user_id": user_id,
-                "user_message": user_message,
-                "execution_context": execution_context
-            },
-            response_body={
-                "error": str(e),
-                "error_type": type(e).__name__,
-                "execution_time": error_time - agent_start_time,
-                "steps_completed": execution_context["steps_completed"],
-                "success": False
-            }
+        return result
+        
+    except Exception as e:
+        # Track error
+        error_result = {
+            "error": str(e),
+            "success": False
+        }
+        
+        tracker.track_node(
+            input=user_message,
+            output=error_result,
+            node_name="error_handling",
+            agent_name="customer_service_agent",
+            node_type="tool",
+            execution_id=execution_id
         )
         
         # Decide on error recovery strategy
@@ -191,6 +155,13 @@ async def manual_customer_service_agent(user_message, user_id):
                 "fallback": True,
                 "error": str(e)
             }
+            
+    finally:
+        # End the trace session
+        tracker.end_tracing(
+            execution_id=execution_id,
+            agent_name="customer_service_agent"
+        )
 
 # Helper functions
 async def classify_intent(message):
@@ -204,10 +175,6 @@ async def retrieve_knowledge(message, category):
 async def generate_response(message, intent, knowledge):
     # Your response generation logic
     return "Generated response based on intent and knowledge"
-
-def calculate_response_quality(response):
-    # Your quality scoring logic
-    return 0.85
 ```
 </Tabs.Tab>
 <Tabs.Tab>
@@ -221,39 +188,27 @@ tracker.config(api_key="your-api-key")
 def manual_data_processing_agent(dataset_path, processing_options):
     """Manually traced data processing agent with detailed monitoring"""
     
-    agent_start_time = time.time()
-    processing_stats = {
-        "total_records": 0,
-        "processed_records": 0,
-        "failed_records": 0,
-        "processing_stages": []
-    }
+    # Start a new trace session
+    tracing_response = tracker.start_tracing(
+        agent_name="data_processing_agent"
+    )
+    execution_id = tracing_response.get("executionId")
     
     try:
         # Step 1: Data loading with validation
-        load_start = time.time()
         data = load_dataset(dataset_path)
-        processing_stats["total_records"] = len(data)
         
         # Track data loading
-        tracker._send_tracked_data_sync(
-            model_id="data-loading",
-            request_body={
-                "dataset_path": dataset_path,
-                "processing_options": processing_options,
-                "timestamp": load_start
-            },
-            response_body={
-                "records_loaded": len(data),
-                "loading_time": time.time() - load_start,
-                "data_quality": validate_data_quality(data)
-            }
+        tracker.track_node(
+            input={"path": dataset_path, "options": processing_options},
+            output={"records_loaded": len(data)},
+            node_name="data_loading",
+            agent_name="data_processing_agent",
+            node_type="tool",
+            execution_id=execution_id
         )
         
-        processing_stats["processing_stages"].append("data_loading")
-        
         # Step 2: Data cleaning with progress tracking
-        clean_start = time.time()
         cleaned_data = []
         failed_records = []
         
@@ -261,46 +216,34 @@ def manual_data_processing_agent(dataset_path, processing_options):
             try:
                 cleaned_record = clean_record(record)
                 cleaned_data.append(cleaned_record)
-                processing_stats["processed_records"] += 1
             except Exception as e:
                 failed_records.append({"record_id": i, "error": str(e)})
-                processing_stats["failed_records"] += 1
             
             # Track progress every 1000 records
             if (i + 1) % 1000 == 0:
-                tracker._send_tracked_data_sync(
-                    model_id="data-cleaning-progress",
-                    request_body={
-                        "progress": (i + 1) / len(data),
-                        "processed_count": i + 1
-                    },
-                    response_body={
-                        "success_rate": processing_stats["processed_records"] / (i + 1),
-                        "current_batch": i // 1000 + 1
-                    }
+                tracker.track_node(
+                    input={"total_records": len(data), "processed": i + 1},
+                    output={"success_rate": len(cleaned_data) / (i + 1)},
+                    node_name="cleaning_progress",
+                    agent_name="data_processing_agent",
+                    node_type="tool",
+                    execution_id=execution_id
                 )
         
         # Track cleaning completion
-        tracker._send_tracked_data_sync(
-            model_id="data-cleaning-complete",
-            request_body={
-                "total_records": len(data),
-                "processing_options": processing_options
-            },
-            response_body={
+        tracker.track_node(
+            input={"total_records": len(data)},
+            output={
                 "cleaned_records": len(cleaned_data),
-                "failed_records": len(failed_records),
-                "cleaning_time": time.time() - clean_start,
-                "success_rate": len(cleaned_data) / len(data)
-            }
+                "failed_records": len(failed_records)
+            },
+            node_name="cleaning_complete",
+            agent_name="data_processing_agent",
+            node_type="tool",
+            execution_id=execution_id
         )
         
-        processing_stats["processing_stages"].append("data_cleaning")
-        
         # Step 3: Analysis with quality gates
-        analysis_start = time.time()
-        
-        # Quality gate: Minimum success rate
         success_rate = len(cleaned_data) / len(data)
         if success_rate < 0.8:
             raise ValueError(f"Data quality too low: {success_rate:.2%} success rate")
@@ -308,75 +251,66 @@ def manual_data_processing_agent(dataset_path, processing_options):
         analysis_result = analyze_cleaned_data(cleaned_data)
         
         # Track analysis
-        tracker._send_tracked_data_sync(
-            model_id="data-analysis",
-            request_body={
-                "record_count": len(cleaned_data),
-                "analysis_type": processing_options.get("analysis_type", "default")
-            },
-            response_body={
-                "analysis_result": analysis_result,
-                "analysis_time": time.time() - analysis_start,
-                "quality_passed": True
-            }
+        tracker.track_node(
+            input={"cleaned_data": cleaned_data},
+            output={"analysis_result": analysis_result},
+            node_name="data_analysis",
+            agent_name="data_processing_agent",
+            node_type="tool",
+            execution_id=execution_id
         )
         
-        processing_stats["processing_stages"].append("data_analysis")
-        
-        # Final tracking: Complete agent execution
-        total_time = time.time() - agent_start_time
-        tracker._send_tracked_data_sync(
-            model_id="data-processing-agent-complete",
-            request_body={
-                "dataset_path": dataset_path,
-                "processing_options": processing_options,
-                "processing_stats": processing_stats
-            },
-            response_body={
-                "analysis_result": analysis_result,
-                "total_execution_time": total_time,
-                "processing_stats": processing_stats,
-                "success": True
-            }
-        )
-        
-        return {
+        # Track final result
+        result = {
             "analysis": analysis_result,
-            "stats": processing_stats,
-            "execution_time": total_time,
+            "stats": {
+                "total_records": len(data),
+                "cleaned_records": len(cleaned_data),
+                "failed_records": len(failed_records)
+            },
             "success": True
         }
         
-    except Exception as e:
-        # Comprehensive error tracking
-        error_time = time.time()
+        tracker.track_node(
+            input={"dataset_path": dataset_path, "options": processing_options},
+            output=result,
+            node_name="final_result",
+            agent_name="data_processing_agent",
+            node_type="tool",
+            execution_id=execution_id
+        )
         
-        tracker._send_tracked_data_sync(
-            model_id="data-processing-agent-error",
-            request_body={
-                "dataset_path": dataset_path,
-                "processing_options": processing_options,
-                "processing_stats": processing_stats
-            },
-            response_body={
-                "error": str(e),
-                "error_type": type(e).__name__,
-                "execution_time": error_time - agent_start_time,
-                "processing_stages": processing_stats["processing_stages"],
-                "success": False
-            }
+        return result
+        
+    except Exception as e:
+        # Track error
+        error_result = {
+            "error": str(e),
+            "success": False
+        }
+        
+        tracker.track_node(
+            input={"dataset_path": dataset_path, "options": processing_options},
+            output=error_result,
+            node_name="error_handling",
+            agent_name="data_processing_agent",
+            node_type="tool",
+            execution_id=execution_id
         )
         
         raise e
+        
+    finally:
+        # End the trace session
+        tracker.end_tracing(
+            execution_id=execution_id,
+            agent_name="data_processing_agent"
+        )
 
 # Helper functions
 def load_dataset(path):
     # Your data loading logic
     return [{"id": i, "data": f"record_{i}"} for i in range(5000)]
-
-def validate_data_quality(data):
-    # Your data quality validation
-    return {"quality_score": 0.92, "issues": []}
 
 def clean_record(record):
     # Your record cleaning logic
@@ -394,258 +328,153 @@ def analyze_cleaned_data(data):
 ### JavaScript: Manual Control Flow
 
 ```javascript filename="manual_agent.js"
-const { config, captureAgentNode, endAgentTracing } = require('handit-sdk');
+const { config, startTracing, trackNode, endTracing } = require('@handit.ai/node');
 
 config({ apiKey: 'your-api-key' });
 
 async function manualEcommerceAgent(userId, actionType, payload) {
-    const agentStartTime = Date.now();
-    const executionContext = {
-        userId,
-        actionType,
-        startTime: agentStartTime,
-        stepsCompleted: [],
-        errors: [],
-        externalId: `ecommerce-${userId}-${Date.now()}`
-    };
+    // Start a new trace session
+    const tracingResponse = await startTracing({ 
+        agentName: 'ecommerce_agent'
+    });
+    const executionId = tracingResponse.executionId;
     
     try {
         // Step 1: User authentication and validation
-        const authStart = Date.now();
         const userAuth = await authenticateUser(userId);
         
-        // Manual tracking of authentication
-        await captureAgentNode({
-            agentNodeSlug: 'user-authentication',
-            externalId: executionContext.externalId,
-            requestBody: {
-                userId,
-                actionType,
-                timestamp: authStart
-            },
-            responseBody: {
-                authenticated: userAuth.success,
-                userTier: userAuth.tier,
-                processingTime: Date.now() - authStart
-            }
+        // Track authentication
+        await trackNode({
+            input: { userId, actionType },
+            output: userAuth,
+            nodeName: 'user_authentication',
+            agentName: 'ecommerce_agent',
+            nodeType: 'tool',
+            executionId
         });
         
-        executionContext.stepsCompleted.push('authentication');
-        
-        // Step 2: Action-specific processing with conditional logic
+        // Step 2: Action-specific processing
         let actionResult;
         
         if (actionType === 'purchase') {
-            actionResult = await processPurchase(payload, userAuth, executionContext);
+            actionResult = await processPurchase(payload, userAuth);
         } else if (actionType === 'recommendation') {
-            actionResult = await processRecommendation(payload, userAuth, executionContext);
+            actionResult = await processRecommendation(payload, userAuth);
         } else if (actionType === 'support') {
-            actionResult = await processSupport(payload, userAuth, executionContext);
+            actionResult = await processSupport(payload, userAuth);
         } else {
             throw new Error(`Unknown action type: ${actionType}`);
         }
         
+        // Track action processing
+        await trackNode({
+            input: { payload, userAuth },
+            output: actionResult,
+            nodeName: `${actionType}_processing`,
+            agentName: 'ecommerce_agent',
+            nodeType: 'tool',
+            executionId
+        });
+        
         // Step 3: Final result processing
-        const finalStart = Date.now();
         const finalResult = await finalizeResult(actionResult, userAuth);
         
         // Track final processing
-        await captureAgentNode({
-            agentNodeSlug: 'result-finalization',
-            externalId: executionContext.externalId,
-            requestBody: {
-                actionResult,
-                userTier: userAuth.tier
-            },
-            responseBody: {
-                finalResult,
-                processingTime: Date.now() - finalStart
-            }
+        await trackNode({
+            input: { actionResult, userAuth },
+            output: finalResult,
+            nodeName: 'result_finalization',
+            agentName: 'ecommerce_agent',
+            nodeType: 'tool',
+            executionId
         });
         
-        executionContext.stepsCompleted.push('finalization');
-        
-        // Complete agent execution tracking
-        const totalTime = Date.now() - agentStartTime;
-        await captureAgentNode({
-            agentNodeSlug: 'ecommerce-agent-complete',
-            externalId: executionContext.externalId,
-            requestBody: {
-                userId,
-                actionType,
-                executionContext
-            },
-            responseBody: {
-                result: finalResult,
-                totalExecutionTime: totalTime,
-                stepsCompleted: executionContext.stepsCompleted,
-                success: true
-            }
-        });
-        
-        // End the agent tracing session
-        await endAgentTracing({ externalId: executionContext.externalId });
-        
-        return {
+        // Track final result
+        const result = {
             result: finalResult,
-            executionTime: totalTime,
-            success: true,
-            externalId: executionContext.externalId
+            success: true
         };
         
+        await trackNode({
+            input: { userId, actionType, payload },
+            output: result,
+            nodeName: 'final_response',
+            agentName: 'ecommerce_agent',
+            nodeType: 'tool',
+            executionId
+        });
+        
+        return result;
+        
     } catch (error) {
-        // Comprehensive error handling and tracking
-        const errorTime = Date.now();
-        executionContext.errors.push({
+        // Track error
+        const errorResult = {
             error: error.message,
-            timestamp: errorTime,
-            step: executionContext.stepsCompleted[executionContext.stepsCompleted.length - 1] || 'startup'
-        });
+            success: false
+        };
         
-        // Track the error with full context
-        await captureAgentNode({
-            agentNodeSlug: 'ecommerce-agent-error',
-            externalId: executionContext.externalId,
-            requestBody: {
-                userId,
-                actionType,
-                executionContext
-            },
-            responseBody: {
-                error: error.message,
-                errorType: error.constructor.name,
-                executionTime: errorTime - agentStartTime,
-                stepsCompleted: executionContext.stepsCompleted,
-                success: false
-            },
-            error: true
+        await trackNode({
+            input: { userId, actionType, payload },
+            output: errorResult,
+            nodeName: 'error_handling',
+            agentName: 'ecommerce_agent',
+            nodeType: 'tool',
+            executionId
         });
-        
-        // End the agent tracing session with error
-        await endAgentTracing({ externalId: executionContext.externalId });
         
         // Custom error recovery based on context
-        if (actionType === 'purchase' && executionContext.stepsCompleted.includes('authentication')) {
+        if (actionType === 'purchase') {
             // Save purchase attempt for later retry
             await savePurchaseAttempt(userId, payload, error.message);
             return {
                 result: { saved: true, retryable: true },
-                error: error.message,
-                externalId: executionContext.externalId
+                error: error.message
             };
         } else {
             // Return graceful error response
             return {
                 result: { success: false, message: 'Operation failed' },
-                error: error.message,
-                externalId: executionContext.externalId
+                error: error.message
             };
         }
+        
+    } finally {
+        // End the trace session
+        await endTracing({ 
+            executionId,
+            agentName: 'ecommerce_agent'
+        });
     }
 }
 
 // Helper functions for different action types
-async function processPurchase(payload, userAuth, context) {
-    const purchaseStart = Date.now();
+async function processPurchase(payload, userAuth) {
+    // Validate purchase data
+    const validation = await validatePurchaseData(payload);
     
-    try {
-        // Validate purchase data
-        const validation = await validatePurchaseData(payload);
-        
-        // Track validation
-        await captureAgentNode({
-            agentNodeSlug: 'purchase-validation',
-            externalId: context.externalId,
-            requestBody: { purchaseData: payload },
-            responseBody: { 
-                valid: validation.valid, 
-                issues: validation.issues 
-            }
-        });
-        
-        if (!validation.valid) {
-            throw new Error(`Purchase validation failed: ${validation.issues.join(', ')}`);
-        }
-        
-        // Process payment
-        const payment = await processPayment(payload.paymentInfo, payload.amount);
-        
-        // Track payment
-        await captureAgentNode({
-            agentNodeSlug: 'payment-processing',
-            externalId: context.externalId,
-            requestBody: { 
-                amount: payload.amount, 
-                paymentMethod: payload.paymentInfo.method 
-            },
-            responseBody: { 
-                transactionId: payment.transactionId, 
-                success: payment.success 
-            }
-        });
-        
-        context.stepsCompleted.push('purchase_processing');
-        
-        return {
-            transactionId: payment.transactionId,
-            amount: payload.amount,
-            processingTime: Date.now() - purchaseStart
-        };
-        
-    } catch (error) {
-        // Track purchase-specific error
-        await captureAgentNode({
-            agentNodeSlug: 'purchase-error',
-            externalId: context.externalId,
-            requestBody: { purchaseData: payload },
-            responseBody: { error: error.message },
-            error: true
-        });
-        throw error;
+    if (!validation.valid) {
+        throw new Error(`Purchase validation failed: ${validation.issues.join(', ')}`);
     }
+    
+    // Process payment
+    const payment = await processPayment(payload.paymentInfo, payload.amount);
+    
+    return {
+        transactionId: payment.transactionId,
+        amount: payload.amount
+    };
 }
 
-async function processRecommendation(payload, userAuth, context) {
-    const recStart = Date.now();
-    
+async function processRecommendation(payload, userAuth) {
     // Get user preferences
-    const preferences = await getUserPreferences(context.userId);
-    
-    // Track preference retrieval
-    await captureAgentNode({
-        agentNodeSlug: 'preference-retrieval',
-        externalId: context.externalId,
-        requestBody: { userId: context.userId },
-        responseBody: { 
-            preferencesFound: preferences.length > 0,
-            preferenceCount: preferences.length 
-        }
-    });
+    const preferences = await getUserPreferences(userAuth.userId);
     
     // Generate recommendations
     const recommendations = await generateRecommendations(preferences, payload.category);
     
-    // Track recommendation generation
-    await captureAgentNode({
-        agentNodeSlug: 'recommendation-generation',
-        externalId: context.externalId,
-        requestBody: { 
-            preferences, 
-            category: payload.category,
-            userTier: userAuth.tier 
-        },
-        responseBody: { 
-            recommendationCount: recommendations.length,
-            processingTime: Date.now() - recStart 
-        }
-    });
-    
-    context.stepsCompleted.push('recommendation_processing');
-    
     return {
         recommendations,
-        category: payload.category,
-        processingTime: Date.now() - recStart
+        category: payload.category
     };
 }
 
@@ -675,6 +504,7 @@ async function processPayment(paymentInfo, amount) {
 ```python filename="multi_agent_orchestration.py"
 from handit import HanditTracker
 import asyncio
+import time
 
 tracker = HanditTracker()
 tracker.config(api_key="your-api-key")
@@ -682,159 +512,204 @@ tracker.config(api_key="your-api-key")
 async def orchestrate_multi_agent_workflow(task_request):
     """Orchestrate multiple specialized agents with manual coordination tracking"""
     
-    orchestration_id = f"orchestration-{int(time.time())}"
-    workflow_start = time.time()
-    
-    # Track orchestration start
-    await tracker._send_tracked_data(
-        model_id="multi-agent-orchestration-start",
-        request_body={
-            "task_request": task_request,
-            "orchestration_id": orchestration_id,
-            "timestamp": workflow_start
-        },
-        response_body={"status": "started", "agents_planned": 3}
+    # Start a new trace session
+    tracing_response = tracker.start_tracing(
+        agent_name="multi_agent_orchestration"
     )
+    execution_id = tracing_response.get("executionId")
     
     try:
+        # Track orchestration start
+        tracker.track_node(
+            input=task_request,
+            output={"status": "started", "agents_planned": 3},
+            node_name="orchestration_start",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        
         # Agent 1: Analysis Agent
-        analysis_result = await run_analysis_agent(task_request, orchestration_id)
+        analysis_result = await run_analysis_agent(task_request)
         
-        # Agent 2: Processing Agent (depends on analysis)
-        processing_result = await run_processing_agent(
-            analysis_result, 
-            task_request, 
-            orchestration_id
+        # Track analysis completion
+        tracker.track_node(
+            input=task_request,
+            output=analysis_result,
+            node_name="analysis_complete",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
         )
         
-        # Agent 3: Synthesis Agent (depends on both)
-        final_result = await run_synthesis_agent(
-            analysis_result, 
-            processing_result, 
-            orchestration_id
+        # Agent 2: Processing Agent
+        processing_result = await run_processing_agent(analysis_result, task_request)
+        
+        # Track processing completion
+        tracker.track_node(
+            input={"analysis": analysis_result, "request": task_request},
+            output=processing_result,
+            node_name="processing_complete",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
         )
         
-        # Track successful orchestration
-        total_time = time.time() - workflow_start
-        await tracker._send_tracked_data(
-            model_id="multi-agent-orchestration-complete",
-            request_body={
-                "orchestration_id": orchestration_id,
-                "task_request": task_request
-            },
-            response_body={
-                "final_result": final_result,
-                "total_execution_time": total_time,
-                "agents_completed": 3,
-                "success": True
-            }
+        # Agent 3: Synthesis Agent
+        final_result = await run_synthesis_agent(analysis_result, processing_result)
+        
+        # Track synthesis completion
+        tracker.track_node(
+            input={"analysis": analysis_result, "processing": processing_result},
+            output=final_result,
+            node_name="synthesis_complete",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        
+        # Track final result
+        tracker.track_node(
+            input=task_request,
+            output=final_result,
+            node_name="final_result",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
         )
         
         return final_result
         
     except Exception as e:
-        # Track orchestration failure
-        await tracker._send_tracked_data(
-            model_id="multi-agent-orchestration-error",
-            request_body={"orchestration_id": orchestration_id},
-            response_body={"error": str(e), "success": False}
-        )
-        raise
-
-async def run_analysis_agent(task_request, orchestration_id):
-    """Run analysis agent with orchestration context"""
-    agent_start = time.time()
-    
-    # Agent-specific processing
-    analysis = await perform_analysis(task_request)
-    
-    # Track with orchestration context
-    await tracker._send_tracked_data(
-        model_id="analysis-agent",
-        request_body={
-            "task_request": task_request,
-            "orchestration_id": orchestration_id,
-            "agent_role": "analysis"
-        },
-        response_body={
-            "analysis_result": analysis,
-            "execution_time": time.time() - agent_start,
-            "orchestration_id": orchestration_id
+        # Track error
+        error_result = {
+            "error": str(e),
+            "success": False
         }
-    )
-    
-    return analysis
+        
+        tracker.track_node(
+            input=task_request,
+            output=error_result,
+            node_name="error_handling",
+            agent_name="multi_agent_orchestration",
+            node_type="tool",
+            execution_id=execution_id
+        )
+        
+        raise
+        
+    finally:
+        # End the trace session
+        tracker.end_tracing(
+            execution_id=execution_id,
+            agent_name="multi_agent_orchestration"
+        )
+
+async def run_analysis_agent(task_request):
+    """Run analysis agent with orchestration context"""
+    # Your analysis logic here
+    return {"analysis": "completed"}
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```javascript filename="multi_agent_orchestration.js"
-const { config, captureAgentNode } = require('handit-sdk');
+const { config, startTracing, trackNode, endTracing } = require('@handit.ai/node');
 
 config({ apiKey: 'your-api-key' });
 
 async function orchestrateMultiAgentWorkflow(taskRequest) {
-    const orchestrationId = `orchestration-${Date.now()}`;
-    const workflowStart = Date.now();
-    
-    // Track orchestration start
-    await captureAgentNode({
-        agentNodeSlug: 'multi-agent-orchestration-start',
-        externalId: orchestrationId,
-        requestBody: {
-            taskRequest,
-            orchestrationId,
-            timestamp: workflowStart
-        },
-        responseBody: { status: 'started', agentsPlanned: 3 }
+    // Start a new trace session
+    const tracingResponse = await startTracing({ 
+        agentName: 'multi_agent_orchestration'
     });
+    const executionId = tracingResponse.executionId;
     
     try {
+        // Track orchestration start
+        await trackNode({
+            input: taskRequest,
+            output: { status: 'started', agentsPlanned: 3 },
+            nodeName: 'orchestration_start',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
+        });
+        
         // Agent 1: Analysis Agent
-        const analysisResult = await runAnalysisAgent(taskRequest, orchestrationId);
+        const analysisResult = await runAnalysisAgent(taskRequest);
         
-        // Agent 2: Processing Agent (depends on analysis)
-        const processingResult = await runProcessingAgent(
-            analysisResult,
-            taskRequest,
-            orchestrationId
-        );
+        // Track analysis completion
+        await trackNode({
+            input: taskRequest,
+            output: analysisResult,
+            nodeName: 'analysis_complete',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
+        });
         
-        // Agent 3: Synthesis Agent (depends on both)
-        const finalResult = await runSynthesisAgent(
-            analysisResult,
-            processingResult,
-            orchestrationId
-        );
+        // Agent 2: Processing Agent
+        const processingResult = await runProcessingAgent(analysisResult, taskRequest);
         
-        // Track successful orchestration
-        const totalTime = Date.now() - workflowStart;
-        await captureAgentNode({
-            agentNodeSlug: 'multi-agent-orchestration-complete',
-            externalId: orchestrationId,
-            requestBody: {
-                orchestrationId,
-                taskRequest
-            },
-            responseBody: {
-                finalResult,
-                totalExecutionTime: totalTime,
-                agentsCompleted: 3,
-                success: true
-            }
+        // Track processing completion
+        await trackNode({
+            input: { analysis: analysisResult, request: taskRequest },
+            output: processingResult,
+            nodeName: 'processing_complete',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
+        });
+        
+        // Agent 3: Synthesis Agent
+        const finalResult = await runSynthesisAgent(analysisResult, processingResult);
+        
+        // Track synthesis completion
+        await trackNode({
+            input: { analysis: analysisResult, processing: processingResult },
+            output: finalResult,
+            nodeName: 'synthesis_complete',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
+        });
+        
+        // Track final result
+        await trackNode({
+            input: taskRequest,
+            output: finalResult,
+            nodeName: 'final_result',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
         });
         
         return finalResult;
         
     } catch (error) {
-        // Track orchestration failure
-        await captureAgentNode({
-            agentNodeSlug: 'multi-agent-orchestration-error',
-            externalId: orchestrationId,
-            requestBody: { orchestrationId },
-            responseBody: { error: error.message, success: false },
-            error: true
+        // Track error
+        const errorResult = {
+            error: error.message,
+            success: false
+        };
+        
+        await trackNode({
+            input: taskRequest,
+            output: errorResult,
+            nodeName: 'error_handling',
+            agentName: 'multi_agent_orchestration',
+            nodeType: 'tool',
+            executionId
         });
+        
         throw error;
+        
+    } finally {
+        // End the trace session
+        await endTracing({ 
+            executionId,
+            agentName: 'multi_agent_orchestration'
+        });
     }
 }
 ```
@@ -855,7 +730,7 @@ async function orchestrateMultiAgentWorkflow(taskRequest) {
 
 **Implementation Guidelines:**
 
-1. **Use consistent external IDs** - Ensure proper correlation across all trace points
+1. **Use consistent node names** - Ensure proper correlation across all trace points
 2. **Track both success and failure paths** - Comprehensive coverage of all execution scenarios
 3. **Include relevant context** - Provide meaningful data in all traces for debugging
 4. **Implement proper error handling** - Handle tracing failures gracefully without affecting business logic
