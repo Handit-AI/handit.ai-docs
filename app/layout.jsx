@@ -52,7 +52,7 @@ const navbar = (
       </div>
     }
     projectLink="https://github.com/Handit-AI/handit.ai.git"
-    chatLink="https://https://discord.gg/wZbW9Bu5"
+    chatLink="https://discord.gg/wZbW9Bu5"
     chatIcon={
       <svg
         xmlns="http://www.w3.org/2000/svg"
