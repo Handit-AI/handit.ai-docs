@@ -52,7 +52,7 @@ const navbar = (
       </div>
     }
     projectLink="https://github.com/Handit-AI/handit.ai.git"
-    chatLink="https://discord.gg/wZbW9Bu5"
+    chatLink="https://discord.gg/XCVWYCFen6"
     chatIcon={
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +89,7 @@ const navbar = (
 
 const footer = (
   <Footer className="flex-col items-center md:items-start">
-    MIT {new Date().getFullYear()} © Nextra.
+    MIT {new Date().getFullYear()} © Handit.ai
   </Footer>
 );
 
