@@ -6,5 +6,6 @@ export default {
   "tracing": "Tracing",
   "evaluation": "Evaluation",
   "optimization": "Optimization",
-  "more": "More"
+  "more": "More",
+  "use_cases": "Use Cases"
 } satisfies MetaRecord
