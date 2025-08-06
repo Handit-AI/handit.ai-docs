@@ -54,16 +54,19 @@ The CLI will show a summary of your setup and apply the configuration to your Ha
 You can run the CLI setup multiple times to add or modify evaluators:
 
 ```bash filename="terminal"
-# Add new evaluators or modify existing ones
+# Run evaluator setup to modify configuration
 handit-cli evaluators-setup
-
-# View current evaluator configuration
-handit-cli evaluators-setup --show-config
 ```
 
-### Setting Evaluation Percentages
+The CLI will guide you through:
+- **Adding new evaluation models** (OpenAI, Together AI, etc.)
+- **Connecting evaluators to LLM nodes** in your project
+- **Setting evaluation percentages** for each evaluator
+- **Configuring model tokens** for evaluation
 
-The CLI will help you configure how often each evaluator runs:
+### Example Configuration
+
+After setup, your evaluators might look like this:
 
 ```
 Evaluator: "Response Completeness"
@@ -75,25 +78,6 @@ Evaluator: "Hallucination Detection"
 ├── Evaluation Percentage: 20% (higher for critical accuracy)
 ├── Priority: High
 └── Associated Nodes: customer-service-response, technical-support-response
-```
-
-### Model Token Management
-
-The CLI provides several options for managing your evaluation models:
-
-**Add New Model:**
-```bash
-handit-cli evaluators-setup --add-model
-```
-
-**Update Existing Model:**
-```bash
-handit-cli evaluators-setup --update-model openai-gpt4
-```
-
-**List All Models:**
-```bash
-handit-cli evaluators-setup --list-models
 ```
 
 ## CLI-Generated Configuration

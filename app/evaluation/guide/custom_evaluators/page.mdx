@@ -9,57 +9,44 @@ import { Tabs } from "nextra/components"
 
 # Custom Evaluators
 
-> **Define your quality standards with precision.** Custom evaluators allow you to create sophisticated evaluation systems tailored to your specific business requirements, ensuring AI responses meet your exact quality criteria.
+> **Define your quality standards with precision.** Custom evaluators let you create evaluation systems tailored to your specific business requirements, ensuring your AI meets the exact quality criteria that matter most to your users.
 
-This guide covers creating evaluation systems that automatically assess AI responses against your defined standards using LLM-as-Judge methodology.
-
-<Callout type="info">
-  Custom evaluators use your [configured model tokens](/evaluation/guide/model_tokens) to automatically assess AI responses against your defined criteria.
-</Callout>
-
-## Evaluator Components
-
-A custom evaluator consists of:
-
-<Steps>
-### Evaluation Criteria
-Define what constitutes quality for your specific use case
-- Identify key quality dimensions
-- Set clear scoring guidelines
-- Define minimum acceptable thresholds
-
-### Evaluation Prompt  
-Instruction template that guides the judge model
-- Clear role definition
-- Specific evaluation criteria
-- Context requirements
-- Output format specifications
-
-### Scoring Framework
-How to interpret and score responses consistently
-- Numerical scoring scale (e.g., 1-10)
-- Weighted criteria if needed
-- Confidence scoring
-
-### Output Format
-Structured format for evaluation results and insights
-- JSON schema for consistency
-- Required fields and data types
-- Optional metadata fields
-- Error handling format
-</Steps>
+Transform generic quality assessment into domain-specific evaluation that understands your unique requirements and standards.
 
 <Callout type="info">
-  **Pro tip:** Start with a simple evaluator focusing on 3-5 key criteria, then expand as you gather more data and insights about your AI's performance.
+  Custom evaluators use your [configured model tokens](/evaluation/guide/model_tokens) to automatically assess AI responses against criteria you define, providing quality insights specific to your use case.
 </Callout>
 
-## Creating Your First Evaluator
+## Why Custom Evaluators Matter
 
-**1. Navigate to Evaluators**
-- Go to **Evaluation Suite**
-- Click **Create New Evaluator**
-- Choose between template-based or custom creation
-- Consider your evaluation goals and requirements
+While Handit provides powerful general-purpose evaluators, every AI application has unique quality requirements. A medical AI needs to assess clinical accuracy, a customer service AI must evaluate empathy and resolution effectiveness, and an educational AI should focus on clarity and pedagogical value.
+
+**Generic evaluation falls short** when your AI operates in specialized domains or serves specific user needs. Custom evaluators bridge this gap by incorporating your domain expertise, business requirements, and user expectations into automated quality assessment.
+
+**The result**: Quality evaluation that truly reflects what matters for your application, enabling your autonomous engineer to generate improvements that align with your specific goals and standards.
+
+## Creating Effective Custom Evaluators
+
+The key to successful custom evaluation is focus and clarity. The most effective evaluators assess one specific quality dimension with clear, unambiguous criteria.
+
+### Start with Clear Objectives
+
+Before creating an evaluator, define exactly what you want to measure. Instead of "overall quality," focus on specific aspects like "medical accuracy," "brand voice consistency," or "regulatory compliance."
+
+**Example objectives**:
+- **Medical AI**: "Does the response provide medically accurate information without making diagnostic claims?"
+- **Legal AI**: "Does the response comply with legal disclaimers while providing helpful guidance?"
+- **Educational AI**: "Does the explanation use age-appropriate language and build on foundational concepts?"
+
+### Design Focused Evaluation Criteria
+
+Each evaluator should have 3-5 specific criteria that define quality for that dimension. More criteria make evaluation inconsistent and results harder to interpret.
+
+**Example: Customer Support Empathy Evaluator**
+- Does the response acknowledge the customer's frustration or concern?
+- Does it use empathetic language appropriate to the situation?
+- Does it avoid dismissive or robotic phrasing?
+- Does it show understanding of the customer's perspective?
 
 <video 
   width="100%" 
@@ -67,346 +54,107 @@ Structured format for evaluation results and insights
   loop 
   muted 
   playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+  style={{ borderRadius: '8px' }}
 >
-  <source src="/assets/quickstart/evaluator_creation.mp4" type="video/mp4" />
+  <source src="/assets/quickstart/evaluators-setup.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
-**2. Basic Configuration**
+### Create Clear Evaluation Prompts
 
-**Evaluator Name**
-```
-Customer Support Quality
-```
-- Use descriptive, purpose-specific names
-- Include version number if applicable
-- Consider environment prefix (dev/prod)
+Your evaluation prompt is the instruction you give to the judge model (like GPT-4) to assess quality. Effective prompts are specific, provide examples, and define scoring clearly.
 
-**Model Token**
-- Select your configured judge model from the dropdown
-- Choose based on evaluation complexity and cost requirements
-- Consider model capabilities and limitations
-- Factor in response time requirements
+**Structure of effective evaluation prompts**:
 
-**3. Create Evaluation Prompt**
+**Role Definition**: "You are an expert customer service quality assessor evaluating AI responses for empathy and emotional intelligence."
 
-This is where you define your evaluation criteria and instructions for the judge model, example:
+**Context Provision**: Include the original user question, the AI's response, and any relevant background context the evaluator needs.
 
-```
-You are evaluating customer service AI responses for quality.
+**Specific Criteria**: List exactly what to evaluate with clear definitions and examples of good vs. poor performance.
 
-Rate the response on these criteria (1-10 scale, 10 = excellent):
+**Scoring Instructions**: Define your scoring scale (typically 1-10) with specific anchors for different score ranges.
 
-1. **Helpfulness**: Does the response directly address and solve the customer's issue?
-2. **Accuracy**: Is all provided information correct and up-to-date?
-3. **Professionalism**: Is the tone and language appropriate for business communication?
-4. **Completeness**: Are all aspects of the customer's question thoroughly addressed?
+**Output Format**: Specify exactly how you want results formatted, typically as structured JSON for consistency.
 
-**Context:**
-- Customer Question: {input}
-- AI Response: {output}
-- Customer History: {context}
+## Real-World Examples
 
-**Output Format (JSON):**
-{
-  "scores": {
-    "helpfulness": <1-10>,
-    "accuracy": <1-10>,
-    "professionalism": <1-10>,
-    "completeness": <1-10>,
-    "overall": <average>
-  },
-  "reasoning": "Brief explanation of scoring decisions",
-  "strengths": ["What the response did well"],
-  "improvements": ["Specific areas for improvement"],
-  "escalation_needed": <true/false>
-}
+Here are examples of custom evaluators that work well in practice:
 
-Provide detailed, constructive feedback to help improve response quality.
-```
+### Medical Information Accuracy
+**Purpose**: Ensure medical AI provides accurate information without overstepping into diagnosis
+**Key Criteria**: Factual accuracy, appropriate disclaimers, avoiding diagnostic language, recommending professional consultation when needed
+**Scoring Focus**: Accuracy of medical facts, appropriateness of advice level, presence of necessary disclaimers
 
-**4. Save Evaluator**
-- Review your configuration
-- Click **Save** to create the evaluator
+### Brand Voice Consistency  
+**Purpose**: Maintain consistent brand personality across all AI interactions
+**Key Criteria**: Tone alignment with brand guidelines, appropriate formality level, consistent terminology usage, brand value reflection
+**Scoring Focus**: Alignment with brand voice guide, consistency with previous interactions, appropriate personality expression
 
-## Prompt Engineering Best Practices
+### Regulatory Compliance
+**Purpose**: Ensure AI responses meet industry-specific regulatory requirements
+**Key Criteria**: Required disclosures present, prohibited claims avoided, appropriate risk warnings, compliance with industry standards
+**Scoring Focus**: Presence of required elements, absence of prohibited content, overall compliance risk level
 
-### Essential Prompt Structure
+## Implementation Best Practices
 
-**1. Clear Role Definition**
-```
-You are an expert evaluator specializing in [domain].
-Your goal is to assess [specific aspect] of AI responses.
-Your evaluation should be:
-- Objective and consistent
-- Based on defined criteria
-- Focused on actionable feedback
-- Considerate of business context
-```
+**Start Simple**: Begin with one clear quality dimension and 3-4 specific criteria. You can always add complexity later as you understand what works.
 
-**2. Specific Evaluation Criteria**
-```
-Rate the response on these dimensions:
-1. **Criterion Name** (1-10): Detailed description of what this measures
-2. **Second Criterion** (1-10): Clear explanation of quality indicators
-```
+**Test Thoroughly**: Before deploying custom evaluators, test them on a variety of your AI's responses to ensure they provide consistent, meaningful scores.
 
-**3. Context Provision**
-```
-**Context:**
-- Original Question: {input}
-- AI Response: {output}
-- Additional Context: {context}
-- User Profile: {user_metadata}
-```
+**Iterate Based on Data**: Review evaluation results regularly and refine your criteria based on what you learn about your AI's performance patterns.
 
-**4. Output Format Specification**
-```
-**Output Format (JSON):**
-{
-  "scores": { ... },
-  "reasoning": "...",
-  "confidence": 0.85
-}
-```
+**Maintain Consistency**: Use clear, specific language in your evaluation prompts to ensure consistent scoring across different interactions.
 
-## Domain-Specific Examples
-
-<Callout type="info">
-  **Real-world evaluation templates that you can use today!** These examples demonstrate how to create specialized evaluators for different industries, each with carefully crafted criteria and scoring frameworks. Use these as starting points and customize them for your specific needs.
+<Callout type="warning">
+  **Avoid Common Pitfalls**: Don't try to evaluate too many things at once, don't use vague criteria like "good quality," and don't create evaluators without testing them on real examples first.
 </Callout>
 
-These examples showcase how to adapt evaluation criteria for different domains:
+## Advanced Configuration
 
-- **E-commerce**: Focus on product recommendations, customer satisfaction, and business impact
-- **Healthcare**: Prioritize medical accuracy, safety, and appropriate scope
-- **Education**: Emphasize learning effectiveness, clarity, and age-appropriate content
-- **Technical Support**: Concentrate on problem-solving accuracy and user safety
+For sophisticated evaluation needs, custom evaluators support advanced features:
 
-Each example includes:
-- Domain-specific evaluation criteria
-- Industry-standard scoring guidelines
-- Practical implementation tips
+**Weighted Scoring**: If some criteria are more important than others, you can weight them accordingly in your evaluation logic.
 
-<Tabs items={["E-commerce", "Healthcare", "Education", "Technical Support"]} defaultIndex="0">
-<Tabs.Tab>
+**Conditional Evaluation**: Create evaluators that apply different criteria based on the type of interaction or user context.
 
-**E-commerce Product Recommendations**
+**Multi-Model Evaluation**: Use different judge models for different types of evaluation—GPT-4 for complex reasoning, specialized models for domain-specific assessment.
 
-```
-You are evaluating AI-generated product recommendations for an e-commerce platform.
+**Confidence Scoring**: Include confidence levels in evaluation results to identify cases where the evaluator is uncertain about quality assessment.
 
-Rate each recommendation on these criteria (1-10 scale):
+## Monitoring Evaluator Performance
 
-1. **Relevance** (1-10): How well do the recommended products match the customer's query and needs?
-2. **Diversity** (1-10): Does the selection offer variety in price, brand, and features?
-3. **Personalization** (1-10): Are recommendations tailored to the customer's profile and history?
-4. **Business Value** (1-10): Do recommendations balance customer needs with business objectives?
-5. **Presentation** (1-10): Are products presented with compelling descriptions and clear benefits?
+Track how well your custom evaluators work in practice:
 
-**Context:**
-- Customer Query: {input}
-- Product Recommendations: {output}
-- Customer Profile: {customer_profile}
-- Purchase History: {purchase_history}
+**Score Distribution**: Monitor the range and distribution of scores your evaluators produce. If everything scores very high or very low, you might need to adjust criteria or scoring scales.
 
-**Business Guidelines:**
-- Prioritize products with higher margins when quality is equal
-- Always include at least one budget-friendly option
-- Consider seasonal trends and inventory levels
+**Correlation with Business Metrics**: Check whether evaluator scores correlate with business outcomes like user satisfaction, conversion rates, or support ticket volume.
 
-**Output Format (JSON):**
-{
-  "scores": {
-    "relevance": <1-10>,
-    "diversity": <1-10>,
-    "personalization": <1-10>,
-    "business_value": <1-10>,
-    "presentation": <1-10>,
-    "overall": <average>
-  },
-  "reasoning": "Detailed evaluation explanation",
-  "business_impact": {
-    "likely_conversion": <1-10>,
-    "revenue_potential": "low|medium|high"
-  },
-  "recommendations": ["Specific actions to improve future recommendations"]
-}
-```
+**Evaluator Agreement**: If you have multiple evaluators for similar quality dimensions, check whether they provide consistent insights about your AI's performance.
 
-</Tabs.Tab>
-<Tabs.Tab>
+**Edge Case Handling**: Review how evaluators perform on unusual or challenging interactions to ensure they provide meaningful assessment across all scenarios.
 
-**Healthcare Information Assessment**
+## Integration with Autonomous Improvement
 
-```
-You are evaluating AI responses about health information for accuracy and safety.
+Custom evaluators become particularly powerful when integrated with autonomous improvement:
 
-**CRITICAL**: This evaluation focuses on safety and accuracy. Be extremely careful about medical claims.
+**Targeted Fixes**: Your autonomous engineer uses custom evaluation results to generate improvements specific to your quality requirements. If brand voice consistency scores drop, it creates fixes that address brand voice specifically.
 
-Rate responses on these criteria (1-10 scale):
+**Domain Expertise**: Custom evaluators give your autonomous engineer domain-specific knowledge about what constitutes quality in your application, leading to more relevant and effective improvements.
 
-1. **Medical Accuracy** (1-10): Is the health information factually correct and current?
-2. **Safety** (1-10): Does the response avoid harmful advice and appropriately recommend professional care?
-3. **Clarity** (1-10): Is medical information explained in understandable terms?
-4. **Scope Appropriateness** (1-10): Does the response stay within appropriate bounds for AI assistance?
-5. **Empathy** (1-10): Is the tone supportive and understanding of health concerns?
+**Business Alignment**: Improvements generated by your autonomous engineer align with your business goals and quality standards rather than generic AI quality metrics.
 
-**Context:**
-- User Question: {input}
-- AI Response: {output}
-- User Health Context: {health_context}
+## Getting Started
 
-**Safety Guidelines:**
-- Any response suggesting specific treatments requires professional consultation disclaimer
-- Symptoms descriptions should encourage medical professional evaluation
-- No response should discourage seeking professional medical care
+Ready to create custom evaluators that understand your specific quality requirements?
 
-**Red Flags (Automatic Low Scores):**
-- Diagnostic claims ("You have...", "This is definitely...")
-- Specific medication recommendations without professional oversight
-- Discouraging professional medical consultation
+**Define Your Quality Dimensions**: Start by identifying the 2-3 most important quality aspects specific to your AI application. What makes a response truly valuable for your users?
 
-**Output Format (JSON):**
-{
-  "scores": {
-    "medical_accuracy": <1-10>,
-    "safety": <1-10>,
-    "clarity": <1-10>,
-    "scope_appropriateness": <1-10>,
-    "empathy": <1-10>,
-    "overall": <average>
-  },
-  "safety_assessment": {
-    "risk_level": "low|medium|high",
-    "requires_disclaimer": <true/false>,
-    "professional_referral_needed": <true/false>
-  },
-  "reasoning": "Detailed medical information evaluation",
-  "safety_concerns": ["Any potential safety issues identified"]
-}
-```
+**Create Your First Evaluator**: Begin with one focused evaluator that assesses a single quality dimension clearly and specifically. Test it thoroughly before deploying.
 
-</Tabs.Tab>
-<Tabs.Tab>
-
-**Educational Content Evaluation**
-
-```
-You are evaluating AI-generated educational content for learning effectiveness and accuracy.
-
-Rate content on these educational criteria (1-10 scale):
-
-1. **Accuracy** (1-10): Is the educational content factually correct and current?
-2. **Clarity** (1-10): Is the information presented in a clear, understandable way?
-3. **Engagement** (1-10): Is the content interesting and likely to hold student attention?
-4. **Learning Objectives** (1-10): Does the content clearly achieve stated learning goals?
-5. **Age Appropriateness** (1-10): Is the complexity and content suitable for the target age group?
-
-**Context:**
-- Learning Objective: {input}
-- Generated Content: {output}
-- Target Age Group: {age_group}
-- Subject Area: {subject}
-
-**Educational Best Practices:**
-- Use active learning techniques when possible
-- Include examples and real-world applications
-- Break complex concepts into digestible parts
-- Encourage critical thinking and questions
-
-**Assessment Criteria:**
-- Does content scaffold learning appropriately?
-- Are examples diverse and inclusive?
-- Is there opportunity for practice or application?
-- Does content connect to prior knowledge?
-
-**Output Format (JSON):**
-{
-  "scores": {
-    "accuracy": <1-10>,
-    "clarity": <1-10>,
-    "engagement": <1-10>,
-    "learning_objectives": <1-10>,
-    "age_appropriateness": <1-10>,
-    "overall": <average>
-  },
-  "learning_assessment": {
-    "cognitive_load": "low|appropriate|high",
-    "engagement_level": "low|medium|high", 
-    "learning_effectiveness": <1-10>
-  },
-  "reasoning": "Educational content evaluation details",
-  "pedagogical_strengths": ["Effective teaching elements identified"]
-}
-```
-
-</Tabs.Tab>
-<Tabs.Tab>
-
-**Technical Support Quality**
-
-```
-You are evaluating technical support AI responses for problem-solving effectiveness and safety.
-
-Rate responses on these technical criteria (1-10 scale):
-
-1. **Problem Diagnosis** (1-10): Does the response correctly identify the technical issue?
-2. **Solution Accuracy** (1-10): Are the proposed solutions technically correct and safe?
-3. **Step Clarity** (1-10): Are troubleshooting steps clear and easy to follow?
-4. **Safety** (1-10): Do solutions avoid potential system damage or security risks?
-5. **Completeness** (1-10): Does the response provide a complete solution path?
-
-**Context:**
-- Technical Issue: {input}
-- AI Response: {output}
-- System Information: {system_info}
-- User Technical Level: {user_expertise}
-
-**Technical Guidelines:**
-- Always consider user's technical expertise level
-- Prioritize safe solutions over quick fixes
-- Include backup/recovery steps for risky operations
-- Recommend professional help for complex issues
-
-**Safety Checks:**
-- No commands that could delete important data
-- No modifications to critical system files without warnings
-- No network security compromises
-- Clear warnings for potentially risky operations
-
-**Output Format (JSON):**
-{
-  "scores": {
-    "problem_diagnosis": <1-10>,
-    "solution_accuracy": <1-10>,
-    "step_clarity": <1-10>,
-    "safety": <1-10>,
-    "completeness": <1-10>,
-    "overall": <average>
-  },
-  "technical_assessment": {
-    "difficulty_level": "beginner|intermediate|advanced",
-    "risk_level": "low|medium|high",
-    "estimated_resolution_time": "minutes|hours|professional_needed"
-  },
-  "reasoning": "Technical evaluation details",
-  "safety_considerations": ["Potential risks and safeguards"]
-}
-```
-
-</Tabs.Tab>
-</Tabs>
-
-## Next Steps
-
-Ready to deploy your custom evaluator?
-
-- [Assign to LLM nodes](/evaluation/guide/llm_assignment) for automated quality assessment
-- Configure sampling percentages and quality thresholds
-- [Monitor evaluation results](/evaluation/guide/evaluation_results) and optimize performance
+**Monitor and Iterate**: Use evaluation results to understand your AI's performance patterns and refine your evaluators based on what you learn.
 
 <Callout type="success">
-  **Your custom evaluator is ready!** Next, learn how to [assign it to your LLM nodes](/evaluation/guide/llm_assignment) to start automatic quality assessment.
-</Callout> 
+  **Ready to build?** Navigate to **Evaluation Suite** in your dashboard and click **Create New Evaluator** to start building quality assessment tailored to your specific needs.
+</Callout>
+
+Custom evaluators transform generic quality monitoring into precise, actionable insights that drive meaningful improvements in your AI's performance. Start building evaluation systems that truly understand what quality means for your application.

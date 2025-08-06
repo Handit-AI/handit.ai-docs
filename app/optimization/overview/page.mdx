@@ -1,6 +1,6 @@
 ---
-title: Handit.ai Optimization & CI/CD
-description: Automated AI optimization, self-improving systems, and continuous deployment with real-time A/B testing.
+title: Handit.ai Autonomous AI Fixes
+description: Your autonomous engineer that works 24/7, detecting issues, creating fixes, and shipping pull requests automatically.
 sidebarTitle: Introduction
 ---
 
@@ -11,124 +11,55 @@ import { Cards } from 'nextra/components'
 
 > **Your autonomous engineer that works 24/7.** Handit automatically detects quality issues, generates better prompts, tests them, and creates pull requests with proven improvements—like having an on-call engineer dedicated to your AI.
 
-<details>
-<summary>**Why You Need an Autonomous Engineer**</summary>
+## Stop Being Your AI's On-Call Engineer
 
-- **24/7 monitoring**: Never miss quality issues, even during off-hours
-- **Instant fixes**: Generate and test improvements automatically
-- **Zero downtime**: Background A/B testing with no user impact
-- **Pull request workflow**: Seamless integration with your existing development process
-- **Evidence-based changes**: Every fix is backed by evaluation data
-- **Continuous improvement**: Your AI gets better while you sleep
+Picture this: It's 2 AM and your phone buzzes. Your customer service AI is giving unhelpful responses, and angry customers are flooding your support channels. You stumble out of bed, spend hours debugging prompts, make a guess at what might fix it, and deploy changes hoping they work. Sound familiar?
 
-**Stop being your AI's on-call engineer. Let Handit handle the monitoring and fixing.**
+**This is the reality for most AI teams.** You're not building features—you're constantly firefighting AI quality issues. Every time you fix one problem, three more seem to pop up. You're tweaking prompts based on intuition rather than data, with no way to safely test if changes actually improve things before they go live.
 
-</details>
-
-<details>
-<summary>**The Problem: You're Your AI's On-Call Engineer**</summary>
-
-Without an autonomous engineer, you're stuck being the on-call engineer for your AI:
-
-- **Alerts wake you up**: Quality drops and you get paged at 2 AM
-- **Manual investigation**: Hours spent debugging what went wrong
-- **Guesswork fixes**: Tweaking prompts based on intuition, not data
-- **Risky deployments**: No way to safely test if changes actually improve things
-- **Endless cycle**: Fix one issue, three more pop up next week
-
-**The result? You're constantly firefighting AI issues instead of building features.**
-
-</details>
+What if instead of waking up to fix problems, you woke up to pull requests with proven solutions already tested and ready to merge?
 
 <Callout type="info">
-  Your autonomous engineer works through GitHub pull requests—seamlessly integrating with your existing development workflow while you focus on building features.
+  That's exactly what Handit's autonomous engineer does. It monitors your AI 24/7, detects issues as they happen, generates fixes, tests them against real data, and creates pull requests with improvements that actually work.
 </Callout>
 
 ## How Your Autonomous Engineer Works
 
-Handit.ai creates an intelligent optimization loop that continuously improves your AI system:
+Think of it as having a dedicated engineer on your team whose only job is to monitor and improve your AI. Here's how it operates:
 
-<div className="grid grid-cols-4 gap-4 mt-4">
-  <div>
-    <h4>🔍 1. Detect Issues</h4>
-    Evaluation system identifies specific quality problems in production responses
-  </div>
-  <div>
-    <h4>🧠 2. Generate Solutions</h4>
-    AI analyzes problems and generates improved prompts targeting specific issues
-  </div>
-  <div>
-    <h4>⚡ 3. Test Automatically</h4>
-    Background testing processes production inputs through optimized prompts for evaluation comparison
-  </div>
-  <div>
-    <h4>🚀 4. Recommend Deployment</h4>
-    Provide clear deployment recommendations based on statistical evidence - you decide when to deploy
-  </div>
-</div>
+**Continuous Monitoring**: Your autonomous engineer never sleeps. It constantly watches your AI's performance through evaluation scores, tracking quality trends and immediately spotting when something goes wrong. Whether it's a drop in empathy scores, accuracy issues, or response quality problems, it catches them before they impact your users significantly.
 
-## Core Optimization Features
+**Intelligent Problem Solving**: When an issue is detected, your autonomous engineer doesn't just alert you—it investigates. It analyzes what's different between your successful and failed interactions, identifies the root cause (maybe your system prompt is missing context, or the tone is off), and generates a targeted fix that addresses the specific problem.
 
-### Self-Improving AI
+**Safe Testing**: Before bothering you with a fix, your autonomous engineer tests it thoroughly. It runs the improved prompt against real production data in the background, comparing results with your current version. Only when it's confident the fix actually works (with statistical significance) does it create a pull request.
 
-Automatically generates better prompts based on evaluation insights:
+**Professional Pull Requests**: When you receive a PR from your autonomous engineer, it's just like working with a human colleague. The pull request includes a clear explanation of what was wrong, what the fix does, and concrete evidence that it works—complete with before/after metrics and examples.
 
-<details>
-<summary>**Intelligent Problem Analysis**</summary>
+## What Your Pull Requests Look Like
 
-- **Error detection**: Uses evaluation results to identify specific quality issues
-- **Problem categorization**: AI analyzes and categorizes different types of failures
-- **Root cause analysis**: Understands why responses fail (lack of context, wrong tone, missing information)
-- **Solution generation**: Creates targeted prompt improvements for each problem type
-- **Learning from patterns**: Improves optimization strategies based on what works
+When your autonomous engineer detects an issue and creates a fix, you'll receive a pull request that looks like this:
 
-</details>
+### Example: Customer Service Empathy Fix
 
-### Automated A/B Testing
+```markdown
+## 🤖 Autonomous AI Fix: Improve Customer Service Empathy
 
-Every optimization is tested automatically in the background against your current production prompt:
+### Issue Detected
+Empathy scores dropped from 4.2/5.0 to 3.7/5.0 over the past week, causing a 15% 
+decrease in customer satisfaction. Root cause analysis shows the system prompt lacks 
+emotional context and empathy instructions.
 
-<details>
-<summary>**Background Evaluation Testing**</summary>
+### Fix Applied
+Updated `src/agents/customer_service/system_prompt.py` lines 23-31 to include 
+empathy guidelines and emotional context awareness.
 
-- **Zero user impact**: Users always receive production prompt responses
-- **Background processing**: Takes production inputs and processes them through optimized prompts for evaluation
-- **Real data testing**: Uses actual production inputs to measure performance differences
-- **Statistical comparison**: Compares evaluation scores between production and optimized prompts
-- **Safe experimentation**: Testing happens invisibly without affecting user experience
+### Results Validated
+- Empathy Score: 3.7/5.0 → 4.6/5.0 (+24% improvement)
+- Overall Quality: 4.1/5.0 → 4.4/5.0 (+7% improvement)
+- Statistical Confidence: 95% (tested on 500 real interactions)
 
-</details>
-
-![Agent Performance Dashboard](/assets/overview/general-handit.png)
-
-
-
-### CI/CD Deployment
-
-Seamlessly integrate optimized prompts into your existing development workflow:
-
-<details>
-<summary>**Production-Ready Integration**</summary>
-
-- **Release Hub**: Visual interface to compare prompt performance and select for deployment
-- **SDK integration**: Fetch optimized prompts directly in your code - deployed prompts become available via SDK
-- **Version control**: Track all prompt changes and easily rollback if needed
-- **Zero-downtime updates**: Prompt changes take effect immediately when fetched via SDK
-
-</details>
-
-![Release Hub - Prompt Performance Comparison](/assets/overview/prompt-comparison.png)
-
-
-## Platform-Based Workflow
-
-Everything happens through the intuitive Handit.ai platform interface:
-
-### 1. Connect Optimization Models
-- Add GPT-4o or other models for optimization analysis
-- Configure optimization preferences and constraints
-- Set quality thresholds and improvement targets
-- Self-improving AI automatically activates when optimization tokens are configured
+Ready to merge when you approve!
+```
 
 <video 
   width="100%" 
@@ -136,68 +67,34 @@ Everything happens through the intuitive Handit.ai platform interface:
   loop 
   muted 
   playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+  style={{ borderRadius: '8px' }}
 >
-  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  <source src="/assets/quickstart/pr-review.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
-### 2. Monitor A/B Tests
-- View real-time performance comparisons
-- Track statistical significance and confidence levels
-- Analyze business impact of optimizations
+## Seamless Integration with Your Workflow
 
-![Handit.ai Platform Overview](/assets/overview/general-handit.png)
+Your autonomous engineer doesn't disrupt your development process—it enhances it. You continue writing code, deploying through your normal CI/CD pipeline, and reviewing pull requests as usual. The only difference is that some of those pull requests come from your autonomous engineer with proven AI improvements.
 
-### 3. Deploy Optimizations
-- Select winning prompts from Release Hub
-- Mark prompts as production to make them available via SDK
-- Monitor post-deployment performance
+**No New Tools to Learn**: Everything happens through GitHub pull requests. Your team already knows how to review and merge PRs, so there's no learning curve.
 
+**Your Standards Apply**: Just like with human teammates, you review the changes, ask questions if needed, and merge when you're satisfied. You maintain complete control over what goes into production.
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/ci:cd.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+**Continuous Improvement**: Unlike human engineers who need sleep, your autonomous engineer works around the clock. Your AI gets better continuously without you having to think about it, freeing you to focus on building new features rather than maintaining existing ones.
 
-## Optimization Capabilities
+## Real Impact on Your Development
 
-### Prompt Engineering Automation
+Teams using autonomous AI fixes report a fundamental shift in how they work with AI. Instead of spending 30-40% of their time on AI maintenance and prompt engineering, they focus on building features. Quality issues get caught and fixed automatically, often before they significantly impact users.
 
-**Automatic Improvements:**
-- **Quality enhancement**: Fix issues identified by evaluators
-- **Context optimization**: Improve how prompts use available context
-- **Format refinement**: Optimize output structure and formatting
-- **Tone adjustment**: Fine-tune communication style for better user experience
-- **Error reduction**: Specifically target and eliminate common failure patterns
+The autonomous engineer learns your AI's patterns and becomes more effective over time. It understands what types of fixes work for your specific use cases and generates increasingly targeted solutions.
 
-### Advanced Testing Strategies
-
-**Comprehensive Evaluation:**
-- **Performance metrics**: Response quality, accuracy, helpfulness
-- **Business metrics**: User satisfaction, conversion rates, engagement
-- **System metrics**: Response time, token usage, reliability
-- **Comparative analysis**: Side-by-side evaluation of prompt variations
-- **Long-term tracking**: Monitor optimization impact over time
-
-### Deployment Flexibility
-
-**Integration Options:**
-- **Manual selection**: Review and select optimizations for deployment via Release Hub
-- **SDK integration**: Fetch deployed prompts directly in your application code
-- **Version management**: Track, compare, and rollback prompt versions
+Most importantly, you sleep better. No more 2 AM alerts about AI quality issues. No more weekend debugging sessions. Your autonomous engineer handles the monitoring and fixing while you focus on what matters most—growing your product.
 
 ## Get Started
 
-Ready to optimize your AI systems? Start with our quickstart guide:
+Ready to stop being your AI's on-call engineer?
 
 <Cards.Card title="Autonomous AI Fixes Quickstart" href="/optimization/quickstart" arrow />
 
-Need help setting up AI optimization? Check out our [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) or [Contact Us](/contact). 
+Set up your autonomous engineer in under 10 minutes and start receiving pull requests with proven AI improvements.

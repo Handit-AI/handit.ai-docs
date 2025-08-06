@@ -8,372 +8,123 @@ import { Steps } from "nextra/components"
 
 # Evaluation Quickstart
 
-> **Give your autonomous engineer the data it needs to detect issues and create fixes.** This guide walks you through setting up comprehensive quality assessment that powers autonomous optimization.
+> **Give your autonomous engineer the data it needs to detect issues and create fixes.** Set up comprehensive AI quality assessment in under 5 minutes to enable autonomous optimization.
+
+Transform your AI from producing unknown quality to having continuous quality monitoring that powers autonomous improvement.
 
 <Callout type="info">
-  **Already set up Handit?** If you followed our [Main Quickstart](/quickstart), evaluation is already working. This page explains how to view and understand your evaluation data.
+  **Prerequisites**: You need Node.js installed and a [Handit.ai Account](https://beta.handit.ai). If you want the complete setup including tracing and autonomous fixes, use our [Main Quickstart](/quickstart) instead.
 </Callout>
 
-## Quick Setup with CLI (Recommended)
+## Setting Up Evaluation
 
-### Step 1: Run Evaluators Setup
+Getting comprehensive AI evaluation running is straightforward with the Handit CLI. The CLI will connect evaluation models, configure quality assessments, and set up the monitoring your autonomous engineer needs.
+
+### Step 1: Install the Handit CLI
+
+```bash filename="terminal"
+npm install -g @handit.ai/cli
+```
+
+### Step 2: Set Up Your Evaluators
+
+Navigate to your AI project directory and run:
 
 ```bash filename="terminal"
 handit-cli evaluators-setup
 ```
 
 The CLI will guide you through:
-- **Connecting evaluation models** (OpenAI, Together AI, etc.)
-- **Adding AI model tokens** for evaluation
-- **Connecting existing evaluators** to your LLM nodes
-- **Setting evaluation percentages** and priorities
+- **Model connection** - Connect evaluation models like GPT-4 or Llama for quality assessment
+- **Evaluator association** - Link existing evaluators to your AI components
+- **Evaluation configuration** - Set what percentage of interactions to evaluate
+- **Quality dimensions** - Configure completeness, accuracy, empathy, and custom metrics
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px' }}
+>
+  <source src="/assets/quickstart/evaluators-setup.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
 
 <Callout type="success">
-  **That's it!** Your evaluation system is now active and will start assessing your AI outputs automatically.
+  **Setup Complete!** Your evaluation system is now active and will start assessing your AI outputs automatically. Quality scores will appear in your dashboard within minutes.
 </Callout>
 
-### Step 2: Monitor Evaluation Results
+## Understanding Your Evaluation Data
 
-View real-time evaluation results in your dashboard:
+Once evaluation is active, you'll start seeing quality insights that your autonomous engineer uses to detect issues and create improvements:
 
-**Real-Time Monitoring:**
-- Go to **Tracing** tab to see individual evaluation scores
-- Monitor quality trends in **Agent Performance** dashboard
+**Real-Time Quality Monitoring**: Your dashboard shows live evaluation scores as your AI processes requests. You can see how individual interactions perform and spot quality trends as they develop, giving your autonomous engineer the data it needs to identify problems quickly.
+
+**Quality Pattern Recognition**: The Agent Performance section reveals patterns in your AI's quality over time. Your autonomous engineer analyzes these patterns to understand when quality drops, what causes failures, and which improvements would have the biggest impact.
+
+**Individual Interaction Analysis**: Click on specific interactions to see detailed evaluation breakdowns. You'll see exactly why an interaction received particular scores, providing the evidence your autonomous engineer uses to generate targeted fixes.
 
 ![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
-**Quality Analytics:**
-- Access **Agent Performance** for trends across different quality dimensions
-- Understand which aspects are performing well or need attention
+**Quality Dimension Breakdown**: Rather than generic "good" or "bad" scores, you'll see specific assessments across different quality dimensions—completeness, accuracy, empathy, format compliance, and any custom evaluators you've configured. This granular data helps your autonomous engineer understand exactly what needs improvement.
 
-![Agent Performance Dashboard](/assets/overview/general-handit.png)
+## How Your Autonomous Engineer Uses Evaluation Data
 
-## Manual Setup (Advanced)
+Your evaluation data becomes the foundation for autonomous improvement:
 
-If you prefer manual configuration or need custom setups, follow these detailed steps:
+**Issue Detection**: By continuously monitoring quality scores, your autonomous engineer identifies when performance drops, which interactions fail, and what patterns indicate systemic problems.
 
-<Steps>
-### Connect Model Tokens
-Add your evaluation models (GPT-4, Llama, etc.) to the platform
+**Root Cause Analysis**: Detailed evaluation breakdowns help your autonomous engineer understand whether issues stem from prompt problems, logic errors, or missing context, enabling targeted rather than generic fixes.
 
-### Create Single-Purpose Evaluators  
-Design focused evaluators that check ONE specific quality aspect
+**Fix Validation**: Before creating pull requests, your autonomous engineer tests potential improvements against historical evaluation data to ensure fixes actually solve quality problems.
 
-### Associate Evaluators to LLM Nodes
-Connect your evaluators to the AI functions you want to assess
+**Continuous Learning**: As fixes get deployed, new evaluation data shows their effectiveness, helping your autonomous engineer learn what types of improvements work best for your specific AI system.
 
-### Monitor Results
-View evaluation results and quality insights in real-time
-</Steps>
+## Viewing Your Quality Insights
 
-<Callout type="warning">
-  **Critical Best Practice**: Create separate evaluators for each quality aspect (completeness, accuracy, format, etc.). Don't try to evaluate multiple things in one prompt—this reduces effectiveness and clarity.
-</Callout>
+Your evaluation data appears in the Handit dashboard immediately:
 
-## Step 1: Connect Model Tokens
+### Quality Trends Dashboard
+Go to your [Handit Dashboard](https://beta.handit.ai) to see quality trends over time. You'll see success rates, average scores across different quality dimensions, and can identify when quality issues started occurring.
 
-Connect the AI models that will act as "judges" to evaluate your LLM responses.
+### Interaction-Level Analysis
+Click on individual interactions to see complete evaluation details. You can analyze why specific responses received particular scores and understand exactly what your AI is doing well or poorly.
 
-### Navigate to Model Tokens
-- Go to your Handit.ai dashboard
-- Click **Settings** → **Model Tokens**
-- Click **Add New Token**
+### Evaluator Performance
+Monitor how different evaluators perform and adjust their evaluation percentages based on the insights they provide. Some evaluators might catch critical issues that others miss.
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+## Advanced Evaluation Setup
 
-Add your OpenAI or Together AI credentials to connect evaluation models.
+Once you have basic evaluation running, you can enhance your quality monitoring:
 
-<Callout type="success">
-  **Recommended Models**: GPT-4o (highest accuracy), GPT-3.5-turbo (cost-effective), Llama v4 Scout (open source alternative)
-</Callout>
+**Custom Evaluators**: Create evaluators specific to your use case. If you're building a customer service AI, you might want evaluators for politeness, problem resolution, and brand voice consistency.
 
-## Step 2: Create Single-Purpose Evaluators
+**Evaluation Percentages**: Start with 10-20% evaluation coverage for cost-effectiveness, then adjust based on your quality requirements and traffic patterns.
 
-Create focused evaluators in the Evaluation Suite. Remember: **one evaluator = one quality aspect**.
-
-### Navigate to Evaluation Suite
-- Go to **Evaluation** → **Evaluation Suite**
-- Click **Create New Evaluator**
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/evaluator_creation.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-### Example 1: Completeness Evaluator
-
-**Evaluation Prompt:**
-```
-You are evaluating whether an AI response completely addresses the user's question.
-
-Focus ONLY on completeness - ignore other quality aspects.
-
-User Question: {input}
-AI Response: {output}
-
-Rate on a scale of 1-10:
-1-2 = Missing major parts of the question
-3-4 = Addresses some parts but incomplete
-5-6 = Addresses most parts adequately  
-7-8 = Addresses all parts well
-9-10 = Thoroughly addresses every aspect
-
-Provide your score and brief reasoning.
-
-Output format:
-Score: [1-10]
-Reasoning: [Brief explanation]
-```
-
-### Example 2: Hallucination Detection Evaluator
-
-**Evaluation Prompt:**
-```
-You are checking if an AI response contains hallucinations or made-up information.
-
-Focus ONLY on factual accuracy - ignore other aspects like tone or completeness.
-
-User Question: {input}
-AI Response: {output}
-
-Rate on a scale of 1-10:
-1-2 = Contains obvious false information
-3-4 = Contains questionable claims
-5-6 = Mostly accurate with minor concerns
-7-8 = Accurate information
-9-10 = Completely accurate and verifiable
-
-Output format:
-Score: [1-10]
-Reasoning: [Brief explanation of any concerns]
-```
-
-### Example 3: Format Compliance Evaluator
-
-**Evaluation Prompt:**
-```
-You are checking if an AI response follows the required format guidelines.
-
-Focus ONLY on format compliance - ignore content quality.
-
-User Question: {input}
-AI Response: {output}
-Expected Format: [Professional tone, structured paragraphs, proper punctuation]
-
-Rate on a scale of 1-10:
-1-2 = Poor formatting, unprofessional
-3-4 = Some format issues
-5-6 = Acceptable formatting
-7-8 = Good formatting
-9-10 = Perfect format compliance
-
-Output format:
-Score: [1-10]
-Reasoning: [Brief format assessment]
-```
-
-<Callout type="info">
-  **Why Separate Evaluators?** Each evaluator focuses on one aspect, making evaluation more reliable and providing clear insights. You can see exactly which quality dimensions are performing well or need attention.
-</Callout>
-
-## Step 3: Associate Evaluators to LLM Nodes
-
-Connect your evaluators to the specific LLM nodes you want to monitor.
-
-### Find Your LLM Nodes
-- Go to **Tracing** → **Nodes**
-- Identify the LLM nodes you want to evaluate (e.g., "customer-response-generation")
-
-### Associate Evaluators
-- Click on your target LLM node
-- Navigate to **Evaluation** tab
-- Click **Add Evaluator**
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/associate_evaluator.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-### Configure Evaluation Settings
-
-For each evaluator you want to associate:
-
-```
-Evaluator: "Response Completeness Check"
-Evaluation Percentage: 10% (start small)
-Priority: Normal
-```
-
-```
-Evaluator: "Hallucination Detection"  
-Evaluation Percentage: 15% (higher for critical accuracy)
-Priority: High
-```
-
-```
-Evaluator: "Format Compliance"
-Evaluation Percentage: 5% (lower for less critical aspects)
-Priority: Normal
-```
-
-<Callout type="tip">
-  **Sampling Strategy**: Start with 5-15% evaluation percentage. You can always increase it later. Use higher percentages for critical quality aspects.
-</Callout>
-
-### Save Configuration
-- Review your evaluator associations
-- Click **Save** to activate evaluation
-
-## Step 4: Monitor Evaluation Results
-
-**Your evaluation system is now active!** Here's how to monitor the results.
-
-### Real-Time Monitoring
-- Go to **Tracing** tab in your dashboard
-- View evaluation scores as they happen
-- Monitor quality trends across different aspects
-
-![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
-
-### Quality Analytics
-- Access **Agent Performance** tab in your dashboard
-- View trends for each agent with their associated evaluators
-- Understand which quality aspects are performing well or need attention for each agent
-
-![Agent Performance Dashboard](/assets/overview/general-handit.png)
-
-### Sample Result Display
-
-## Additional Evaluator Examples
-
-### Customer Service Evaluators
-
-**Empathy Evaluator:**
-```
-Focus: Does the response show understanding and care for the customer's situation?
-Scale: 1-10 (1-2=cold/robotic, 9-10=highly empathetic)
-```
-
-**Solution Clarity Evaluator:**
-```
-Focus: Are the solution steps clear and easy to follow?
-Scale: 1-10 (1-2=confusing steps, 9-10=crystal clear instructions)
-```
-
-**Policy Compliance Evaluator:**
-```
-Focus: Does the response follow company policies and guidelines?
-Scale: 1-10 (1-2=policy violations, 9-10=perfect compliance)
-```
-
-### Technical Support Evaluators
-
-**Technical Accuracy Evaluator:**
-```
-Focus: Is the technical information provided correct?
-Scale: 1-10 (1-2=incorrect technical details, 9-10=completely accurate)
-```
-
-**Safety Check Evaluator:**
-```
-Focus: Are the suggested actions safe and won't cause system damage?
-Scale: 1-10 (1-2=potentially dangerous, 9-10=completely safe)
-```
-
-**Troubleshooting Flow Evaluator:**
-```
-Focus: Does the response follow logical troubleshooting steps?
-Scale: 1-10 (1-2=illogical flow, 9-10=perfect troubleshooting sequence)
-```
-
-## Best Practices
-
-<div className="grid grid-cols-2 gap-4 mt-4">
-  <div>
-    <h4>✅ Do's</h4>
-    - Create one evaluator per quality aspect
-    - Use clear, specific evaluation criteria
-    - Start with lower evaluation percentages
-    - Focus on business-critical quality dimensions
-    - Test evaluators before deploying
-  </div>
-  <div>
-    <h4>❌ Don'ts</h4>
-    - Combine multiple quality checks in one evaluator
-    - Use vague evaluation criteria
-    - Evaluate 100% of traffic initially
-    - Ignore the results without taking action
-    - Create overly complex evaluation prompts
-  </div>
-</div>
+**Model Selection**: Use GPT-4 for highest accuracy evaluation, or GPT-3.5-turbo for cost-effective quality monitoring. The CLI helps you configure the right balance.
 
 ## Next Steps
 
-- Set up [Optimization](/optimization) to automatically improve your prompts
-- Explore [Advanced Evaluation Features](/evaluation/evaluation_features/llm_as_judges)
-- Configure [Custom Evaluators](/evaluation/evaluation_features/custom_evaluators)
-- Visit [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for assistance
+Your AI now has comprehensive quality monitoring! Here's what you can do next:
+
+**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with proven improvements based on your evaluation data.
+
+**Set Up Tracing**: Add [Complete Tracing](/tracing/quickstart) to give your autonomous engineer full visibility into your AI's execution flow.
+
+**Create Custom Evaluators**: Build [Custom Quality Assessments](/evaluation/guide/custom_evaluators) tailored to your specific AI application.
 
 <Callout type="success">
-  **Congratulations!** You now have automated AI evaluation running on your production data in under 5 minutes using the CLI. Each evaluator will help you understand specific quality aspects. This evaluation data provides the foundation for AI optimization (covered in our [Autonomous AI Fixes Quickstart](/optimization/quickstart)).
+  **Your AI now has continuous quality monitoring!** Your autonomous engineer can detect quality issues automatically. Add GitHub integration to enable autonomous fixes based on this evaluation data.
 </Callout>
 
 ## Troubleshooting
 
-**CLI Setup Issues?**
-- Re-run `handit-cli evaluators-setup` to reconfigure
-- Ensure you have valid model API keys ready
-- Check that your Handit.ai account has access to evaluation features
+**CLI Setup Issues**: If you encounter problems during evaluator setup, ensure Node.js is installed and you have proper access to your project directory. Try running `handit-cli evaluators-setup` again to reconfigure.
 
-**Evaluations Not Running?**
-- Verify model tokens were properly configured during CLI setup
-- Check your model tokens have sufficient credits
-- Ensure the LLM node is actively receiving traffic
-- Confirm evaluation percentage is > 0%
+**No Evaluation Data**: If you're not seeing evaluation scores in the dashboard, verify that your AI is receiving traffic and that evaluation percentages are set above 0%.
 
-**Inconsistent Evaluation Scores?**
-- Review evaluator prompts for clarity and specificity
-- Consider if evaluation criteria are too subjective
-- Test evaluators with known good/bad examples
-- Focus on single quality aspects per evaluator
+**Model Token Issues**: If evaluation models aren't working, check that your API keys are valid and have sufficient credits. The CLI will help you reconfigure tokens if needed.
 
-## Next Steps
-
-Your autonomous engineer now has the evaluation data it needs to detect issues and create fixes:
-
-- **Enable Autonomous Fixes**: Set up [GitHub Integration](/optimization/quickstart) to complete your autonomous engineer
-- **Custom Quality Checks**: Create [Custom Evaluators](/evaluation/guide/custom_evaluators) for specialized quality assessment
-- **Advanced Features**: Explore [Evaluation Features](/evaluation/evaluation_features/overview) for comprehensive monitoring
-
-<Callout type="success">
-  **Your autonomous engineer can now see quality issues!** Next, enable autonomous fixes so it can automatically create PRs to resolve problems.
-</Callout>
-
-**Need Help?**
-- Check our [detailed evaluation guides](/evaluation/evaluation_features/overview)
-- Visit [Support](/more/contact) for assistance
-- Join our [Discord community](https://discord.gg/wZbW9Bu5) 
+For additional help, check our [detailed evaluation guides](/evaluation/guide/cli_setup) or visit our [Support page](/more/contact) for assistance.

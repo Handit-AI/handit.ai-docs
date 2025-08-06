@@ -247,44 +247,26 @@ retrieveKnowledge = traceAgentNode({
 
 ## CLI Management Commands
 
-### Updating Configuration
+### Managing Your Setup
+
+If you need to update your tracing configuration or fix issues:
 
 ```bash
-# Regenerate configuration with new settings
-handit-cli setup --update
-
-# Add tracing to new agent functions
-handit-cli setup --scan-new
-
-# Update SDK to latest version
-handit-cli setup --upgrade-sdk
+# Re-run setup to update configuration
+handit-cli setup
 ```
 
-### Validating Setup
+The CLI will:
+- Detect any changes in your codebase
+- Update tracing configuration as needed
+- Regenerate integration code if necessary
+- Test the connection to Handit.ai
 
-```bash
-# Test tracing configuration
-handit-cli validate
-
-# Check connection to Handit.ai
-handit-cli test-connection
-
-# View generated file summary
-handit-cli setup --show-files
-```
-
-### Debugging Issues
-
-```bash
-# Enable verbose logging
-handit-cli setup --verbose
-
-# Generate debug report
-handit-cli diagnose
-
-# Reset configuration
-handit-cli setup --reset
-```
+**When to re-run setup:**
+- After adding new agent functions
+- When changing your project structure
+- If tracing stops working
+- To update to latest SDK version
 
 ## Integration Patterns
 

@@ -1,5 +1,5 @@
 ---
-title: 'CLI & GitHub Integration Setup'
+title: 'Connect GitHub for Autonomous AI Fixes'
 sidebarTitle: 'CLI & GitHub Setup'
 ---
 
@@ -8,271 +8,133 @@ import { Steps } from "nextra/components"
 
 # Connect GitHub for Autonomous AI Fixes
 
-> **Turn Handit into your autonomous AI engineer.** Connect GitHub so Handit can automatically detect issues, write fixes, and ship pull requests with improved AI code—all while you sleep.
+> **Transform Handit into your autonomous AI engineer.** Connect GitHub so Handit can automatically detect issues, create fixes, and ship pull requests with improved AI code—all while you focus on building features.
 
 <Callout type="info">
-  **Prerequisites**: You need the Handit CLI installed, a GitHub repository, and your AI running with Handit evaluation. If you haven't set up Handit yet, start with our [Main Quickstart](/quickstart).
+  **Prerequisites**: You need the Handit CLI installed and your AI running with Handit evaluation. If you haven't set up Handit yet, start with our [Main Quickstart](/quickstart).
 </Callout>
 
 ## Why Connect GitHub?
 
-**Stop being your AI's on-call engineer.** With GitHub integration, Handit becomes an autonomous team member that:
+Imagine having a dedicated engineer whose only job is to monitor your AI and fix issues as they arise. That's exactly what connecting GitHub to Handit gives you—an autonomous team member that works 24/7 to keep your AI performing at its best.
 
-- **Detects issues automatically** - Monitors your AI 24/7 for failures and performance drops
-- **Writes fixes that work** - Generates improved prompts tested on real production data  
-- **Ships pull requests** - Creates PRs with proven fixes directly in your repository
-- **Uses your workflow** - Integrates with your existing code review and deployment process
-- **Works while you sleep** - Wake up to PRs with validated AI improvements
+Without GitHub integration, Handit can detect issues and generate fixes, but you still need to manually implement them. With GitHub connected, Handit becomes truly autonomous: it detects problems, creates proven solutions, and delivers them as pull requests ready for your review and deployment.
 
-## Quick Setup
+**The transformation is remarkable.** Instead of waking up to alerts about AI quality issues, you wake up to pull requests with validated fixes. Instead of spending your weekends debugging prompts, you spend five minutes reviewing and merging improvements that have already been tested on real data.
 
-### Step 1: Run GitHub Setup Command
+## Setting Up Your Autonomous Engineer
+
+Getting your autonomous engineer connected to GitHub takes just a few minutes:
 
 ```bash filename="terminal"
 handit-cli github
 ```
 
-The CLI will guide you through an interactive setup:
+The CLI will guide you through an interactive setup process. First, it helps you select which repository contains your AI code and confirms you have the necessary permissions to install GitHub apps.
 
-<Steps>
-### Repository Selection
-- Choose the repository where your AI agent code lives
-- Confirm you have admin access to install GitHub apps
-- Select the branch for pull requests (usually `main` or `develop`)
+Next, the CLI opens your browser to install the Handit GitHub app on your repository. This app allows your autonomous engineer to create pull requests, read your code structure, and update prompt files when fixes are validated.
 
-### GitHub App Installation
-- The CLI opens your browser to install the Handit GitHub app
-- Grant permissions for repository access and PR creation
-- Confirm the installation was successful
+Finally, the setup configures which of your AI components should trigger automated pull requests and sets quality thresholds to ensure only meaningful improvements generate PRs.
 
-### Optimization Configuration
-- Configure which LLM nodes should trigger automated PRs
-- Set quality thresholds for creating optimizations
-- Choose PR creation preferences (immediate vs batched)
+<Callout type="tip">
+  **Repository Access**: You'll need admin access to install the GitHub app. If you don't have admin permissions, ask a repository administrator to run the setup or temporarily grant you the necessary permissions.
+</Callout>
 
-### Test Connection
-- The CLI verifies the GitHub integration is working
-- Creates a test branch to confirm permissions
-- Shows you where to monitor optimization status
-</Steps>
+## How Your Autonomous Engineer Creates Pull Requests
 
-## How Your Autonomous Engineer Works
+Once connected, your autonomous engineer operates with impressive sophistication. When it detects a quality issue—say, your customer service AI's empathy scores drop significantly—it doesn't just alert you. Instead, it investigates.
 
-### The Automated Fix Pipeline
+**Analysis and Fix Generation**: Your autonomous engineer analyzes recent interactions to understand what changed. Maybe customer complaints became more complex, or your system prompt doesn't handle frustrated users well. Based on this analysis, it generates an improved prompt that specifically addresses the identified issues.
 
-```mermaid
-graph TD
-    A[🔍 Detects AI failure] --> B[🧠 Analyzes root cause]
-    B --> C[⚡ Generates fix]
-    C --> D[✅ Tests on real data]
-    D --> E[📋 Creates pull request]
-    E --> F[👀 You review & merge]
-    F --> G[🚀 Fix deployed automatically]
+**Rigorous Testing**: Before creating any pull request, your autonomous engineer tests its fix thoroughly. It runs hundreds of real user interactions through both your current prompt and the improved version, measuring the difference in quality scores. Only when it achieves statistical confidence that the fix genuinely improves performance does it proceed.
+
+**Professional Pull Requests**: When a fix is validated, your autonomous engineer creates a detailed pull request that explains what was wrong, how the fix addresses it, and provides concrete evidence of improvement. The PR includes before/after metrics, example interactions that improved, and clear explanations of the changes made.
+
+## What Your Pull Requests Look Like
+
+Here's an example of what you'll receive when your autonomous engineer detects and fixes an issue:
+
+```markdown
+## 🤖 Autonomous AI Fix: Improve Customer Service Empathy
+
+### Issue Detected
+Empathy scores dropped from 4.2/5.0 to 3.7/5.0 over the past week, 
+causing a 15% decrease in customer satisfaction scores.
+
+### Root Cause Analysis  
+The system prompt lacks emotional context for handling frustrated customers. 
+Recent interactions show the AI providing technically correct but emotionally 
+tone-deaf responses to upset users.
+
+### Fix Applied
+Updated `src/agents/customer_service/system_prompt.py` to include:
+- Emotional awareness guidelines for frustrated customers
+- Specific language patterns for empathetic responses
+- Context preservation for emotional state throughout conversations
+
+### Validation Results
+- Empathy Score: 3.7/5.0 → 4.6/5.0 (+24% improvement)
+- Customer Satisfaction: 78% → 89% (+11% improvement)  
+- Statistical Confidence: 95% (tested on 500 real interactions)
+- No negative impact on response time or accuracy
+
+### Files Changed
+- `src/agents/customer_service/system_prompt.py`
+
+Ready to merge when you approve!
 ```
 
-### What the Pull Requests Look Like
+This level of detail means you can quickly understand the change, verify it makes sense for your use case, and merge with confidence.
 
-When your autonomous engineer detects an issue and creates a fix, you'll get a PR like this:
+## Integration with Your Workflow
 
-```diff
-# 🤖 Autonomous Fix: Customer Service Response Quality
+Your autonomous engineer seamlessly integrates with your existing development process. Pull requests from your autonomous engineer work exactly like those from human teammates—they trigger your CI/CD pipelines, run your tests, and follow your code review requirements.
 
-## Issue Detected
-❌ Customer service AI giving incomplete responses (detected at 2:14 AM)
-📊 Quality score dropped to 3.2/5.0 over 247 interactions
+**Repository Structure Flexibility**: Your autonomous engineer adapts to however you organize your code. Whether your prompts are in separate files, embedded in your application code, or part of a larger monorepo, it learns your structure and makes appropriate updates.
 
-## Fix Applied
-✅ Improved system prompt for better completeness and empathy
-🧪 Tested on 1,247 real customer interactions
-📈 Quality improved to 4.8/5.0 (+50% improvement)
+**CI/CD Compatibility**: The pull requests work with GitHub Actions, CircleCI, Jenkins, or any other CI/CD system you use. You can add specific validation steps for AI changes, require certain team members to review AI improvements, or automatically deploy changes that pass your tests.
 
-## Code Changes
+**Branch Protection**: Your autonomous engineer respects your branch protection rules. If you require reviews before merging to main, it will create PRs that wait for approval. If you have required status checks, the PRs will wait for those to pass.
 
-### Before (causing incomplete responses)
-- prompt = "You are a customer service agent. Help the customer."
+## Monitoring Your Autonomous Engineer
 
-### After (tested fix)
-+ prompt = """You are a caring customer service agent dedicated to providing complete, helpful responses.
-+ Always address every part of the customer's question and show genuine empathy.
-+ If you don't have complete information, explain what you do know and how to get more help."""
+You can track your autonomous engineer's work through several channels:
 
-## Validation Results
-✅ 95% statistical confidence
-✅ Tested on production data
-✅ No negative side effects detected
-✅ Ready for immediate deployment
-```
+**GitHub Activity**: All pull requests appear in your normal GitHub workflow. You'll see them in your PR list, receive notifications according to your GitHub settings, and can review them using GitHub's standard interface.
 
-**This is what it looks like to have an autonomous engineer on your team.**
+**Handit Dashboard**: The Agent Performance section shows when issues are detected and fixes are generated. You can see the quality trends that triggered each improvement and track the impact of merged changes over time.
 
-### Configuration Options
-
-The CLI allows you to customize the GitHub integration:
-
-**PR Creation Settings:**
-```bash
-# Create PRs immediately when optimizations are ready
-handit-cli github --pr-mode immediate
-
-# Batch multiple optimizations into single PRs
-handit-cli github --pr-mode batched
-
-# Only create PRs for high-confidence improvements
-handit-cli github --confidence-threshold 90
-```
-
-**Branch Management:**
-```bash
-# Set target branch for PRs
-handit-cli github --target-branch main
-
-# Configure PR branch naming pattern
-handit-cli github --branch-pattern "handit/optimization-{node-name}-{date}"
-```
-
-## Advanced Configuration
-
-### Works with Any Repository Structure
-
-The autonomous engineer adapts to your existing codebase:
-
-**Monorepo:**
-```
-my-app/
-├── agents/
-│   ├── customer-service/
-│   │   └── prompts.py  ← Handit updates this
-│   └── technical-support/
-│       └── prompts.py  ← And this
-├── handit.config.json
-└── package.json
-```
-
-**Separate AI Service:**
-```
-ai-service/
-├── src/
-│   ├── prompts/  ← Handit finds and updates these
-│   └── agents/
-├── handit.config.json
-└── requirements.txt
-```
-
-### Integrates with Your CI/CD
-
-Handit PRs work with your existing GitHub Actions, CircleCI, or any CI/CD system:
-
-```yaml filename=".github/workflows/ai-validation.yml"
-name: Validate AI Changes
-on:
-  pull_request:
-    branches: [main]
-
-jobs:
-  validate-ai-changes:
-    if: contains(github.head_ref, 'handit/fix')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Test AI changes
-        run: npm test -- --ai-validation
-```
-
-## Monitoring and Management
-
-### Dashboard Monitoring
-
-Track your GitHub integration in the Handit dashboard:
-
-**Optimization Status:**
-- View pending optimizations waiting for PR creation
-- Monitor PR creation success/failure rates
-- Track merge rates and deployment success
-
-**Repository Health:**
-- Check GitHub app permissions and status
-- Monitor API rate limits and usage
-- View integration logs and errors
-
-### CLI Management Commands
-
-```bash
-# Check GitHub integration status
-handit-cli github --status
-
-# Update GitHub app permissions
-handit-cli github --update-permissions
-
-# Disconnect GitHub integration
-handit-cli github --disconnect
-
-# Re-sync repository configuration
-handit-cli github --sync
-```
+**Release Hub**: Provides detailed analysis of each fix, including the A/B test results that validated the improvement. This gives you full transparency into how your autonomous engineer makes decisions and ensures you understand the reasoning behind each change.
 
 ## Security and Permissions
 
-### Required GitHub Permissions
+Your autonomous engineer operates with carefully limited permissions designed to enable its work while maintaining security:
 
-The Handit GitHub app requires these permissions:
+**Repository Access**: The GitHub app can read your repository structure and create pull requests, but it cannot merge changes or access sensitive information like secrets or environment variables.
 
-- **Repository contents**: Read/write to create and modify files
-- **Pull requests**: Create and manage pull requests
-- **Repository metadata**: Read repository information
-- **Checks**: Create status checks on PRs (optional)
+**File Modifications**: Your autonomous engineer only modifies prompt-related files that you've configured during setup. It cannot change application logic, dependencies, or configuration files beyond the specific AI prompts it's designed to improve.
 
-### Security Best Practices
+**Review Requirements**: All changes go through your standard code review process. Your autonomous engineer cannot bypass branch protection rules or merge its own changes—you maintain complete control over what goes into production.
 
-<div className="grid grid-cols-2 gap-4 mt-4">
-  <div>
-    <h4>✅ Recommended Settings</h4>
-    - Enable branch protection rules
-    - Require PR reviews before merging
-    - Use status checks for validation
-    - Limit GitHub app access to specific repositories
-  </div>
-  <div>
-    <h4>🔒 Security Considerations</h4>
-    - Review all PR changes before merging
-    - Set up alerts for unexpected changes
-    - Regularly audit GitHub app permissions
-    - Use separate repositories for sensitive code
-  </div>
-</div>
+## Advanced Configuration
+
+Most teams find the default configuration works well, but you can customize your autonomous engineer's behavior through the Handit dashboard:
+
+**Quality Thresholds**: Adjust how significant an improvement must be before a pull request is created. Higher thresholds mean fewer but more impactful PRs, while lower thresholds catch smaller issues more quickly.
+
+**PR Timing**: Choose whether to create pull requests immediately when fixes are validated or batch multiple improvements together for less frequent but more comprehensive updates.
+
+**Repository Settings**: Specify which files your autonomous engineer should monitor and update, set target branches for pull requests, and configure integration with your specific CI/CD requirements.
 
 ## Troubleshooting
 
-### Common Setup Issues
+**Setup Issues**: If the GitHub integration fails during setup, ensure you have admin access to the repository and that your organization allows third-party GitHub apps. Re-running `handit-cli github` will guide you through any missing steps.
 
-**GitHub app installation fails:**
-- Ensure you have admin access to the repository
-- Check that your organization allows third-party apps
-- Try installing the app manually from the GitHub marketplace
+**Missing Pull Requests**: If you don't see pull requests after several days, it likely means your AI is performing well and no significant issues have been detected. Check your Agent Performance dashboard to confirm your quality metrics are stable.
 
-**PRs not being created:**
-- Verify the GitHub integration status: `handit-cli github --status`
-- Check repository permissions in GitHub settings
-- Ensure the target branch exists and is accessible
-- Confirm optimizations are being generated in the Release Hub
+**Permission Problems**: If pull requests fail to create, verify the Handit GitHub app still has the necessary permissions in your repository settings. Organization-level security policies sometimes change app permissions after installation.
 
-**Permission errors:**
-- Re-run the setup: `handit-cli github --update-permissions`
-- Check GitHub app installation in your repository settings
-- Verify you have write access to the target branch
-
-### Integration Issues
-
-**PRs created in wrong repository:**
-- Update repository configuration: `handit-cli github --set-repo owner/repo`
-- Check the repository URL in your local git config
-
-**Branch conflicts:**
-- Configure a different target branch: `handit-cli github --target-branch develop`
-- Set up automatic conflict resolution preferences
-
-**Rate limiting:**
-- Monitor API usage in the dashboard
-- Consider batching PRs: `handit-cli github --pr-mode batched`
+For additional help, our [support team](/more/contact) can assist with specific configuration questions or integration challenges.
 
 ## Your Autonomous Engineer is Ready
 
@@ -280,15 +142,8 @@ The Handit GitHub app requires these permissions:
   **Congratulations!** Your AI now has a dedicated autonomous engineer working 24/7. It will detect issues, write fixes, test them on real data, and create pull requests—all while you sleep.
 </Callout>
 
-**What happens next:**
-1. **Handit monitors your AI** continuously for any issues or performance drops
-2. **When problems are detected**, it automatically generates and tests fixes
-3. **You'll receive pull requests** with proven improvements ready to merge
-4. **Your AI gets better** automatically without you being on-call
+**What happens next**: Your autonomous engineer begins monitoring your AI immediately. When it detects quality issues, generates fixes, and validates improvements, you'll receive pull requests with proven enhancements ready for review and deployment.
 
-**No more 2am alerts. No more manual prompt engineering. Just wake up to better AI.**
+**No more 2 AM alerts. No more manual prompt engineering. Just wake up to better AI.**
 
-### Next Steps
-- Monitor your autonomous engineer in the **Release Hub**
-- Set up [CI/CD validation](/optimization/optimization_features/cicd_deployment) for extra safety
-- Explore [Advanced Features](/optimization/optimization_features/ab_testing) for more control
+Your days of being on-call for AI quality issues are over. Focus on building great products while your autonomous engineer handles the continuous improvement of your AI systems.

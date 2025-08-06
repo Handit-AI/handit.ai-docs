@@ -10,27 +10,33 @@ import { Cards } from 'nextra/components'
 
 # Tracing Features Overview
 
-> **Transform your AI agents from black boxes to fully observable systems.** Handit.ai's tracing features give you complete visibility into every operation, from the highest-level agent workflow to individual LLM calls and tool executions.
+> **Transform your AI agents from black boxes to fully observable systems.** Handit's tracing features provide complete visibility into every operation, from high-level agent workflows to individual LLM calls and tool executions.
 
-Handit.ai provides three core tracing capabilities that work together to give you comprehensive observability:
+Comprehensive tracing enables your autonomous engineer to understand exactly how your AI works, identify issues when they occur, and generate targeted improvements based on real behavior patterns.
 
-- **🤖 Agent Tracing** - The orchestrator that tracks your entire agent workflow from start to finish
-- **🧠 LLM Node Tracing** - The brain monitor that captures every AI model interaction with complete context  
-- **🛠️ Tool Tracing** - The action tracker that monitors every function and tool execution
+## Understanding AI Agent Observability
 
-## The Three Pillars of AI Agent Tracing
+AI agents are complex systems that orchestrate multiple operations—they make decisions, call language models, execute tools, and chain operations together. Without proper observability, debugging issues or optimizing performance becomes nearly impossible.
 
-### 🤖 Agent Tracing: The Complete Picture
+**Handit provides three complementary types of tracing** that work together to give you complete visibility into your AI's behavior:
 
-**What it does:** Wraps your entire agent workflow, creating the root trace that connects all operations together.
+**Agent Tracing** captures the big picture—your complete agent workflow from start to finish. This is like having a flight recorder for your entire AI system.
 
-**Perfect for:** Main agent functions, API endpoints, end-to-end monitoring, production workflows
+**LLM Node Tracing** provides detailed insight into every language model interaction, showing exactly what prompts were sent, what responses were received, and how your AI uses language models.
 
-**Key capabilities:**
-- Automatic operation linking - All child operations are automatically connected
-- Complete execution timeline - From first input to final output
-- Error propagation tracking - See how errors flow through your system
-- Performance overview - Total execution time and resource usage
+**Tool Tracing** monitors every function and API call your AI makes, capturing parameters, results, timing, and errors to help you understand when external operations cause problems.
+
+<Callout type="info">
+  These three tracing types work together automatically. When you trace an agent workflow, all LLM calls and tool executions within that workflow are captured with full context and linked together.
+</Callout>
+
+## Agent Tracing: The Complete Picture
+
+Agent tracing wraps your entire AI workflow, creating a comprehensive record of everything your agent does to process a request. This is typically what you'll apply to your main agent functions or API endpoints.
+
+**What gets captured**: The complete execution timeline from first input to final output, all child operations automatically linked together, error propagation through your system, and overall performance metrics.
+
+**Why it matters**: Agent tracing gives your autonomous engineer the big picture view it needs to understand how your AI system operates as a whole. When issues occur, it can see the complete context and understand how different components interact.
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
@@ -46,7 +52,7 @@ async def process_customer_request(request):
 </Tabs.Tab>
 <Tabs.Tab>
 ```javascript filename="processCustomerRequest.js"
-const processCustomerRequest = startAgentTracing(async (request) => {Add commentMore actions
+const processCustomerRequest = startAgentTracing(async (request) => {
     // Everything inside here is automatically traced
     const intent = await classifyIntent(request);
     const context = await searchKnowledgeBase(intent);
@@ -57,143 +63,102 @@ const processCustomerRequest = startAgentTracing(async (request) => {Add comment
 </Tabs.Tab>
 </Tabs>
 
-### 🧠 LLM Node Tracing: Understanding AI Decisions
+## LLM Node Tracing: Understanding AI Decisions
 
-**What it does:** Captures every interaction with language models, including prompts, responses, and performance metrics.
+LLM node tracing captures every interaction with language models, providing the detailed insight your autonomous engineer needs to understand how your AI uses language models and where improvements might be needed.
 
-**Perfect for:** GPT/Claude calls, prompt engineering, token usage monitoring, model performance analysis
+**What gets captured**: Complete prompt history with every prompt and response recorded, performance metrics including response time and token usage, model parameters and settings, and detailed error information when calls fail.
 
-**Key capabilities:**
-- Complete prompt history - Every prompt and response is recorded
-- Performance metrics - Response time, token usage, and costs
-- Model parameters - Temperature, max tokens, and other settings
-- Error handling - Failed calls and retry attempts
+**Why it matters**: Language model interactions are often the most critical and expensive part of AI systems. LLM node tracing helps your autonomous engineer understand prompt effectiveness, identify performance bottlenecks, and generate improvements to system prompts.
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
 ```python filename="classify_intent.py"
 @tracker.trace_agent_node("intent-classifier")
 async def classify_intent(user_message):
-    # LLM call is automatically captured with full contextAdd commentMore actions
+    # LLM call is automatically captured with full context
     response = await llm.generate(f"Classify intent: {user_message}")
     return response
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```javascript filename="classifyIntent.js"
-const classifyIntent = traceAgentNode({
-    agentNodeId: "intent-classifier",
-    callback: async (userMessage) => {
-        // LLM call is automatically captured with full context
-        const response = await llm.generate(`Classify intent: ${userMessage}`);
-        return response;
-    }
+const classifyIntent = traceAgentNode("intent-classifier", async (userMessage) => {
+    // LLM call is automatically captured with full context
+    const response = await llm.generate(`Classify intent: ${userMessage}`);
+    return response;
 });
 ```
 </Tabs.Tab>
 </Tabs>
 
-### 🛠️ Tool Tracing: Monitoring Actions
+## Tool Tracing: Monitoring External Operations
 
-**What it does:** Tracks every tool execution, from simple functions to complex API calls and database operations.
+Tool tracing monitors every function and API call your AI makes, helping your autonomous engineer understand when external operations cause problems or perform poorly.
 
-**Perfect for:** Custom functions, external API integrations, database queries, file processing
+**What gets captured**: Function parameters and return values, execution timing and performance data, error conditions and failure details, and API response codes and metadata.
 
-**Key capabilities:**
-- Function monitoring - Input parameters and return values
-- Execution timing - How long each operation takes
-- Error tracking - Detailed error context and stack traces
-- Resource usage - Memory, CPU, and network utilization
+**Why it matters**: Tools and external functions are common sources of AI system issues. Tool tracing helps your autonomous engineer identify when external operations are slow, unreliable, or returning unexpected data that affects your AI's performance.
 
 <Tabs items={['Python', 'JavaScript']}>
 <Tabs.Tab>
 ```python filename="search_knowledge_base.py"
-@tracker.trace_agent_node("knowledge-search")
+@tracker.trace_tool("knowledge-search")
 async def search_knowledge_base(query):
-    # Tool execution is captured with timing and results
-    results = await vector_db.similarity_search(query)
+    # Tool execution is automatically captured
+    results = await knowledge_api.search(query)
     return results
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```javascript filename="searchKnowledgeBase.js"
-const searchKnowledgeBase = traceAgentNode({
-    agentNodeId: "knowledge-search",
-    callback: async (query) => {
-        // Tool execution is captured with timing and results
-        const results = await vectorDb.similaritySearch(query);
-        return results;Add commentMore actions
-    }
+const searchKnowledgeBase = traceTool("knowledge-search", async (query) => {
+    // Tool execution is automatically captured
+    const results = await knowledgeApi.search(query);
+    return results;
 });
 ```
 </Tabs.Tab>
 </Tabs>
 
-## How They Work Together
+## How Tracing Enables Autonomous Improvement
 
-The three tracing types create a complete observability stack:
+Comprehensive tracing provides the foundation that enables your autonomous engineer to work effectively:
 
-<Steps>
-### Agent Tracing Creates the Foundation
-Your main agent function becomes the root trace that captures the entire workflow
+**Pattern Recognition**: By analyzing thousands of traces, your autonomous engineer identifies patterns in successful and failed interactions that would be impossible to spot manually.
 
-### LLM & Tool Tracing Add Detail
-Individual operations are automatically linked as child traces under the agent
+**Root Cause Analysis**: When issues occur, detailed trace data helps your autonomous engineer understand exactly what went wrong—whether it's a prompt issue, tool failure, or logic error.
 
-### Complete Visibility Emerges
-You get a hierarchical view showing exactly how your agent processes each request
-</Steps>
+**Performance Optimization**: Timing data from traces helps your autonomous engineer identify bottlenecks and generate improvements that address actual performance issues.
 
-**Example trace hierarchy:**
-```
-🤖 Customer Support Agent (2.3s)
-├── 🧠 Intent Classification (0.8s)
-├── 🛠️ Knowledge Search (0.9s)
-├── 🧠 Response Generation (0.6s)
-└── 🛠️ Response Validation (0.1s)
-```
+**Fix Validation**: Historical trace data allows your autonomous engineer to test potential improvements against real past interactions, ensuring fixes actually solve problems.
+
+## Real-World Benefits
+
+Teams using comprehensive tracing report significant improvements in their AI development and operations:
+
+**Faster Debugging**: Issues that used to take days to diagnose get resolved in hours because teams can see exactly what happened in production.
+
+**Better Performance**: Detailed timing and performance data enables targeted optimizations that actually improve user experience.
+
+**Confident Deployments**: Understanding exactly how changes affect AI behavior enables teams to deploy improvements with confidence.
+
+**Autonomous Improvement**: Comprehensive trace data enables autonomous engineers to generate meaningful improvements rather than generic fixes.
+
+## Getting Started with Tracing
+
+Ready to make your AI fully observable?
+
+<Cards.Card title="Main Quickstart - Includes Tracing" href="/quickstart" arrow />
+<Cards.Card title="Tracing Setup Guide" href="/tracing/quickstart" arrow />
+
+**Advanced Resources:**
+- [Agent Tracing Details](/tracing/tracing_features/agent)
+- [LLM Node Tracing](/tracing/tracing_features/llm_node) 
+- [Tool Tracing](/tracing/tracing_features/tool)
 
 <Callout type="success">
-  **Automatic correlation:** All operations are automatically linked together, so you can see the complete story of how your agent handled each request.
+  **Start with agent tracing** for your main AI workflows. LLM node and tool tracing will be captured automatically within those workflows, giving you complete observability with minimal setup.
 </Callout>
 
-## Why This Matters
-
-**🔍 Complete Visibility** - See every operation, understand execution flow, track data transformations
-
-**🐛 Faster Debugging** - Pinpoint exact failure locations, access complete error context, reduce debugging time from hours to minutes
-
-**⚡ Performance Optimization** - Identify bottlenecks, track resource usage, optimize prompts and model parameters
-
-**📊 Production Monitoring** - Monitor agent health, track success rates, get alerts for anomalies
-
-## Getting Started
-
-<Steps>
-### Choose Your Starting Point
-Pick the tracing type that matches your immediate needs
-
-### Implement Tracing
-Add decorators or wrappers to your agent functions
-
-### View Results
-See complete traces in your Handit.ai dashboard
-
-### Optimize & Scale
-Use insights to improve your agent's performance
-</Steps>
-
-<Callout type="tip">
-  **Start simple:** Begin with Agent Tracing for your main workflow, then add LLM and Tool tracing for detailed insights. You can implement tracing incrementally without disrupting your existing code.
-</Callout>
-
-## Explore Each Feature
-
-Ready to dive deeper into each tracing capability?
-
-- Learn about [Agent Tracing](/tracing/tracing_features/agent) for end-to-end workflow monitoring
-- Explore [LLM Node Tracing](/tracing/tracing_features/llm_node) for AI model interaction tracking
-- Check [Tool Tracing](/tracing/tracing_features/tool) for function and tool execution monitoring
-
-*Transform your AI agents from mysterious black boxes into fully observable, debuggable, and optimizable systems.*
-
+Transform your AI from a mysterious black box into a fully observable system that your autonomous engineer can continuously monitor and improve.

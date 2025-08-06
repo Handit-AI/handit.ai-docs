@@ -3,113 +3,127 @@ import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
 import { Cards } from 'nextra/components'
 
-# AI Agent Tracing
+# AI Agent Tracing Quickstart
 
-> **Complete visibility into your AI agents.** See exactly what your agents are doing, why they're failing, and how your autonomous engineer uses this data to create fixes.
+> **Give your autonomous engineer eyes to see your AI.** Set up comprehensive tracing in under 5 minutes to enable autonomous issue detection and fix generation.
+
+Transform your AI from a black box into a fully observable system that your autonomous engineer can continuously monitor and improve.
 
 <Callout type="info">
-  **Already set up Handit?** If you followed our [Main Quickstart](/quickstart), tracing is already working. This page explains what tracing captures and how to use the data.
+  **Prerequisites**: You need Node.js installed and a [Handit.ai Account](https://beta.handit.ai). If you want the complete setup including evaluation and autonomous fixes, use our [Main Quickstart](/quickstart) instead.
+</Callout>
+
+## Setting Up Tracing
+
+Getting tracing up and running is straightforward with the Handit CLI. The CLI will analyze your codebase, generate the necessary integration code, and set up comprehensive monitoring for your AI.
+
+### Step 1: Install the Handit CLI
+
+```bash filename="terminal"
+npm install -g @handit.ai/cli
+```
+
+### Step 2: Set Up Your Project
+
+Navigate to your AI project directory and run:
+
+```bash filename="terminal"
+handit-cli setup
+```
+
+The CLI will guide you through:
+- **Account connection** - Link your project to your Handit.ai account
+- **Codebase analysis** - Automatically detect your AI agent patterns and LLM calls
+- **Integration code generation** - Create tracing wrappers for your AI functions
+- **Configuration setup** - Generate environment variables and config files
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px' }}
+>
+  <source src="/assets/quickstart/cli-setup-app-2.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+<Callout type="success">
+  **Setup Complete!** Your AI now has comprehensive tracing active. Every interaction will be captured and visible in your dashboard within minutes.
 </Callout>
 
 ## What Tracing Captures
 
-When your autonomous engineer monitors your AI, it captures everything:
+Once active, your tracing system captures everything your autonomous engineer needs to understand your AI's behavior:
 
-- **Every LLM call** with exact prompts and responses
-- **All tool executions** and their results  
-- **Complete execution flow** from request to response
-- **Performance metrics** and timing data
-- **Error details** with full context
+**Complete Execution Flow**: Every step from user request to final response gets recorded, showing exactly how your AI processes requests and makes decisions.
 
-This data powers the autonomous issue detection and fix generation.
+**LLM Interactions**: All language model calls are captured with exact prompts sent, complete responses received, token usage, timing data, and any errors that occurred.
 
-## How to View Your Traces
+**Tool Executions**: When your AI calls external functions or APIs, tracing captures the parameters passed, results returned, execution timing, and any error conditions.
 
-Once tracing is active (via the [Main Quickstart](/quickstart)), you can view and analyze your AI's behavior:
+**Performance Metrics**: Detailed timing data shows where your AI spends time, helping identify bottlenecks and optimization opportunities.
 
-### 1. **Real-Time Monitoring**
-- Go to your [Handit Dashboard](https://beta.handit.ai)
-- View live traces as your AI processes requests
-- See performance metrics and success rates
+**Error Context**: When things go wrong, tracing provides complete context about what led to failures, making debugging precise rather than guesswork.
 
-### 2. **Trace Analysis**
-- Click on individual traces to see the complete execution flow
-- Analyze timing, inputs, outputs, and any errors
-- Understand how your AI makes decisions
+## Viewing Your Trace Data
 
-### 3. **Issue Detection**
-- Watch as the autonomous engineer identifies patterns
-- See which traces trigger quality concerns
-- Monitor how fixes improve performance over time
+Your tracing data appears in the Handit dashboard immediately:
 
-## What Makes Great Traces
+### Real-Time Monitoring
+Go to your [Handit Dashboard](https://beta.handit.ai) to see live traces as your AI processes requests. You'll see performance metrics, success rates, and can drill into individual interactions for detailed analysis.
 
-The autonomous engineer needs high-quality trace data to detect issues and generate fixes effectively:
+### Trace Analysis
+Click on individual traces to see the complete execution flow. You can analyze timing, inputs, outputs, and any errors to understand exactly how your AI behaves in different scenarios.
 
-### **📊 Comprehensive Coverage**
-- **Trace all critical paths** - Every user request should generate a complete trace
-- **Include context** - Capture user inputs, intermediate steps, and final outputs
-- **Track performance** - Monitor timing and resource usage
-- **Log errors** - Capture failures with full context for analysis
+### Pattern Recognition
+Watch as patterns emerge in your trace data. Your autonomous engineer uses these patterns to identify quality issues, performance problems, and optimization opportunities automatically.
 
-### **🔍 Rich Detail**
-- **LLM interactions** - Full prompts and responses for analysis
-- **Tool executions** - Parameters, results, and timing data
-- **Decision points** - Why your AI chose specific actions
-- **Data flow** - How information moves through your agent
+## Understanding Your Trace Data
 
-### **⚡ Real-Time Streaming**
-- **Live monitoring** - See traces as they happen
-- **Immediate detection** - Issues identified as they occur
-- **Fast feedback** - Quick iteration on improvements
+Your dashboard shows different types of traces that provide comprehensive visibility:
 
-## Understanding Your Traces
+**Agent Traces** show complete workflows from start to finish. You can see how your AI processes user requests, which tools and language models it calls, success and failure patterns, and where performance bottlenecks occur. These traces give you the big picture of how your AI operates.
 
-Your dashboard shows different types of traces that help the autonomous engineer understand your AI:
+**LLM Node Traces** capture individual language model interactions with remarkable detail. You'll see the exact prompts sent to models, complete responses received, token usage and costs, and response quality patterns. This granular view helps your autonomous engineer understand how your AI uses language models.
 
-### **🤖 Agent Traces**
-Complete workflows from start to finish showing:
-- How your AI processes user requests
-- Which tools and LLMs are called
-- Success/failure patterns
-- Performance bottlenecks
+**Tool Traces** record external function and API calls, showing what parameters were passed, what results were returned, execution timing, and any error conditions. When tools cause problems or perform poorly, these traces provide the evidence needed for improvement.
 
-### **🧠 LLM Node Traces**  
-Individual language model interactions showing:
-- Exact prompts sent to the model
-- Complete responses received
-- Token usage and costs
-- Response quality patterns
+**The key insight**: Your autonomous engineer analyzes all this trace data together to understand patterns, identify root causes of issues, and generate improvements that address specific problems rather than applying generic fixes.
 
-### **🛠️ Tool Traces**
-External function and API calls showing:
-- What parameters were passed
-- What results were returned
-- Execution timing
-- Error conditions
+## How Your Autonomous Engineer Uses Traces
 
-## How the Autonomous Engineer Uses Traces
+Your trace data becomes the foundation for autonomous improvement:
 
-Your traces power the autonomous issue detection and fix generation:
+**Pattern Recognition**: By analyzing thousands of traces, your autonomous engineer identifies patterns in successful and failed interactions that would be impossible to spot manually.
 
-1. **Pattern Recognition** - Identifies when traces show declining quality or increasing errors
-2. **Root Cause Analysis** - Pinpoints exactly which component is causing issues
-3. **Fix Generation** - Creates improved prompts based on successful vs failed traces
-4. **Validation** - Tests fixes against historical trace data before deployment
+**Root Cause Analysis**: When issues occur, detailed trace data helps your autonomous engineer understand exactly what went wrong—whether it's a prompt issue, tool failure, or logic error.
 
-![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
+**Fix Validation**: Historical trace data allows your autonomous engineer to test potential improvements against real past interactions, ensuring fixes actually solve problems before creating pull requests.
 
-## Need Manual Setup?
-
-If you need custom tracing configuration beyond the CLI setup, check our [Advanced Tracing Guide](/tracing/guide/cli_setup) for detailed manual integration steps.
+**Continuous Learning**: As fixes get deployed, new trace data shows their effectiveness, helping your autonomous engineer learn what types of improvements work best for your specific AI system.
 
 ## Next Steps
 
-- View your traces in the [Handit Dashboard](https://beta.handit.ai)
-- Set up [Evaluation](/evaluation/quickstart) to score trace quality
-- Enable [Autonomous Fixes](/optimization/quickstart) based on trace analysis
-- Explore [Advanced Tracing Features](/tracing/tracing_features/overview)
+Your AI is now fully observable! Here's what you can do next:
+
+**Set Up Evaluation**: Add [Quality Evaluation](/evaluation/quickstart) to score your AI's performance and enable your autonomous engineer to detect quality issues.
+
+**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with proven improvements.
+
+**Explore Advanced Features**: Learn about [Advanced Tracing Features](/tracing/tracing_features/overview) for comprehensive monitoring and debugging capabilities.
 
 <Callout type="success">
-  **Your AI is now fully observable!** The autonomous engineer can see everything your AI does and will automatically detect issues and create fixes based on this trace data.
+  **Your AI is now fully observable!** Your autonomous engineer can see everything your AI does. Add evaluation and optimization to complete your autonomous engineer setup.
 </Callout>
+
+## Troubleshooting
+
+**CLI Setup Issues**: If you encounter problems during setup, ensure Node.js is installed and you have proper access to your project directory. Try running `handit-cli setup` again to regenerate configuration.
+
+**No Trace Data**: If you're not seeing traces in the dashboard, verify that your generated integration code is being executed and that your API key was set correctly during setup.
+
+**Missing Traces**: If some interactions aren't being traced, check that the CLI-generated tracing code covers all your AI's entry points and main functions.
+
+For additional help, check our [detailed tracing guides](/tracing/guide/cli_setup) or visit our [Support page](/more/contact) for assistance.

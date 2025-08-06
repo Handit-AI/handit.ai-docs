@@ -8,68 +8,61 @@ import { Steps } from "nextra/components"
 
 # Autonomous AI Fixes Quickstart
 
-Set up your autonomous engineer in under 10 minutes. This guide shows you how to enable automated issue detection and fix generation that creates pull requests with proven improvements.
+Set up your autonomous engineer in under 10 minutes. Once configured, it will automatically detect quality issues in your AI, generate fixes, test them, and create pull requests with proven improvements.
 
 <Callout type="info">
   **Prerequisites**: You need active Handit.ai evaluation running on your LLM nodes. If you haven't set up evaluation yet, start with our [Main Quickstart](/quickstart).
 </Callout>
 
-## Quick Setup with CLI & GitHub (Recommended)
+## Setting Up Your Autonomous Engineer
 
-### Step 1: Set Up GitHub Integration
+Getting your autonomous engineer up and running is straightforward. The key is connecting it to your GitHub repository so it can create pull requests with fixes when issues are detected.
+
+### Connect to GitHub
+
+Run the GitHub integration command in your project directory:
 
 ```bash filename="terminal"
 handit-cli github
 ```
 
-The CLI will guide you through:
-- **Installing the Handit GitHub app** on your repository
-- **Configuring repository permissions** for automated PRs
-- **Setting up optimization models** if not already configured
-- **Enabling automated pull request creation** for optimizations
+The CLI will walk you through installing the Handit GitHub app on your repository and configuring the necessary permissions. This allows your autonomous engineer to create pull requests when it finds and validates fixes for quality issues.
 
 <Callout type="tip">
-  **Why GitHub Integration?** Your autonomous engineer creates pull requests with fixes when it detects quality issues. You review and merge the improvements you want—just like working with a human engineer.
+  **Why GitHub?** Your autonomous engineer works just like a human teammate—when it finds and tests a fix, it creates a pull request for you to review. You maintain complete control over what gets merged into your codebase.
 </Callout>
 
-### Step 2: Monitor and Deploy
-
-**Receive Automated Pull Requests:**
-- Your autonomous engineer creates PRs when fixes are ready
-- Review the exact changes to prompts and system configurations
-- Merge approved improvements through your normal workflow
-
-**Monitor in Dashboard:**
-- View autonomous engineer progress in **Agent Performance**
-- See detailed fix comparisons in **Release Hub**
+Once the setup completes, your autonomous engineer is active and monitoring your AI around the clock.
 
 <Callout type="success">
-  **Your autonomous engineer is now active!** It will automatically detect quality issues, generate fixes, test them, and create pull requests with proven improvements—24/7.
+  **Setup Complete!** Your autonomous engineer is now watching your AI's performance 24/7. When it detects issues, generates fixes, and validates improvements, you'll receive pull requests ready for review.
 </Callout>
 
-## Manual Setup (Alternative)
+## How Your Autonomous Engineer Operates
 
-If you prefer manual control over deployments, follow these steps:
+After setup, your autonomous engineer works continuously in the background without any intervention from you. Here's what happens:
 
-<Steps>
-### Connect Optimization Models
-Add AI models that will analyze problems and generate improved prompts
+**Continuous Quality Monitoring**: Your autonomous engineer monitors evaluation scores across all your AI interactions. When it notices patterns like declining empathy scores, accuracy drops, or response quality issues, it immediately begins investigating the root cause.
 
-### Monitor Optimization Results  
-View performance comparisons between current and optimized prompts
+**Intelligent Fix Generation**: Rather than just alerting you to problems, your autonomous engineer analyzes what's different between your successful and failed interactions. It then generates targeted improvements to your system prompts that address the specific issues it identified.
 
-### Deploy via Release Hub
-Mark winning prompts as production and fetch them via SDK
-</Steps>
+**Thorough Testing**: Before creating any pull requests, your autonomous engineer tests its fixes against real production data. It runs hundreds of actual user interactions through both your current prompt and the improved version, only proceeding when it has statistical confidence that the fix genuinely improves performance.
 
-## Step 1: Connect Optimization Models
+**Professional Pull Requests**: When a fix is validated, your autonomous engineer creates a detailed pull request that explains what was wrong, how the fix addresses it, and provides concrete evidence of improvement with before/after metrics.
 
-Connect the AI models that will analyze your evaluation data and generate optimized prompts.
+## A Day in the Life of Your Autonomous Engineer
 
-**1. Navigate to Optimization Settings**
-- Go to your Handit.ai dashboard
-- Click **Optimization** → **Settings** → **Model Tokens**
-- Click **Add Optimization Token** or select an existing token
+Here's what a typical issue detection and resolution cycle looks like:
+
+**Monday Morning**: Your autonomous engineer notices that customer service empathy scores have dropped from 4.2 to 3.7 over the weekend. It begins analyzing the failed interactions to understand why.
+
+**Monday Afternoon**: After analyzing patterns, it determines that the system prompt lacks emotional context for handling frustrated customers. It generates an improved prompt with better empathy guidelines.
+
+**Tuesday Morning**: The fix has been tested against 500 real customer interactions overnight. Results show a 24% improvement in empathy scores with 95% statistical confidence. Your autonomous engineer creates a pull request.
+
+**Tuesday**: You receive the PR notification, review the changes and metrics, and merge the improvement. Customer satisfaction scores begin improving immediately.
+
+**The Result**: What used to be a multi-day debugging process that required your direct involvement is now handled automatically while you focus on building new features.
 
 <video 
   width="100%" 
@@ -77,197 +70,50 @@ Connect the AI models that will analyze your evaluation data and generate optimi
   loop 
   muted 
   playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+  style={{ borderRadius: '8px' }}
 >
-  <source src="/assets/quickstart/model_token.mp4" type="video/mp4" />
+  <source src="/assets/quickstart/pr-review.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
-**2. Configure Your Optimization Model**
+## Monitoring Your Autonomous Engineer
 
-Select or configure your optimization model:
+You can track your autonomous engineer's work through the Handit dashboard:
 
-**3. Save Configuration**
-- Save the optimization token configuration
-- Self-improving AI automatically activates
+**Agent Performance**: Shows overall trends in your AI's quality metrics and highlights when issues are detected and resolved. You'll see clear before/after comparisons showing the impact of each fix.
 
-<Callout type="tip">
-  **Automatic Activation**: Once optimization tokens are configured, self-improving AI automatically begins analyzing your evaluation data and generating optimizations. No additional setup required!
-</Callout>
+**Release Hub**: Provides detailed analysis of each improvement, including the A/B test results that validated the fix before the pull request was created. This gives you full transparency into how your autonomous engineer makes decisions.
 
-## Step 2: Monitor Optimization Results
+**GitHub Integration**: All activity appears in your normal GitHub workflow. Pull requests from your autonomous engineer look and function exactly like those from human teammates, maintaining your existing code review and deployment processes.
 
-Your AI is now automatically generating and testing improved prompts. Monitor the results in two places:
+## What to Expect
 
-**1. Agent Performance Dashboard**
-- Go to **Agent Performance** 
-- View how your agents and LLM nodes are performing
-- Compare current vs optimized versions
+Your autonomous engineer typically creates 2-4 pull requests per month for most AI applications, depending on how actively your AI is being used and how much room there is for improvement. Each PR represents a meaningful quality improvement that's been thoroughly tested.
 
-![Agent Performance Dashboard](/assets/overview/general-handit.png)
+The improvements become more targeted over time as your autonomous engineer learns your AI's specific patterns and challenges. Early fixes might address broad issues like tone or completeness, while later improvements often tackle nuanced problems specific to your use case.
 
-**Example Metrics:**
-```
-Customer Support Agent
-
-LLM Node: Response Generator
-├── Current Version: 4.2/5.0 overall quality
-├── Optimized Version: 4.6/5.0 overall quality
-└── Improvement: +9.5% quality increase
-
-Recent Optimizations:
-✅ Empathy Enhancement: +15% empathy score
-✅ Technical Clarity: +12% accuracy score  
-🔄 Response Completeness: Currently testing
-```
-
-**2. Release Hub Analysis**
-- Go to **Optimization** → **Release Hub**
-- View detailed metrics for each prompt per LLM node
-- See performance comparisons and deployment recommendations
-
-![Release Hub - Prompt Performance Comparison](/assets/overview/prompt-comparison.png)
-
-**Example Release Hub View:**
-```
-Customer Support LLM - Prompt Performance
-
-Current Production Prompt:
-- Overall Quality: 4.2/5.0
-- Empathy: 4.0/5.0
-- Accuracy: 4.3/5.0
-
-Optimized Prompt v1.2:
-- Overall Quality: 4.6/5.0 (+9.5% improvement)
-- Empathy: 4.7/5.0 (+17.5% improvement)
-- Accuracy: 4.5/5.0 (+4.7% improvement)
-
-Statistical Confidence: 95%
-Recommendation: Ready for production
-```
-
-## Step 3: Deploy Optimizations
-
-Select winning optimizations in the Release Hub and integrate them into your applications via SDK.
-
-**1. Navigate to Release Hub**
-- Go to **Optimization** → **Release Hub**
-- View recommended optimizations for each LLM node
-
-**2. Compare and Select**
-```
-Recommended for Production:
-
-✅ Empathy Enhancement v1.2
-Performance: +15% empathy, +7% overall quality
-Status: Recommended for production
-
-✅ Technical Accuracy v2.1  
-Performance: +12% accuracy, +5% overall quality
-Status: Ready for production
-```
-
-**3. Mark as Production**
-- Select the optimization you want to use
-- Click **Mark as Production**
-- Prompt becomes immediately available via SDK
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
->
-  <source src="/assets/quickstart/ci:cd.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-**4. Fetch via SDK**
-
-Once marked as production, fetch optimized prompts directly in your application:
-
-**Python SDK:**
-```python
-from handit import HanditTracker
-
-# Initialize with your project
-tracker = HanditTracker(api_key="your-api-key")
-
-# Fetch the current production prompt
-optimized_prompt = tracker.fetch_optimized_prompt(model_id="customer-support-llm")
-
-# Use in your own LLM calls
-response = your_llm_client.chat.completions.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": optimized_prompt},
-        {"role": "user", "content": user_query}
-    ]
-)
-```
-
-**JavaScript SDK:**
-```javascript
-import { HanditClient } from '@handit/sdk';
-
-// Initialize client
-const handit = new HanditClient({ apiKey: 'your-api-key' });
-
-// Fetch current production prompt
-const optimizedPrompt = await handit.fetchOptimizedPrompt({ 
-  modelId: 'customer-support-llm' 
-});
-
-// Use in your own LLM calls
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [
-    { role: 'system', content: optimizedPrompt },
-    { role: 'user', content: userQuery }
-  ]
-});
-```
-
-**5. Monitor Performance**
-- Track the performance of deployed prompts in Agent Performance
-- Monitor for any issues in your applications
-- Continue the optimization cycle
+Most teams find that after a few weeks, their AI quality stabilizes at a higher level with fewer issues requiring attention. Your autonomous engineer continues monitoring but focuses on maintaining quality and making incremental improvements rather than fixing major problems.
 
 ## Next Steps
 
-- Explore [Advanced Optimization Features](/optimization/optimization_features/ab_testing)
-- Set up [CI/CD Deployment](/optimization/optimization_features/cicd_deployment)
-- Configure [Release Hub](/optimization/guide/release_hub)
-- Visit [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for assistance
+Your autonomous engineer is now working 24/7 to keep your AI performing at its best. Here's what you can explore:
+
+**Monitor Progress**: Check your [Agent Performance dashboard](https://beta.handit.ai) to see your autonomous engineer's impact on your AI quality over time.
+
+**Advanced Configuration**: Learn more about customizing your autonomous engineer's behavior in our [detailed GitHub integration guide](/optimization/guide/cli_github_setup).
+
+**Get Help**: If you have questions or need assistance, visit our [Support page](/more/contact) or join our community.
 
 <Callout type="success">
-  **Congratulations!** You now have a self-improving AI system with GitHub integration that automatically detects issues, generates solutions, tests improvements, and creates pull requests with proven optimizations.
+  **Welcome to Autonomous AI!** Your days of being on-call for AI quality issues are over. Your autonomous engineer will handle the monitoring, fixing, and improvement while you focus on building great products.
 </Callout>
-
 
 ## Troubleshooting
 
-**CLI GitHub Setup Issues?**
-- Ensure you have admin access to the repository
-- Try running `handit-cli github` again to reinstall the app
-- Check repository permissions in your GitHub settings
-- Verify the GitHub app is installed on the correct repository
+**GitHub Setup Issues**: If you encounter problems during setup, ensure you have admin access to the repository and try running `handit-cli github` again. The CLI will guide you through any missing steps.
 
-**Pull Requests Not Being Created?**
-- Confirm the GitHub integration is properly configured
-- Check that optimizations are being generated (visible in Release Hub)
-- Verify repository permissions allow PR creation
-- Ensure the target branch exists and is accessible
+**No Pull Requests**: If you don't see pull requests after a few days, it likely means your AI is performing well and no significant issues have been detected. You can check the Agent Performance dashboard to confirm your quality metrics are stable.
 
-**Optimizations Not Generating?**
-- Check that evaluation data shows quality issues (scores below threshold)
-- Verify optimization model tokens are configured (done during `handit-cli setup`)
-- Ensure evaluation has been running long enough to collect data
-- Confirm optimization is enabled for the correct LLM nodes
+**Permission Problems**: Make sure the Handit GitHub app has the necessary permissions in your repository settings. Re-running `handit-cli github` will help identify and fix any permission issues.
 
-**Need Help?**
-- Check our [detailed optimization guides](/optimization/guide/cli_github_setup)
-- Visit [Support](/more/contact) for assistance
-- Join our [Discord community](https://discord.gg/wZbW9Bu5) 
+For additional help, our [detailed troubleshooting guide](/optimization/guide/cli_github_setup) covers common scenarios and solutions.

@@ -12,20 +12,19 @@ import { Cards } from "nextra/components"
 
 > **The foundation of AI agent observability.** Agent Tracing wraps your entire agent workflow, creating the root trace that connects all operations together and gives you complete visibility from start to finish.
 
-Agent Tracing is designed for your main API endpoints and entry points—the functions that process incoming requests and orchestrate your entire agent workflow.
+Think of Agent Tracing as the master recorder for your AI system. When a user submits a request, Agent Tracing creates a comprehensive record of everything that happens to process that request—every function call, every decision point, every tool execution, and every language model interaction.
+
+**Why Agent Tracing is essential**: Without this foundational wrapper, your autonomous engineer would see individual operations in isolation without understanding how they connect. Agent Tracing provides the context that links everything together, enabling pattern recognition and root cause analysis.
 
 <Callout type="warning">
-  **Golden Rule:** Every request that enters your system must start with Agent Tracing. Without this wrapper, the root context won't be created and inner nodes won't be linked together.
+  **Golden Rule:** Every request that enters your system should start with Agent Tracing. This creates the root context that allows all child operations to be properly linked and analyzed together.
 </Callout>
 
-## How It Works
+## How Agent Tracing Works
 
-Agent Tracing creates a root context for your entire workflow, allowing you to:
+Agent Tracing creates a root context for your entire workflow, enabling comprehensive observability across your AI system. When you wrap your main agent function with Agent Tracing, it automatically captures the complete execution flow, correlates all operations within that request, monitors performance and errors across the entire workflow, and maintains a hierarchical view of how your system processes requests.
 
-- Track the complete lifecycle of your application
-- Correlate all operations within a single request
-- Monitor performance and errors across the entire flow
-- Maintain a hierarchical view of your system's behavior
+**The result**: Your autonomous engineer can see the big picture of how your AI operates, understand how different components interact, and identify issues that span multiple operations or components.
 
 ## Implementation
 
