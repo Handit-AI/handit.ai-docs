@@ -1,37 +1,66 @@
 ---
-title: 'Optimization Quickstart'
+title: 'Autonomous AI Fixes Quickstart'
 sidebarTitle: 'Quickstart'
 ---
 
 import { Callout } from "nextra/components"
 import { Steps } from "nextra/components"
 
-# Optimization Quickstart
+# Autonomous AI Fixes Quickstart
 
-Transform your AI from static to self-improving in under 15 minutes. This guide shows you how to set up automated optimization, A/B testing, and CI/CD deployment using the Handit.ai platform.
+Set up your autonomous engineer in under 10 minutes. This guide shows you how to enable automated issue detection and fix generation that creates pull requests with proven improvements.
 
 <Callout type="info">
-  **Prerequisites**: You need active Handit.ai evaluation running on your LLM nodes. If you haven't set up evaluation yet, start with our [Evaluation Quickstart](/evaluation/quickstart).
+  **Prerequisites**: You need active Handit.ai evaluation running on your LLM nodes. If you haven't set up evaluation yet, start with our [Main Quickstart](/quickstart).
 </Callout>
 
-## Overview
+## Quick Setup with CLI & GitHub (Recommended)
 
-Here's what we'll accomplish using the Handit.ai platform:
+### Step 1: Set Up GitHub Integration
+
+```bash filename="terminal"
+handit-cli github
+```
+
+The CLI will guide you through:
+- **Installing the Handit GitHub app** on your repository
+- **Configuring repository permissions** for automated PRs
+- **Setting up optimization models** if not already configured
+- **Enabling automated pull request creation** for optimizations
+
+<Callout type="tip">
+  **Why GitHub Integration?** Your autonomous engineer creates pull requests with fixes when it detects quality issues. You review and merge the improvements you want—just like working with a human engineer.
+</Callout>
+
+### Step 2: Monitor and Deploy
+
+**Receive Automated Pull Requests:**
+- Your autonomous engineer creates PRs when fixes are ready
+- Review the exact changes to prompts and system configurations
+- Merge approved improvements through your normal workflow
+
+**Monitor in Dashboard:**
+- View autonomous engineer progress in **Agent Performance**
+- See detailed fix comparisons in **Release Hub**
+
+<Callout type="success">
+  **Your autonomous engineer is now active!** It will automatically detect quality issues, generate fixes, test them, and create pull requests with proven improvements—24/7.
+</Callout>
+
+## Manual Setup (Alternative)
+
+If you prefer manual control over deployments, follow these steps:
 
 <Steps>
 ### Connect Optimization Models
-Add AI models that will analyze problems and generate improved prompts - this automatically enables self-improving AI
+Add AI models that will analyze problems and generate improved prompts
 
-### Monitor Optimization Results
-View performance comparisons between current and optimized prompts in Agent Performance and Release Hub
+### Monitor Optimization Results  
+View performance comparisons between current and optimized prompts
 
-### Deploy Optimizations
-Mark winning prompts as production in Release Hub and fetch them via SDK for use in your applications
+### Deploy via Release Hub
+Mark winning prompts as production and fetch them via SDK
 </Steps>
-
-<Callout type="success">
-  **The Result**: Your AI will automatically detect quality issues, generate better prompts, test them in the background, and provide you with proven improvements ready for deployment.
-</Callout>
 
 ## Step 1: Connect Optimization Models
 
@@ -214,25 +243,31 @@ const response = await openai.chat.completions.create({
 - Visit [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for assistance
 
 <Callout type="success">
-  **Congratulations!** You now have a self-improving AI system that automatically detects issues, generates solutions, tests improvements, and provides you with proven optimizations.
+  **Congratulations!** You now have a self-improving AI system with GitHub integration that automatically detects issues, generates solutions, tests improvements, and creates pull requests with proven optimizations.
 </Callout>
 
 
 ## Troubleshooting
 
+**CLI GitHub Setup Issues?**
+- Ensure you have admin access to the repository
+- Try running `handit-cli github` again to reinstall the app
+- Check repository permissions in your GitHub settings
+- Verify the GitHub app is installed on the correct repository
+
+**Pull Requests Not Being Created?**
+- Confirm the GitHub integration is properly configured
+- Check that optimizations are being generated (visible in Release Hub)
+- Verify repository permissions allow PR creation
+- Ensure the target branch exists and is accessible
+
 **Optimizations Not Generating?**
 - Check that evaluation data shows quality issues (scores below threshold)
-- Verify optimization model token is valid and has credits
+- Verify optimization model tokens are configured (done during `handit-cli setup`)
 - Ensure evaluation has been running long enough to collect data
 - Confirm optimization is enabled for the correct LLM nodes
 
-**A/B Tests Not Running?**
-- Verify sufficient traffic on the LLM node for statistical significance
-- Check that optimization model can access evaluation data
-- Ensure A/B testing is enabled in optimization settings
-- Confirm test traffic percentage is appropriate for your volume
-
 **Need Help?**
-- Check our [detailed optimization guides](/optimization/guide/optimization_tokens)
-- Visit [Support](/support) for assistance
+- Check our [detailed optimization guides](/optimization/guide/cli_github_setup)
+- Visit [Support](/more/contact) for assistance
 - Join our [Discord community](https://discord.gg/wZbW9Bu5) 

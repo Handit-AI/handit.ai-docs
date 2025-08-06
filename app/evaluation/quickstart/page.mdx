@@ -8,13 +8,49 @@ import { Steps } from "nextra/components"
 
 # Evaluation Quickstart
 
-> **Get automated AI evaluation running in under 10 minutes.** This guide walks you through setting up comprehensive quality assessment for your AI models using the Handit.ai platform.
+> **Give your autonomous engineer the data it needs to detect issues and create fixes.** This guide walks you through setting up comprehensive quality assessment that powers autonomous optimization.
 
 <Callout type="info">
-  **Prerequisites**: You need an active Handit.ai account with tracing configured. If you haven't set up tracing yet, start with our [Tracing Quickstart](/tracing/quickstart).
+  **Already set up Handit?** If you followed our [Main Quickstart](/quickstart), evaluation is already working. This page explains how to view and understand your evaluation data.
 </Callout>
 
-## What You'll Accomplish
+## Quick Setup with CLI (Recommended)
+
+### Step 1: Run Evaluators Setup
+
+```bash filename="terminal"
+handit-cli evaluators-setup
+```
+
+The CLI will guide you through:
+- **Connecting evaluation models** (OpenAI, Together AI, etc.)
+- **Adding AI model tokens** for evaluation
+- **Connecting existing evaluators** to your LLM nodes
+- **Setting evaluation percentages** and priorities
+
+<Callout type="success">
+  **That's it!** Your evaluation system is now active and will start assessing your AI outputs automatically.
+</Callout>
+
+### Step 2: Monitor Evaluation Results
+
+View real-time evaluation results in your dashboard:
+
+**Real-Time Monitoring:**
+- Go to **Tracing** tab to see individual evaluation scores
+- Monitor quality trends in **Agent Performance** dashboard
+
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
+
+**Quality Analytics:**
+- Access **Agent Performance** for trends across different quality dimensions
+- Understand which aspects are performing well or need attention
+
+![Agent Performance Dashboard](/assets/overview/general-handit.png)
+
+## Manual Setup (Advanced)
+
+If you prefer manual configuration or need custom setups, follow these detailed steps:
 
 <Steps>
 ### Connect Model Tokens
@@ -303,16 +339,21 @@ Scale: 1-10 (1-2=illogical flow, 9-10=perfect troubleshooting sequence)
 - Visit [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for assistance
 
 <Callout type="success">
-  **Congratulations!** You now have automated AI evaluation running on your production data. Each evaluator will help you understand specific quality aspects. This evaluation data provides the foundation for AI optimization (covered in our Optimization guides).
+  **Congratulations!** You now have automated AI evaluation running on your production data in under 5 minutes using the CLI. Each evaluator will help you understand specific quality aspects. This evaluation data provides the foundation for AI optimization (covered in our [Autonomous AI Fixes Quickstart](/optimization/quickstart)).
 </Callout>
 
 ## Troubleshooting
 
+**CLI Setup Issues?**
+- Re-run `handit-cli evaluators-setup` to reconfigure
+- Ensure you have valid model API keys ready
+- Check that your Handit.ai account has access to evaluation features
+
 **Evaluations Not Running?**
-- Check your model tokens are valid and have sufficient credits
-- Verify the LLM node is actively receiving traffic
-- Ensure evaluation percentage is > 0%
-- Confirm evaluators are properly associated
+- Verify model tokens were properly configured during CLI setup
+- Check your model tokens have sufficient credits
+- Ensure the LLM node is actively receiving traffic
+- Confirm evaluation percentage is > 0%
 
 **Inconsistent Evaluation Scores?**
 - Review evaluator prompts for clarity and specificity
@@ -320,7 +361,19 @@ Scale: 1-10 (1-2=illogical flow, 9-10=perfect troubleshooting sequence)
 - Test evaluators with known good/bad examples
 - Focus on single quality aspects per evaluator
 
+## Next Steps
+
+Your autonomous engineer now has the evaluation data it needs to detect issues and create fixes:
+
+- **Enable Autonomous Fixes**: Set up [GitHub Integration](/optimization/quickstart) to complete your autonomous engineer
+- **Custom Quality Checks**: Create [Custom Evaluators](/evaluation/guide/custom_evaluators) for specialized quality assessment
+- **Advanced Features**: Explore [Evaluation Features](/evaluation/evaluation_features/overview) for comprehensive monitoring
+
+<Callout type="success">
+  **Your autonomous engineer can now see quality issues!** Next, enable autonomous fixes so it can automatically create PRs to resolve problems.
+</Callout>
+
 **Need Help?**
 - Check our [detailed evaluation guides](/evaluation/evaluation_features/overview)
-- Visit [Support](/support) for assistance
+- Visit [Support](/more/contact) for assistance
 - Join our [Discord community](https://discord.gg/wZbW9Bu5) 
