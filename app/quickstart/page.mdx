@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Get started with Handit.ai's complete AI observability and optimization platform in under 30 minutes.
+description: Set up your autonomous AI engineer in under 15 minutes.
 sidebarTitle: Quickstart
 ---
 
@@ -8,45 +8,42 @@ import { Callout } from "nextra/components";
 import { Steps } from "nextra/components";
 import { Tabs } from "nextra/components";
 
-# Complete Handit.ai Quickstart
+# Set Up Your Autonomous Engineer
 
 > **The autonomous engineer that fixes your AI 24/7** <br />
 > Handit catches failures, writes fixes, tests them, and ships PRs, automatically. Like having an on-call engineer dedicated to your AI, except it works 24/7.
 
 <Callout type="info">
-  **What you'll build:** A fully observable, continuously evaluated, and automatically optimizing AI system that improves itself based on real production data.
+  **What you're setting up:** Your autonomous engineer that monitors your AI, detects issues, creates fixes, and ships them via pull requests—all automatically.
 </Callout>
 
-## Overview: The Complete Journey
+## What Your Autonomous Engineer Will Do
 
-Here's what we'll accomplish in three phases:
+Once set up, your autonomous engineer will:
 
-<Steps>
-### [Phase 1: AI Observability](#phase-1-ai-observability-3-minutes) ⏱️ 3 minutes
-Set up comprehensive tracing to see inside your AI agents and understand what they're doing
-
-### [Phase 2: Quality Evaluation](#phase-2-quality-evaluation-5-minutes) ⏱️ 5 minutes
-Add automated evaluation to continuously assess performance across multiple quality dimensions
-
-### [Phase 3: Autonomous AI Fixes](#phase-3-autonomous-ai-fixes-8-minutes) ⏱️ 2 minutes
-Connect GitHub so Handit can automatically fix issues by creating pull requests with improved system prompts
-</Steps>
+- **Monitor** every AI interaction for quality issues and failures
+- **Detect** patterns in problems before they become critical
+- **Generate** improved system prompts that fix the issues  
+- **Test** the fixes against real data to ensure they work
+- **Create** pull requests in your repository with the improvements
+- **Work 24/7** so you don't have to wake up to AI failures
 
 <Callout type="success">
-  **The Result**: Complete visibility into performance with automated optimization recommendations based on real production data.
+  **The Result**: Your AI continuously improves itself through your normal GitHub workflow, with zero manual intervention required.
 </Callout>
 
 ## Prerequisites
 
-Before we start, make sure you have:
+Before setting up your autonomous engineer:
 
-- A [Handit.ai Account](https://beta.handit.ai) (sign up if needed)
+- A [Handit.ai Account](https://dashboard.handit.ai) (sign up if needed)
 - Node.js installed (for the CLI)
-- 15-20 minutes to complete the setup
+- Admin access to your GitHub repository
+- 10-15 minutes for the complete setup
 
-## Phase 1: AI Observability (3 minutes)
+## Setting Up Your Autonomous Engineer
 
-Let's add comprehensive tracing to see exactly what your AI is doing.
+Your autonomous engineer setup happens in one seamless flow through the Handit CLI. Here's what will happen:
 
 ### Step 1: Install the Handit CLI
 
@@ -54,19 +51,20 @@ Let's add comprehensive tracing to see exactly what your AI is doing.
 npm install -g @handit.ai/cli
 ```
 
-### Step 2: Set Up Your Project
+### Step 2: Start the Setup Process
 
-Run the setup command and follow the interactive prompts:
+Navigate to your AI project directory and run:
 
 ```bash filename="terminal"
 handit-cli setup
 ```
 
-The CLI will:
-- Guide you through connecting your Handit.ai account
-- Generate all the required integration code for your project
-- Set up tracing for your AI agents automatically
-- Create the necessary configuration files
+The CLI will guide you through connecting your autonomous engineer to your AI system:
+
+**🔧 Initial Connection**
+- Connect your Handit.ai account
+- Generate integration code for your AI project
+- Set up monitoring and tracing automatically
 
 <video 
   width="100%" 
@@ -80,37 +78,10 @@ The CLI will:
   Your browser does not support the video tag.
 </video>
 
-### Step 3: Start Your Application
-
-The CLI has generated all the code you need. Simply run your application and start seeing traces in your dashboard immediately.
-
-<Callout type="success">
-  **That's it!** Your AI agent now has full observability with automatic tracking of all operations, timing, inputs, outputs, and errors.
-</Callout>
-
-<Callout type="success">
-  **Phase 1 Complete!** 🎉 You now have full observability with every operation, timing, input, output, and error visible in your dashboard.
-</Callout>
-
-**➡️ Want to dive deeper?** Check out our [detailed Tracing Quickstart](/tracing/quickstart) for advanced features and best practices.
-
-## Phase 2: Quality Evaluation (5 minutes)
-
-Now let's add automated evaluation to continuously assess quality across multiple dimensions.
-
-### Step 1: Set Up Evaluators with CLI
-
-Run the evaluators setup command:
-
-```bash filename="terminal"
-handit-cli evaluators-setup
-```
-
-The CLI will guide you through:
-- Connecting your evaluation models (OpenAI, Together AI, etc.)
-- Adding AI model tokens for evaluation
-- Connecting existing evaluators to your LLM nodes
-- Setting up evaluation percentages and priorities
+**📱 Test Your Connection**
+- The CLI will ask you to run your app to verify everything works
+- Your autonomous engineer immediately starts monitoring your AI
+- You'll see real-time data flowing in your dashboard
 
 <video 
   width="100%" 
@@ -118,40 +89,33 @@ The CLI will guide you through:
   loop 
   muted 
   playsInline
-  style={{ borderRadius: '8px' }}
+  style={{ borderRadius: '8px'}}
+>
+  <source src="/assets/quickstart/test_connection.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+**🧠 Connect Evaluation Models**
+- The CLI will ask if you want to set up quality evaluation
+- Connect evaluation models (OpenAI, Together AI, etc.) so your autonomous engineer can assess quality
+- Configure which evaluators to use and how often to run them
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px'}}
 >
   <source src="/assets/quickstart/evaluators-setup.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
-### Step 2: Monitor Results
-
-View real-time evaluation results in:
-- **Tracing** tab: Individual evaluation scores
-- **Agent Performance**: Quality trends over time
-
-**Tracing Dashboard - Individual Evaluation Scores:**
-![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
-
-
-**➡️ Want more sophisticated evaluators?** Check out our [detailed Evaluation Quickstart](/evaluation/quickstart) for advanced techniques.
-
-## Phase 3: Autonomous AI Fixes (2 minutes)
-
-Connect GitHub so Handit can automatically fix issues by creating pull requests with improved system prompts.
-
-### Step 1: Connect Your Repository
-
-Run the GitHub integration command:
-
-```bash filename="terminal"
-handit-cli github
-```
-
-The CLI will guide you through:
-- Installing the Handit GitHub app on your repository
-- Configuring repository permissions
-- Setting up automated pull request creation for fixes
+**🔗 Connect Your GitHub Repository**  
+- Finally, the CLI will ask you to connect your GitHub repository
+- Install the Handit GitHub app so your autonomous engineer can create pull requests
+- Configure repository permissions for automated fixes
 
 <video 
   width="100%" 
@@ -159,38 +123,39 @@ The CLI will guide you through:
   loop 
   muted 
   playsInline
-  style={{ borderRadius: '8px' }}
+  style={{ borderRadius: '8px'}}
 >
   <source src="/assets/quickstart/github-setup.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
-<Callout type="tip">
-  **How it works:** Once connected, Handit continuously monitors your AI's performance. When it detects issues and creates fixes, it automatically opens pull requests in your repository with improved system prompts. You simply review and merge the fixes you want.
+<Callout type="success">
+  **Setup Complete!** Your autonomous engineer is now monitoring your AI, evaluating quality, and ready to create pull requests with fixes whenever issues are detected.
 </Callout>
 
-### Step 2: Automatic Issue Detection & Fixes
+## How Your Autonomous Engineer Works
 
-Here's what happens automatically after GitHub integration:
+Once setup is complete, here's what happens automatically:
 
-**1. Continuous Monitoring**
-- Handit analyzes every AI interaction for quality issues
-- Detects patterns in failures, low scores, or user complaints
+**🔍 Continuous Monitoring**
+- Your autonomous engineer watches every AI interaction
+- Tracks quality scores, response times, and error patterns
+- Builds understanding of what good vs. bad performance looks like
 
-**2. Automatic Fix Generation**  
-- When issues are detected, Handit generates improved system prompts
-- Tests the fixes against real data to ensure they work
+**🚨 Issue Detection**  
+- Detects when quality drops or new types of failures appear
+- Identifies root causes by analyzing patterns in your data
+- Prioritizes the most impactful issues to fix first
+
+**🛠️ Automatic Fix Generation**
+- Creates improved system prompts that address the detected issues
+- Tests fixes against your real data to ensure they actually work
 - Validates improvements with statistical confidence
 
-**3. Pull Request Creation**
-- Handit creates a PR in your repository
-- Replaces the problematic system prompt in your code
-- Includes performance data showing the improvement
-
-**4. Review & Deploy**
-- You review the PR like any other code change
-- Merge to deploy the fix automatically
-- Reject if you don't want the change
+**📝 Pull Request Creation**
+- Opens a PR in your repository with the improved system prompt
+- Includes detailed performance data showing the improvement
+- Follows your existing code review and deployment process
 
 <video 
   width="100%" 
@@ -204,51 +169,75 @@ Here's what happens automatically after GitHub integration:
   Your browser does not support the video tag.
 </video>
 
-**Example:** If your customer service AI starts giving incomplete responses, Handit will detect this pattern, generate a better system prompt that addresses completeness, test it, and create a PR to replace the old prompt in your codebase.
+**Example:** If your customer service AI starts giving incomplete responses, your autonomous engineer detects this pattern, generates a better system prompt that addresses completeness, tests it against real conversations, and creates a PR to replace the old prompt in your codebase.
 
-<Callout type="success">
-  **Phase 3 Complete!** 🎉 You now have an autonomous AI engineer that detects issues, generates fixes, and creates pull requests automatically. Your AI will continuously improve itself through your normal GitHub workflow.
-</Callout>
+## Viewing Your Autonomous Engineer's Work
 
-**➡️ Want advanced autonomous fixing features?** Check out our [detailed Autonomous AI Fixes guide](/optimization/quickstart) for advanced GitHub integration and deployment strategies.
+Your autonomous engineer's monitoring and fixes are visible in your Handit dashboard:
+
+**📊 Real-Time Monitoring**
+![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
+
+- **Tracing**: See every AI interaction with complete execution details
+- **Agent Performance**: Track quality trends and improvement over time  
+- **Issue Detection**: View detected problems and their severity
+- **Fix History**: See all improvements your autonomous engineer has made
+
+**🔧 Active Fixes**
+- Monitor pull requests created by your autonomous engineer
+- Review performance improvements before merging
+- Track the impact of deployed fixes on your AI's quality
 
 ## What You've Accomplished
 
-Congratulations! You now have a complete AI observability and optimization system set up in under 20 minutes:
+Congratulations! You now have your autonomous engineer working 24/7 to improve your AI:
 
-### ✅ Full Observability
-- Complete visibility into operations with CLI-generated tracing
-- Real-time monitoring of all LLM calls and tools
-- Detailed execution traces with timing and error tracking
+### ✅ Your Autonomous Engineer is Active
+- **Monitoring** every AI interaction for quality and performance issues
+- **Evaluating** responses automatically using advanced AI models
+- **Detecting** problems before they become critical failures  
+- **Generating** fixes for issues it discovers in your AI system
+- **Creating** pull requests with improvements directly in your codebase
 
-### ✅ Continuous Evaluation  
-- Automated quality assessment configured via CLI
-- Real-time evaluation scores and trends
-- Quality insights to identify improvement opportunities
+### ✅ Continuous AI Improvement
+- Your AI will automatically get better over time through GitHub PRs
+- No more manual prompt engineering or quality monitoring required
+- Issues are caught and fixed 24/7, even while you sleep
+- All improvements go through your normal code review process
 
-### ✅ Autonomous AI Fixes with GitHub Integration
-- Automatic detection of quality issues and performance problems
-- AI-generated system prompt fixes tested against real data
-- Automated pull requests that replace problematic prompts in your codebase
-- Review and deploy fixes through your normal GitHub workflow
+## Your Autonomous Engineer is Now Working
+
+Your setup is complete! Here's what happens next:
+
+**🚀 Immediate Benefits**
+- Start seeing AI interactions and quality scores in your dashboard right away
+- Your autonomous engineer is learning your AI's patterns and baseline performance
+- Any existing issues will be detected and queued for fixing
+
+**📈 Ongoing Improvements**  
+- Over the coming days and weeks, you'll receive pull requests with AI improvements
+- Each PR includes detailed data showing exactly how the fix improves performance
+- Your AI's quality will steadily improve through this autonomous feedback loop
 
 ## Next Steps
 
-- Join our [Discord community](https://discord.gg/wZbW9Bu5) for support
-- Check out [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for additional help
-- Explore [Tracing](/tracing/overview) to monitor your AI agents
-- Set up [Evaluation](/evaluation/overview) to grade your AI outputs
-- Configure [Autonomous AI Fixes](/optimization/overview) for continuous improvement
+**🎯 Monitor Your Progress**
+- Check your [Handit Dashboard](https://beta.handit.ai) to see your autonomous engineer at work
+- Review any pull requests created by your autonomous engineer
+- Watch your AI quality improve over time
 
-## Resources
+**📚 Learn More**
+- [Understanding Tracing Data](/tracing/overview) - Deep dive into what your autonomous engineer sees
+- [Evaluation Insights](/evaluation/overview) - How quality assessment powers autonomous fixes
+- [GitHub Integration Details](/optimization/overview) - Advanced autonomous fixing features
 
-- [Tracing Documentation](/tracing/overview) - Monitor AI agent performance
-- [Evaluation Documentation](/evaluation/overview) - Grade AI outputs automatically  
-- [Autonomous AI Fixes Documentation](/optimization/overview) - Your autonomous engineer that works 24/7
-- Visit our [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) page
+**💬 Get Support**
+- Join our [Discord community](https://discord.gg/wZbW9Bu5) for support and tips
+- Visit our [Support page](/more/contact) for technical help
+- Check [GitHub Issues](https://github.com/Handit-AI/handit.ai-docs/issues) for troubleshooting
 
-<Callout type="info">
-  **Ready to transform your AI?** Visit [beta.handit.ai](https://beta.handit.ai) to get started with the complete Handit.ai platform today.
+<Callout type="success">
+  **Your autonomous engineer is now working!** It's monitoring your AI, detecting issues, and will start creating pull requests with improvements. Welcome to autonomous AI development.
 </Callout>
 
 ## Troubleshooting
