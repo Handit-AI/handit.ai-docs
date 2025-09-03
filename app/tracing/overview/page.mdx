@@ -4,103 +4,55 @@ sidebarTitle: 'Tracing'
 ---
 
 import { Callout } from "nextra/components"
-import { Steps } from "nextra/components"
-import { Tabs } from "nextra/components"
 import { Cards } from 'nextra/components'
 
 # AI Agent Tracing
 
 > **Your autonomous engineer needs eyes to fix your AI.** Tracing provides complete visibility into your AI agents so the autonomous engineer can detect issues, analyze root causes, and generate proven fixes.
 
-Think of tracing as the diagnostic system that powers your autonomous engineer. When something goes wrong with your AI, tracing ensures your autonomous engineer has all the data needed to understand what happened and create an effective fix.
+## The Problem: AI Black Boxes
+
+When your AI starts giving bad responses, you have no idea why. Did the language model change its behavior? Is a tool returning bad data? Is there a logic error in your reasoning chain? Without visibility, you're debugging blind.
+
+**Tracing solves this** by capturing everything your AI does. Every decision, every tool call, every LLM interaction gets recorded with full context. Your autonomous engineer can see exactly what happened and create targeted fixes.
 
 <Callout type="info">
   Tracing transforms your AI from a black box into a fully observable system that your autonomous engineer can continuously monitor and improve.
 </Callout>
 
-## The Black Box Problem
+## How Your Autonomous Engineer Uses Tracing
 
-AI agents are inherently complex systems. They make decisions, call tools, interact with language models, and chain operations together in sophisticated ways. When something goes wrong, figuring out what happened can feel impossible.
+**Issue Detection**: By analyzing trace patterns, your autonomous engineer spots when quality drops, which interactions fail, and what causes problems.
 
-**Picture this scenario**: Your customer service AI suddenly starts giving unhelpful responses. Users are complaining, but you have no idea why. Did the language model change its behavior? Is a tool returning bad data? Is there a logic error in your agent's reasoning chain? Without visibility into what's actually happening, you're reduced to guessing and hoping.
+**Root Cause Analysis**: Detailed trace data helps your autonomous engineer understand whether issues stem from prompt problems, tool failures, or logic errors.
 
-**This is the reality for most AI teams.** They build sophisticated agents but operate them blindly. When issues arise, debugging becomes a time-consuming process of reproduction attempts and educated guesses. Critical problems can persist for days while teams struggle to understand what's going wrong.
+**Fix Validation**: Before creating pull requests, your autonomous engineer tests improvements against historical trace data to ensure fixes actually work.
 
-**Tracing solves this fundamental problem** by capturing the complete execution flow of your AI agents. Every decision, every tool call, every LLM interaction, and every data transformation gets recorded with full context. Your autonomous engineer can see exactly what your AI is doing, why it's making specific choices, and where problems occur.
-
-## How Tracing Powers Your Autonomous Engineer
-
-Tracing data is essential for autonomous AI improvement. Without comprehensive visibility into your AI's behavior, your autonomous engineer would be working blind—unable to detect issues or understand what changes might help.
-
-**Pattern Recognition**: By analyzing thousands of traced interactions, your autonomous engineer identifies patterns that would be impossible to spot manually. Maybe your AI struggles when users ask complex multi-part questions, or perhaps it performs poorly during high-traffic periods. These insights drive targeted improvements.
-
-**Root Cause Analysis**: When quality issues arise, your autonomous engineer uses trace data to understand exactly what's going wrong. Instead of generic fixes, it can pinpoint whether problems stem from prompt issues, tool failures, or logic errors in your agent's reasoning.
-
-**Fix Validation**: Before creating pull requests, your autonomous engineer uses historical trace data to test potential improvements. It can see how proposed changes would have affected past interactions, ensuring fixes actually solve problems rather than creating new ones.
-
-**Continuous Learning**: As your autonomous engineer's fixes get deployed, new trace data shows their effectiveness. This feedback loop helps your autonomous engineer learn what types of improvements work best for your specific AI system.
+**Continuous Learning**: As fixes get deployed, new trace data shows their effectiveness, helping your autonomous engineer improve over time.
 
 ## What Gets Traced
 
-Comprehensive tracing captures every aspect of your AI's operation:
+When you add tracing to your agent entry points, Handit automatically captures:
 
-**Complete Execution Flow**: From the moment a user submits a request until your AI delivers a response, every step gets recorded. You can see the entire journey your request takes through your AI system.
-
-**LLM Interactions**: Every call to language models gets captured with the exact prompts sent, complete responses received, token usage, timing data, and any errors that occurred. This visibility is crucial for understanding how your AI uses language models.
-
-**Tool Executions**: When your AI calls external tools or functions, tracing captures the parameters passed, results returned, execution timing, and any error conditions. This helps identify when tools are causing problems or performing poorly.
-
-**Decision Points**: Tracing shows why your AI made specific choices—which tools it decided to use, how it processed information, and what reasoning led to particular responses. This insight is invaluable for understanding your AI's behavior.
-
-**Context Flow**: See how information moves through your AI system—what context gets passed between operations, how data transforms as it flows through your agent, and where information might get lost or corrupted.
-
-## The Debugging Revolution
-
-Tracing transforms debugging from a frustrating guessing game into a precise diagnostic process:
-
-**Instead of hours of reproduction attempts**, you see exactly what happened in production. The trace shows the complete context and execution flow that led to any issue.
-
-**Instead of generic error messages**, you get detailed information about what went wrong, where it happened, and what conditions led to the failure.
-
-**Instead of wondering about performance**, you see precise timing data showing which operations are slow and where bottlenecks occur in your AI system.
-
-**Instead of guessing about user experience**, you can analyze actual user interactions to understand how your AI performs in real-world scenarios.
-
-## Real-World Impact
-
-Teams using comprehensive tracing report fundamental changes in how they manage AI systems:
-
-**Faster Issue Resolution**: Problems that used to take days to diagnose and fix now get resolved in hours. The complete visibility into AI behavior eliminates the guesswork from debugging.
-
-**Proactive Improvement**: Instead of waiting for user complaints, teams can identify performance issues and optimization opportunities by analyzing trace data patterns.
-
-**Confident Deployments**: With detailed visibility into how changes affect AI behavior, teams can deploy improvements with confidence, knowing exactly what impact they'll have.
-
-**Better User Experience**: Understanding exactly how AI systems behave in production enables teams to optimize for real user needs rather than theoretical performance metrics.
-
-## Types of AI Systems That Benefit from Tracing
-
-Tracing proves valuable across diverse AI applications:
-
-**Customer Service Agents**: See how your AI handles different types of customer inquiries, which responses work best, and where conversation flows break down.
-
-**Content Generation Systems**: Understand how your AI processes content requests, what sources it uses for information, and how it structures responses.
-
-**Decision-Making AI**: Track how your AI evaluates options, what factors influence its decisions, and where its reasoning might be improved.
-
-**Multi-Step Workflows**: For complex AI systems that chain multiple operations together, tracing shows how information flows between steps and where bottlenecks or failures occur.
+- **Complete execution flow** from user request to final response
+- **All LLM interactions** with prompts, responses, and performance data
+- **Tool executions** with parameters, results, and timing
+- **Error details** with full context for debugging
+- **Performance metrics** showing bottlenecks and optimization opportunities
 
 ## Getting Started
 
-Ready to give your autonomous engineer the visibility it needs to detect issues and create fixes?
+Ready to give your autonomous engineer the visibility it needs?
 
-<Cards.Card title="Main Quickstart - Includes Tracing" href="/quickstart" arrow />
+<Cards.Card title="Tracing Quickstart" href="/tracing/quickstart" arrow />
 
-**Or learn more about tracing specifically:**
+**Or get the complete setup:**
 
-<Cards.Card title="Tracing Deep Dive" href="/tracing/quickstart" arrow />
+<Cards.Card title="Main Quickstart - Includes Everything" href="/quickstart" arrow />
 
-**Next Steps**: Once tracing is active, set up [Evaluation](/evaluation/quickstart) to score your AI's performance and [Autonomous Fixes](/optimization/quickstart) to complete your autonomous engineer setup.
+**Need advanced control?**
+
+<Cards.Card title="Advanced Tracing" href="/tracing/guide/advanced" arrow />
 
 <Callout type="success">
   **Transform your AI from a black box** into a fully observable system that your autonomous engineer can continuously monitor and improve.

@@ -1,197 +1,74 @@
 ---
-title: 'CLI Evaluator Setup'
+title: 'CLI Evaluation Setup'
 sidebarTitle: 'CLI Setup'
 ---
 
 import { Callout } from "nextra/components"
-import { Steps } from "nextra/components"
 
-# CLI Evaluator Setup
+# CLI Evaluation Setup
 
-> **Set up comprehensive AI evaluation in minutes using the Handit CLI.** This guide covers the complete CLI workflow for connecting evaluators, managing model tokens, and configuring evaluation settings.
+> **Automatic evaluation configuration using the Handit CLI.** Connect evaluation models and configure quality assessment in minutes.
 
 <Callout type="info">
-  **Prerequisites**: You need the Handit CLI installed and a Handit.ai account. If you haven't installed the CLI yet, run `npm install -g @handit.ai/cli`.
+  **Prerequisites**: Handit CLI installed and a Handit.ai account. If you haven't installed the CLI yet, run `npm install -g @handit.ai/cli`.
 </Callout>
 
-## Quick Setup
-
-### Step 1: Run the Evaluators Setup Command
+## Quick setup
 
 ```bash filename="terminal"
-handit-cli evaluators-setup
-```
-
-The CLI will walk you through an interactive setup process:
-
-<Steps>
-### Connect Evaluation Models
-The CLI will prompt you to add model tokens for evaluation:
-- **OpenAI**: GPT-4, GPT-3.5-turbo for high-quality evaluation
-- **Together AI**: Llama models for cost-effective evaluation
-- **Other providers**: Anthropic, Cohere, and more
-
-### Configure Model Tokens
-For each model you want to use:
-- Enter your API key when prompted
-- Set usage preferences (evaluation vs optimization)
-- Configure rate limits and budgets
-
-### Connect Existing Evaluators
-The CLI will show your existing evaluators and help you:
-- Associate them with specific LLM nodes
-- Set evaluation percentages (how often to run each evaluator)
-- Configure priority levels
-
-### Review and Apply Configuration
-The CLI will show a summary of your setup and apply the configuration to your Handit.ai account.
-</Steps>
-
-## Advanced Configuration
-
-### Managing Multiple Evaluators
-
-You can run the CLI setup multiple times to add or modify evaluators:
-
-```bash filename="terminal"
-# Run evaluator setup to modify configuration
 handit-cli evaluators-setup
 ```
 
 The CLI will guide you through:
-- **Adding new evaluation models** (OpenAI, Together AI, etc.)
-- **Connecting evaluators to LLM nodes** in your project
-- **Setting evaluation percentages** for each evaluator
-- **Configuring model tokens** for evaluation
+- **Connect evaluation models** (OpenAI, Together AI, etc.)
+- **Configure model tokens** with your API keys
+- **Associate evaluators** to your AI components
+- **Set evaluation percentages** for each quality dimension
 
-### Example Configuration
+## What gets configured
 
-After setup, your evaluators might look like this:
+**Evaluation Models**: GPT-4 for highest accuracy, GPT-3.5-turbo for cost-effectiveness, Llama models for open source evaluation.
 
-```
-Evaluator: "Response Completeness"
-├── Evaluation Percentage: 10% (recommended for general quality)
-├── Priority: Normal
-└── Associated Nodes: customer-service-response
+**Quality Dimensions**: Completeness, accuracy, empathy, format compliance, and any custom evaluators you create.
 
-Evaluator: "Hallucination Detection"  
-├── Evaluation Percentage: 20% (higher for critical accuracy)
-├── Priority: High
-└── Associated Nodes: customer-service-response, technical-support-response
-```
+**Evaluation Coverage**: Typically 10-20% of interactions for cost-effective quality monitoring.
 
-## CLI-Generated Configuration
+## Managing your setup
 
-After running the setup, the CLI creates or updates configuration files in your project:
-
-### Environment Variables
-```env filename=".env"
-# Evaluation model tokens (automatically configured)
-HANDIT_EVALUATION_OPENAI_KEY=your-openai-key
-HANDIT_EVALUATION_TOGETHER_KEY=your-together-key
+```bash
+# Update configuration anytime
+handit-cli evaluators-setup
 ```
 
-### Configuration File
-```json filename="handit-evaluators.config.json"
-{
-  "evaluators": [
-    {
-      "id": "completeness-check",
-      "name": "Response Completeness",
-      "associatedNodes": ["customer-service-response"],
-      "evaluationPercentage": 10,
-      "priority": "normal",
-      "modelId": "gpt-4"
-    }
-  ],
-  "models": [
-    {
-      "id": "gpt-4",
-      "provider": "openai",
-      "model": "gpt-4",
-      "usage": "evaluation"
-    }
-  ]
-}
-```
+**When to reconfigure**:
+- Adding new evaluation models
+- Changing evaluation percentages
+- Connecting new evaluators
+- Updating API keys
 
-## Best Practices
+## Verify setup
 
-### Evaluation Percentage Guidelines
+**✅ Check your dashboard:** Go to [dashboard.handit.ai](https://dashboard.handit.ai) - you should see:
+- Quality scores appearing for evaluated interactions
+- Evaluation trends in Agent Performance
+- Individual evaluation breakdowns
 
-<div className="grid grid-cols-2 gap-4 mt-4">
-  <div>
-    <h4>✅ Recommended Percentages</h4>
-    - **Critical quality aspects**: 15-25%
-    - **General quality checks**: 5-15%
-    - **Format/compliance checks**: 5-10%
-    - **Experimental evaluators**: 1-5%
-  </div>
-  <div>
-    <h4>⚠️ Consider Your Traffic</h4>
-    - **High traffic**: Start with lower percentages
-    - **Low traffic**: Use higher percentages for faster insights
-    - **Cost sensitive**: Balance evaluation frequency with budget
-    - **Critical applications**: Prioritize accuracy over cost
-  </div>
-</div>
+## Next steps
 
-### Model Selection Strategy
+- **Monitor results**: View evaluation data in your [Agent Performance dashboard](/evaluation/guide/evaluation_results)
+- **Create custom evaluators**: Build [Custom Evaluators](/evaluation/guide/custom_evaluators) for specific quality needs
+- **Enable autonomous fixes**: Set up [GitHub Integration](/optimization/quickstart) to complete your autonomous engineer
 
-**For High Accuracy Needs:**
-- Primary: GPT-4 (highest quality evaluations)
-- Backup: Claude-3 Opus (alternative high-quality option)
-
-**For Cost-Effective Evaluation:**
-- Primary: GPT-3.5-turbo (good balance of cost/quality)
-- Backup: Llama-2-70B (open source alternative)
-
-**For Specific Use Cases:**
-- **Code evaluation**: GPT-4 or Claude-3
-- **Creative content**: GPT-4 or Claude-3
-- **Factual accuracy**: GPT-4 with web search
-- **Multilingual**: GPT-4 or Claude-3
+<Callout type="success">
+  **Your autonomous engineer can now detect quality issues!** Enable GitHub integration so it can create pull requests with fixes.
+</Callout>
 
 ## Troubleshooting
 
-### Common CLI Issues
+**CLI issues**: Ensure Node.js is installed and you have a valid Handit.ai account. Try running `handit-cli evaluators-setup` again.
 
-**Command not found:**
-```bash
-# Reinstall the CLI
-npm uninstall -g @handit.ai/cli
-npm install -g @handit.ai/cli
-```
+**No evaluation data**: Verify your AI is receiving traffic and evaluation percentages are set above 0%.
 
-**Authentication errors:**
-- Ensure you're logged into your Handit.ai account
-- Check that your account has evaluation permissions
-- Verify your integration token is valid
+**Model token issues**: Check API keys are valid and have sufficient credits. The CLI will help you reconfigure if needed.
 
-**Model token validation fails:**
-- Double-check your API keys are correct
-- Ensure the API keys have sufficient permissions
-- Verify the model provider is supported
-
-### Configuration Issues
-
-**Evaluators not running:**
-- Check that LLM nodes are receiving traffic
-- Verify evaluation percentages are > 0%
-- Ensure model tokens have sufficient credits
-
-**Inconsistent results:**
-- Review evaluator prompts for clarity
-- Consider if criteria are too subjective
-- Test with known good/bad examples
-
-## Next Steps
-
-- Monitor results in your [Agent Performance dashboard](/evaluation/guide/evaluation_results)
-- Create [Custom Evaluators](/evaluation/guide/custom_evaluators) for specific needs
-- Set up [Optimization](/optimization/quickstart) to automatically improve based on evaluation results
-- Explore [Advanced Evaluation Features](/evaluation/evaluation_features/overview)
-
-<Callout type="success">
-  **Ready for optimization?** Once your evaluations are running, set up [automated optimization](/optimization/quickstart) to improve your AI based on the evaluation results.
-</Callout>
+For help, visit our [Support page](/more/contact) or join our [Discord community](https://discord.gg/wZbW9Bu5).

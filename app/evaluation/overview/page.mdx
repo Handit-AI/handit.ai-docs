@@ -11,93 +11,57 @@ import { Cards } from 'nextra/components'
 
 > **Your autonomous engineer needs to know what's broken to fix it.** Handit's evaluation system provides comprehensive quality assessment that powers autonomous issue detection and fix generation.
 
-Transform your AI quality control from reactive spot-checking to autonomous monitoring and fixing.
-
 ## The Manual Review Problem
 
-Picture this scenario: Your AI chatbot handles thousands of customer inquiries daily. You suspect quality might be declining, but manually reviewing responses feels overwhelming. You randomly check 50 conversations, find some issues, and wonder about the other 4,950 interactions you didn't see.
+Picture this: Your AI handles thousands of interactions daily. You suspect quality is declining, but manually reviewing responses is overwhelming. You check 50 conversations, find issues, and wonder about the other 4,950 interactions you didn't see.
 
-**This is the reality for most AI teams.** Manual evaluation doesn't scale. Different team members have different standards, you can't check every interaction, and by the time you notice problems, they've already impacted users. You end up playing whack-a-mole with quality issues instead of systematically improving your AI.
+**Manual evaluation doesn't scale.** By the time you notice problems, they've already impacted users. You end up playing whack-a-mole with quality issues instead of systematically improving your AI.
 
-What if instead of spot-checking a tiny sample, you could automatically evaluate every single interaction your AI handles? What if you could detect quality trends before they become user-facing problems?
+**Handit solves this** by using AI to evaluate AI—at scale, consistently, and with focused insights that power automatic issue detection and fix generation.
 
 <Callout type="info">
-  That's exactly what Handit's evaluation system does. Your autonomous engineer uses AI to evaluate AI—at scale, consistently, and with focused insights that power automatic issue detection and fix generation.
+  Your autonomous engineer evaluates every interaction, detects quality patterns, and generates targeted fixes based on comprehensive quality data.
 </Callout>
 
 ## How Evaluation Powers Your Autonomous Engineer
 
-Evaluation data is the foundation that enables your autonomous engineer to work effectively. Without comprehensive quality assessment, your autonomous engineer would be working blind—unable to detect issues or validate that fixes actually work.
+**Issue Detection**: By monitoring quality scores continuously, your autonomous engineer identifies when performance drops and what patterns indicate problems.
 
-**Continuous Quality Monitoring**: Your autonomous engineer evaluates every interaction (or a significant percentage) in real-time, tracking quality trends across multiple dimensions. When empathy scores start declining or accuracy issues emerge, it notices immediately rather than waiting for user complaints.
+**Root Cause Analysis**: Detailed evaluation data helps your autonomous engineer understand whether issues stem from prompt problems, logic errors, or missing context.
 
-**Pattern Recognition**: By analyzing thousands of evaluated interactions, your autonomous engineer identifies patterns that would be impossible to spot manually. Maybe your AI struggles with complex technical questions, or perhaps it performs poorly when users are frustrated. These insights drive targeted improvements.
+**Fix Validation**: Before creating pull requests, your autonomous engineer tests improvements against evaluation data to ensure fixes actually work.
 
-**Fix Validation**: When your autonomous engineer generates a potential fix, it uses evaluation data to test whether the improvement actually works. It compares the performance of your current prompt against the proposed fix using real production data, only creating pull requests when improvements are statistically significant.
+**Continuous Learning**: As fixes get deployed, new evaluation data shows their effectiveness, helping your autonomous engineer improve over time.
 
-**Continuous Learning**: As your autonomous engineer's fixes get deployed and new evaluation data comes in, it learns what types of improvements work best for your specific AI. This makes future fixes more targeted and effective over time.
+## Focused Evaluation Approach
 
-## LLM-as-Judge Technology
+The key to effective evaluation is focus. Handit uses single-purpose evaluators that examine one specific quality dimension at a time.
 
-The key to scalable AI evaluation is using advanced language models to assess quality with human-level understanding. Instead of simple keyword matching or rule-based checks, LLM-as-Judge technology can understand context, nuance, and subjective qualities like empathy or helpfulness.
-
-**How it works in practice**: When your AI responds to a customer question, an evaluation model (like GPT-4 or Llama) analyzes that response against specific quality criteria. It considers the original question, the AI's response, and provides a detailed assessment with scoring and reasoning.
-
-**Real-time insights**: Evaluation happens automatically in the background without affecting your users' experience. Quality scores appear in your dashboard within seconds, giving you immediate visibility into how your AI is performing across different quality dimensions.
-
-**Historical tracking**: Over time, you build a comprehensive picture of your AI's quality trends. You can see how changes to prompts or system configurations affect performance, and track the impact of improvements your autonomous engineer implements.
-
-![LLM as Judge Concept Diagram](/assets/llm_as_judge/llm_as_judge.png)
-
-## The Power of Focused Evaluation
-
-The secret to effective AI evaluation is focus. Rather than trying to assess everything at once, Handit uses single-purpose evaluators that examine one specific quality dimension at a time.
-
-**Why this matters**: When an evaluator tries to check helpfulness, accuracy, tone, format, and compliance all at once, the results are vague and unhelpful. You might get a low score, but you won't know which aspect needs improvement. Single-purpose evaluators provide clear, actionable insights.
-
-**Example of focused evaluation**:
-- **Completeness Evaluator**: "Does the response address all parts of the user's question?"
-- **Accuracy Evaluator**: "Is the information provided factually correct?"
-- **Empathy Evaluator**: "Does the response show understanding for the user's situation?"
-- **Format Evaluator**: "Does the response follow the required structure and style?"
+**Example evaluators**:
+- **Completeness**: "Does the response address all parts of the question?"
+- **Accuracy**: "Is the information factually correct?"
+- **Empathy**: "Does the response show understanding for the user's situation?"
 
 <Callout type="warning">
-  **Critical Best Practice**: Never combine multiple quality checks in one evaluator. Create separate evaluators for each quality dimension you care about. This provides actionable insights and enables your autonomous engineer to generate targeted fixes.
+  **Best Practice**: Create separate evaluators for each quality dimension. This provides actionable insights and enables your autonomous engineer to generate targeted fixes.
 </Callout>
 
-**The result**: When your autonomous engineer detects that empathy scores are dropping, it knows exactly what to focus on when generating improvements. Instead of generic prompt tweaks, it creates specific enhancements that address empathy while maintaining other quality aspects.
+**The result**: When empathy scores drop, your autonomous engineer knows exactly what to focus on when generating improvements.
 
-## Real-World Impact
+## Supported Models
 
-Teams using comprehensive evaluation report a fundamental shift in how they manage AI quality:
-
-**Proactive vs Reactive**: Instead of responding to user complaints, you identify and fix quality issues before they significantly impact users. Your autonomous engineer catches declining performance trends early and addresses them automatically.
-
-**Data-Driven Decisions**: Every improvement is backed by concrete evaluation data. You're no longer guessing whether a prompt change will help—you can see exactly how it performs against real user interactions.
-
-**Consistent Standards**: Evaluation removes the subjectivity and inconsistency of human review. Your AI is held to the same standards across all interactions, ensuring reliable quality for your users.
-
-**Scalable Quality Control**: Whether you handle hundreds or millions of interactions, evaluation scales seamlessly. Your autonomous engineer can monitor and improve quality across any volume of AI interactions.
-
-## Supported Evaluation Models
-
-Handit integrates with leading AI models to provide flexible evaluation options:
-
-**OpenAI Models**: GPT-4o provides the highest accuracy for complex evaluations, while GPT-3.5-turbo offers cost-effective evaluation for high-volume applications. GPT-4-turbo balances performance and speed for most use cases.
-
-**Together AI (Llama Models)**: Llama v4 Scout offers high-quality open source evaluation, while Llama v4 Maverick provides faster processing for high-volume needs. CodeLlama specializes in technical and code-related evaluation.
-
-**Model Selection**: Choose evaluation models based on your specific needs—accuracy requirements, volume, cost constraints, and the complexity of quality dimensions you're assessing.
+**OpenAI**: GPT-4o (highest accuracy), GPT-3.5-turbo (cost-effective)
+**Together AI**: Llama v4 Scout (open source), Llama v4 Maverick (high-volume)
 
 ## Getting Started
 
-Ready to give your autonomous engineer the evaluation data it needs to detect issues and create fixes?
+Ready to give your autonomous engineer the evaluation data it needs?
 
 <Cards.Card title="Main Quickstart - Includes Evaluation" href="/quickstart" arrow />
-<Cards.Card title="Evaluation Deep Dive" href="/evaluation/quickstart" arrow />
+<Cards.Card title="Evaluation Setup" href="/evaluation/quickstart" arrow />
 
-**Next Steps**: Once evaluation is active, set up [Autonomous Fixes](/optimization/quickstart) to complete your autonomous engineer. With both evaluation and optimization working together, your AI will continuously improve while you focus on building features.
+**Advanced**: [Custom Evaluators](/evaluation/guide/custom_evaluators), [LLM as Judges](/evaluation/guide/advanced/llm_as_judges)
 
 <Callout type="success">
-  **Transform your AI quality control** from manual spot-checking to autonomous monitoring and fixing with comprehensive evaluation data.
+  **Transform your AI quality control** from manual spot-checking to autonomous monitoring and fixing.
 </Callout>

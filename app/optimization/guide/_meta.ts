@@ -1,8 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  "cli_github_setup": "CLI & GitHub Setup",
-  "optimization_tokens": "Manual Token Setup",
-  "release_hub": "Release Hub & Deployment", 
-  "sdk_integration": "SDK Integration",
+  "cli_github_setup": "GitHub Integration (Recommended)",
+  "autonomous_fixes": "Autonomous Fixes",
+  "advanced": "Advanced",
 } satisfies MetaRecord 

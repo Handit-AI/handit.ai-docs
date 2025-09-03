@@ -4,41 +4,34 @@ sidebarTitle: 'Quickstart'
 ---
 
 import { Callout } from "nextra/components"
-import { Steps } from "nextra/components"
 
 # Evaluation Quickstart
 
-> **Give your autonomous engineer the data it needs to detect issues and create fixes.** Set up comprehensive AI quality assessment in under 5 minutes to enable autonomous optimization.
-
-Transform your AI from producing unknown quality to having continuous quality monitoring that powers autonomous improvement.
+> **Give your autonomous engineer the data it needs to detect issues and create fixes.** Set up comprehensive AI quality assessment in under 5 minutes.
 
 <Callout type="info">
-  **Prerequisites**: You need Node.js installed and a [Handit.ai Account](https://beta.handit.ai). If you want the complete setup including tracing and autonomous fixes, use our [Main Quickstart](/quickstart) instead.
+  **Prerequisites**: Node.js and a [Handit.ai Account](https://beta.handit.ai). For complete setup including tracing and autonomous fixes, use our [Main Quickstart](/quickstart).
 </Callout>
 
-## Setting Up Evaluation
+## Set up evaluation
 
-Getting comprehensive AI evaluation running is straightforward with the Handit CLI. The CLI will connect evaluation models, configure quality assessments, and set up the monitoring your autonomous engineer needs.
-
-### Step 1: Install the Handit CLI
+### Step 1: Install the CLI
 
 ```bash filename="terminal"
 npm install -g @handit.ai/cli
 ```
 
-### Step 2: Set Up Your Evaluators
-
-Navigate to your AI project directory and run:
+### Step 2: Configure evaluators
 
 ```bash filename="terminal"
 handit-cli evaluators-setup
 ```
 
 The CLI will guide you through:
-- **Model connection** - Connect evaluation models like GPT-4 or Llama for quality assessment
-- **Evaluator association** - Link existing evaluators to your AI components
-- **Evaluation configuration** - Set what percentage of interactions to evaluate
-- **Quality dimensions** - Configure completeness, accuracy, empathy, and custom metrics
+- **Connect evaluation models** (GPT-4, Llama, etc.)
+- **Configure evaluators** for quality dimensions you care about
+- **Set evaluation percentages** (how often to evaluate)
+- **Link to your AI components** automatically
 
 <video 
   width="100%" 
@@ -53,78 +46,42 @@ The CLI will guide you through:
 </video>
 
 <Callout type="success">
-  **Setup Complete!** Your evaluation system is now active and will start assessing your AI outputs automatically. Quality scores will appear in your dashboard within minutes.
+  **Setup complete!** Your evaluation system is active. Quality scores will appear in your dashboard within minutes.
 </Callout>
 
-## Understanding Your Evaluation Data
+## Verify setup
 
-Once evaluation is active, you'll start seeing quality insights that your autonomous engineer uses to detect issues and create improvements:
+**✅ Check your dashboard:** Go to [dashboard.handit.ai](https://dashboard.handit.ai) - you should see:
+- Quality scores appearing for your AI interactions
+- Evaluation trends in Agent Performance
+- Individual interaction breakdowns
 
-**Real-Time Quality Monitoring**: Your dashboard shows live evaluation scores as your AI processes requests. You can see how individual interactions perform and spot quality trends as they develop, giving your autonomous engineer the data it needs to identify problems quickly.
+## Understanding your evaluation data
 
-**Quality Pattern Recognition**: The Agent Performance section reveals patterns in your AI's quality over time. Your autonomous engineer analyzes these patterns to understand when quality drops, what causes failures, and which improvements would have the biggest impact.
+**Quality Monitoring**: Your dashboard shows live evaluation scores as your AI processes requests, giving your autonomous engineer data to identify problems quickly.
 
-**Individual Interaction Analysis**: Click on specific interactions to see detailed evaluation breakdowns. You'll see exactly why an interaction received particular scores, providing the evidence your autonomous engineer uses to generate targeted fixes.
+**Pattern Recognition**: Your autonomous engineer analyzes quality patterns to understand when performance drops and what improvements would have the biggest impact.
+
+**Targeted Insights**: Rather than generic scores, you see specific assessments across quality dimensions—completeness, accuracy, empathy—enabling targeted fixes.
 
 ![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
 
-**Quality Dimension Breakdown**: Rather than generic "good" or "bad" scores, you'll see specific assessments across different quality dimensions—completeness, accuracy, empathy, format compliance, and any custom evaluators you've configured. This granular data helps your autonomous engineer understand exactly what needs improvement.
+## Next steps
 
-## How Your Autonomous Engineer Uses Evaluation Data
+**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with proven improvements.
 
-Your evaluation data becomes the foundation for autonomous improvement:
+**Custom Evaluators**: Create [Custom Quality Assessments](/evaluation/guide/custom_evaluators) for your specific use case.
 
-**Issue Detection**: By continuously monitoring quality scores, your autonomous engineer identifies when performance drops, which interactions fail, and what patterns indicate systemic problems.
-
-**Root Cause Analysis**: Detailed evaluation breakdowns help your autonomous engineer understand whether issues stem from prompt problems, logic errors, or missing context, enabling targeted rather than generic fixes.
-
-**Fix Validation**: Before creating pull requests, your autonomous engineer tests potential improvements against historical evaluation data to ensure fixes actually solve quality problems.
-
-**Continuous Learning**: As fixes get deployed, new evaluation data shows their effectiveness, helping your autonomous engineer learn what types of improvements work best for your specific AI system.
-
-## Viewing Your Quality Insights
-
-Your evaluation data appears in the Handit dashboard immediately:
-
-### Quality Trends Dashboard
-Go to your [Handit Dashboard](https://beta.handit.ai) to see quality trends over time. You'll see success rates, average scores across different quality dimensions, and can identify when quality issues started occurring.
-
-### Interaction-Level Analysis
-Click on individual interactions to see complete evaluation details. You can analyze why specific responses received particular scores and understand exactly what your AI is doing well or poorly.
-
-### Evaluator Performance
-Monitor how different evaluators perform and adjust their evaluation percentages based on the insights they provide. Some evaluators might catch critical issues that others miss.
-
-## Advanced Evaluation Setup
-
-Once you have basic evaluation running, you can enhance your quality monitoring:
-
-**Custom Evaluators**: Create evaluators specific to your use case. If you're building a customer service AI, you might want evaluators for politeness, problem resolution, and brand voice consistency.
-
-**Evaluation Percentages**: Start with 10-20% evaluation coverage for cost-effectiveness, then adjust based on your quality requirements and traffic patterns.
-
-**Model Selection**: Use GPT-4 for highest accuracy evaluation, or GPT-3.5-turbo for cost-effective quality monitoring. The CLI helps you configure the right balance.
-
-## Next Steps
-
-Your AI now has comprehensive quality monitoring! Here's what you can do next:
-
-**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with proven improvements based on your evaluation data.
-
-**Set Up Tracing**: Add [Complete Tracing](/tracing/quickstart) to give your autonomous engineer full visibility into your AI's execution flow.
-
-**Create Custom Evaluators**: Build [Custom Quality Assessments](/evaluation/guide/custom_evaluators) tailored to your specific AI application.
+**Advanced Features**: Explore [LLM as Judges](/evaluation/guide/advanced/llm_as_judges) and other advanced capabilities.
 
 <Callout type="success">
-  **Your AI now has continuous quality monitoring!** Your autonomous engineer can detect quality issues automatically. Add GitHub integration to enable autonomous fixes based on this evaluation data.
+  **Your autonomous engineer can now detect quality issues!** Add GitHub integration to enable autonomous fixes based on this evaluation data.
 </Callout>
 
 ## Troubleshooting
 
-**CLI Setup Issues**: If you encounter problems during evaluator setup, ensure Node.js is installed and you have proper access to your project directory. Try running `handit-cli evaluators-setup` again to reconfigure.
+**No evaluation data**: Verify your AI is receiving traffic and evaluation percentages are above 0%.
 
-**No Evaluation Data**: If you're not seeing evaluation scores in the dashboard, verify that your AI is receiving traffic and that evaluation percentages are set above 0%.
+**Model issues**: Check API keys are valid and have sufficient credits. Re-run `handit-cli evaluators-setup` to reconfigure.
 
-**Model Token Issues**: If evaluation models aren't working, check that your API keys are valid and have sufficient credits. The CLI will help you reconfigure tokens if needed.
-
-For additional help, check our [detailed evaluation guides](/evaluation/guide/cli_setup) or visit our [Support page](/more/contact) for assistance.
+For help, visit our [Support page](/more/contact) or join our [Discord community](https://discord.gg/wZbW9Bu5).

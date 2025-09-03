@@ -1,129 +1,125 @@
 import { Callout } from "nextra/components"
-import { Steps } from "nextra/components"
 import { Tabs } from "nextra/components"
 import { Cards } from 'nextra/components'
 
 # AI Agent Tracing Quickstart
 
-> **Give your autonomous engineer eyes to see your AI.** Set up comprehensive tracing in under 5 minutes to enable autonomous issue detection and fix generation.
-
-Transform your AI from a black box into a fully observable system that your autonomous engineer can continuously monitor and improve.
+> **Give your autonomous engineer eyes to see your AI.** Choose between automatic setup with the CLI or manual integration with decorators.
 
 <Callout type="info">
-  **Prerequisites**: You need Node.js installed and a [Handit.ai Account](https://beta.handit.ai). If you want the complete setup including evaluation and autonomous fixes, use our [Main Quickstart](/quickstart) instead.
+  **Two setup options**: CLI automatically generates code, or manual setup where you add decorators. For complete autonomous engineer setup, use our [Main Quickstart](/quickstart).
 </Callout>
 
-## Setting Up Tracing
+## Option 1: CLI Setup (Recommended)
 
-Getting tracing up and running is straightforward with the Handit CLI. The CLI will analyze your codebase, generate the necessary integration code, and set up comprehensive monitoring for your AI.
-
-### Step 1: Install the Handit CLI
+Automatic code generation for your agent functions:
 
 ```bash filename="terminal"
 npm install -g @handit.ai/cli
-```
-
-### Step 2: Set Up Your Project
-
-Navigate to your AI project directory and run:
-
-```bash filename="terminal"
 handit-cli setup
 ```
 
-The CLI will guide you through:
-- **Account connection** - Link your project to your Handit.ai account
-- **Codebase analysis** - Automatically detect your AI agent patterns and LLM calls
-- **Integration code generation** - Create tracing wrappers for your AI functions
-- **Configuration setup** - Generate environment variables and config files
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px' }}
->
-  <source src="/assets/quickstart/cli-setup-app-2.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+The CLI detects your agent functions and generates tracing code automatically. No manual coding required.
 
 <Callout type="success">
-  **Setup Complete!** Your AI now has comprehensive tracing active. Every interaction will be captured and visible in your dashboard within minutes.
+  **Setup complete!** Your autonomous engineer is now monitoring your AI automatically.
 </Callout>
 
-## What Tracing Captures
+## Option 2: Manual Setup
 
-Once active, your tracing system captures everything your autonomous engineer needs to understand your AI's behavior:
+Add tracing decorators to your main agent functions yourself:
 
-**Complete Execution Flow**: Every step from user request to final response gets recorded, showing exactly how your AI processes requests and makes decisions.
+### Install and configure
 
-**LLM Interactions**: All language model calls are captured with exact prompts sent, complete responses received, token usage, timing data, and any errors that occurred.
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```bash
+pip install handit-ai
+```
 
-**Tool Executions**: When your AI calls external functions or APIs, tracing captures the parameters passed, results returned, execution timing, and any error conditions.
+```python filename="config.py"
+from handit_ai import configure
+configure(HANDIT_API_KEY="your-api-key")
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash
+npm install @handit.ai/handit-ai
+```
 
-**Performance Metrics**: Detailed timing data shows where your AI spends time, helping identify bottlenecks and optimization opportunities.
+```javascript filename="config.js"
+import { configure } from '@handit.ai/handit-ai';
+configure({ HANDIT_API_KEY: "your-api-key" });
+```
+</Tabs.Tab>
+</Tabs>
 
-**Error Context**: When things go wrong, tracing provides complete context about what led to failures, making debugging precise rather than guesswork.
+### Add tracing to your agent
 
-## Viewing Your Trace Data
+**✅ DO trace (agent entry points):**
 
-Your tracing data appears in the Handit dashboard immediately:
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="agent.py"
+from handit_ai import tracing
 
-### Real-Time Monitoring
-Go to your [Handit Dashboard](https://beta.handit.ai) to see live traces as your AI processes requests. You'll see performance metrics, success rates, and can drill into individual interactions for detailed analysis.
+# Trace your main agent function
+@tracing(agent="customer-service")
+async def process_customer_request(message):
+    intent = await classify_intent(message)     # Captured automatically
+    context = await search_knowledge(intent)    # Captured automatically
+    response = await generate_response(context) # Captured automatically
+    return response
 
-### Trace Analysis
-Click on individual traces to see the complete execution flow. You can analyze timing, inputs, outputs, and any errors to understand exactly how your AI behaves in different scenarios.
+# For FastAPI - route decorator goes ABOVE tracing
+@app.post("/chat")
+@tracing(agent="chat-api")
+async def chat_endpoint(request):
+    return await process_customer_request(request.message)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="agent.js"
+import { startTracing, endTracing } from '@handit.ai/handit-ai';
 
-### Pattern Recognition
-Watch as patterns emerge in your trace data. Your autonomous engineer uses these patterns to identify quality issues, performance problems, and optimization opportunities automatically.
+// Trace your main agent function
+const processCustomerRequest = async (message) => {
+  startTracing({ agent: "customer-service" });
+  try {
+    const intent = await classifyIntent(message);     // Captured automatically
+    const context = await searchKnowledge(intent);    // Captured automatically
+    const response = await generateResponse(context);  // Captured automatically
+        return response;
+  } finally {
+    endTracing();
+  }
+};
+```
+</Tabs.Tab>
+</Tabs>
 
-## Understanding Your Trace Data
+**❌ DON'T trace helper functions:**
+```python
+# These get captured automatically - don't add @tracing here
+async def classify_intent(message):
+async def search_knowledge(query):
+async def generate_response(context):
+```
 
-Your dashboard shows different types of traces that provide comprehensive visibility:
+<Callout type="warning">
+  **Key point**: Only trace your main agent functions that handle user requests. Everything inside gets captured automatically.
+</Callout>
 
-**Agent Traces** show complete workflows from start to finish. You can see how your AI processes user requests, which tools and language models it calls, success and failure patterns, and where performance bottlenecks occur. These traces give you the big picture of how your AI operates.
+## Verify setup
 
-**LLM Node Traces** capture individual language model interactions with remarkable detail. You'll see the exact prompts sent to models, complete responses received, token usage and costs, and response quality patterns. This granular view helps your autonomous engineer understand how your AI uses language models.
+Go to [dashboard.handit.ai](https://dashboard.handit.ai) - you should see agent traces appearing when you run your AI.
 
-**Tool Traces** record external function and API calls, showing what parameters were passed, what results were returned, execution timing, and any error conditions. When tools cause problems or perform poorly, these traces provide the evidence needed for improvement.
+## Next steps
 
-**The key insight**: Your autonomous engineer analyzes all this trace data together to understand patterns, identify root causes of issues, and generate improvements that address specific problems rather than applying generic fixes.
+**Set Up Evaluation**: Add [Quality Assessment](/evaluation/quickstart) so your autonomous engineer can detect quality issues.
 
-## How Your Autonomous Engineer Uses Traces
-
-Your trace data becomes the foundation for autonomous improvement:
-
-**Pattern Recognition**: By analyzing thousands of traces, your autonomous engineer identifies patterns in successful and failed interactions that would be impossible to spot manually.
-
-**Root Cause Analysis**: When issues occur, detailed trace data helps your autonomous engineer understand exactly what went wrong—whether it's a prompt issue, tool failure, or logic error.
-
-**Fix Validation**: Historical trace data allows your autonomous engineer to test potential improvements against real past interactions, ensuring fixes actually solve problems before creating pull requests.
-
-**Continuous Learning**: As fixes get deployed, new trace data shows their effectiveness, helping your autonomous engineer learn what types of improvements work best for your specific AI system.
-
-## Next Steps
-
-Your AI is now fully observable! Here's what you can do next:
-
-**Set Up Evaluation**: Add [Quality Evaluation](/evaluation/quickstart) to score your AI's performance and enable your autonomous engineer to detect quality issues.
-
-**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with proven improvements.
-
-**Explore Advanced Features**: Learn about [Advanced Tracing Features](/tracing/tracing_features/overview) for comprehensive monitoring and debugging capabilities.
+**Enable Autonomous Fixes**: Connect [GitHub Integration](/optimization/quickstart) so your autonomous engineer can create pull requests with improvements.
 
 <Callout type="success">
-  **Your AI is now fully observable!** Your autonomous engineer can see everything your AI does. Add evaluation and optimization to complete your autonomous engineer setup.
+  **Your autonomous engineer can now see everything!** Add evaluation and GitHub integration to complete your setup.
 </Callout>
-
-## Troubleshooting
-
-**CLI Setup Issues**: If you encounter problems during setup, ensure Node.js is installed and you have proper access to your project directory. Try running `handit-cli setup` again to regenerate configuration.
-
-**No Trace Data**: If you're not seeing traces in the dashboard, verify that your generated integration code is being executed and that your API key was set correctly during setup.
-
-**Missing Traces**: If some interactions aren't being traced, check that the CLI-generated tracing code covers all your AI's entry points and main functions.
-
-For additional help, check our [detailed tracing guides](/tracing/guide/cli_setup) or visit our [Support page](/more/contact) for assistance.
