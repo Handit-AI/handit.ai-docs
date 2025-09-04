@@ -1,0 +1,119 @@
+---
+title: 'Manual Setup'
+sidebarTitle: 'Manual Setup'
+---
+
+import { Callout } from "nextra/components"
+import { Tabs } from "nextra/components"
+
+# Manual Setup
+
+> **Add monitoring to your AI agents manually.** This guide shows you exactly where to put the decorators and what they do.
+
+<Callout type="info">
+  **Prefer automatic setup?** Use our [CLI Setup](/autonomous-engineer/guide/cli_setup) for automatic code generation.
+</Callout>
+
+## What you're doing
+
+You're adding monitoring decorators to your **main agent functions** - the functions that handle complete user requests. Everything inside these functions gets captured automatically.
+
+## Step 1: Install and configure
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```bash
+pip install handit-ai
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash
+npm install @handit.ai/handit-ai
+```
+</Tabs.Tab>
+</Tabs>
+
+## Step 2: Add monitoring to your agent
+
+**Where to put it:** On your main agent function that handles user requests.
+
+<Tabs items={["Python", "JavaScript"]} defaultIndex="0">
+<Tabs.Tab>
+```python filename="agent.py"
+# ADD THESE IMPORTS at the top of your file
+from handit_ai import configure, tracing
+import os
+
+# ADD THIS CONFIGURATION at the top of your file
+configure(HANDIT_API_KEY=os.getenv("HANDIT_API_KEY"))
+
+# ADD THIS DECORATOR to your main agent function
+@tracing(agent="customer-service")
+async def process_customer_request(message):
+    # Your existing code here - unchanged
+    intent = await classify_intent(message)
+    response = await generate_response(intent)
+    return response
+
+# For FastAPI - ADD DECORATOR to your route
+@app.post("/chat")
+@tracing(agent="chat-api")  # ADD THIS LINE
+async def chat_endpoint(request):
+    return await process_customer_request(request.message)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```javascript filename="agent.js"
+// ADD THESE IMPORTS at the top of your file
+import { configure, startTracing, endTracing } from '@handit.ai/handit-ai';
+
+// ADD THIS CONFIGURATION at the top of your file
+configure({ HANDIT_API_KEY: process.env.HANDIT_API_KEY });
+
+// ADD startTracing() and endTracing() to your main agent function
+const processCustomerRequest = async (message) => {
+  startTracing({ agent: "customer-service" });  // ADD THIS LINE
+  try {
+    // Your existing code here - unchanged
+    const intent = await classifyIntent(message);
+    const response = await generateResponse(intent);
+    return response;
+  } finally {
+    endTracing();  // ADD THIS LINE
+  }
+};
+```
+</Tabs.Tab>
+</Tabs>
+
+## What NOT to do
+
+**Don't add decorators to helper functions:**
+```python
+# ❌ Don't do this - these get captured automatically
+@tracing(agent="helper")
+async def classify_intent(message):
+    return await llm.classify(message)
+
+# ✅ Just your main agent function needs the decorator
+@tracing(agent="customer-service")
+async def process_customer_request(message):
+    intent = await classify_intent(message)  # This gets captured automatically
+    return await generate_response(intent)   # This gets captured automatically
+```
+
+## Verify it's working
+
+1. **Run your agent** with a test request
+2. **Check [dashboard.handit.ai](https://dashboard.handit.ai)** - you should see traces appearing
+3. **Look for your agent name** in the dashboard
+
+<Callout type="success">
+  **Done!** Your autonomous engineer can now see your AI and will start monitoring for issues.
+</Callout>
+
+## Next steps
+
+**Set up evaluation**: Add [Quality Assessment](/guides/evaluation/quickstart) so your engineer can detect quality issues.
+
+**Enable fixes**: Connect [GitHub Integration](/guides/optimization/quickstart) so your engineer can create pull requests with improvements.

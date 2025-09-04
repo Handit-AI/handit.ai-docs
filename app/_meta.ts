@@ -3,9 +3,8 @@ import type { MetaRecord } from 'nextra'
 export default {
   "index": "Overview",
   "quickstart": "Quickstart",
-  "tracing": "Tracing",
-  "evaluation": "Evaluation",
-  "optimization": "Optimization",
-  "more": "More",
-  "use_cases": "Use Cases"
+  "autonomous-engineer": "Setting up your autonomous engineer",
+  "guides": "Advanced Guides",
+  "use_cases": "Use Cases",
+  "more": "More"
 } satisfies MetaRecord
