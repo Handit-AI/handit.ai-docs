@@ -1,0 +1,47 @@
+---
+title: 'Custom Evaluators'
+sidebarTitle: 'Custom Evaluators'
+---
+
+# Custom Evaluators
+
+> **Define your quality standards with precision.** Custom evaluators let you create evaluation systems tailored to your specific business requirements, ensuring your AI meets the exact quality criteria that matter most to your users.
+
+Transform generic quality assessment into domain-specific evaluation that understands your unique requirements and standards.
+
+<Callout type="info">
+  Custom evaluators use your configured model tokens to automatically assess AI responses against criteria you define, providing quality insights specific to your use case.
+</Callout>
+
+## Why Custom Evaluators Matter
+
+While Handit provides powerful general-purpose evaluators, every AI application has unique quality requirements. A medical AI needs to assess clinical accuracy, a customer service AI must evaluate empathy and resolution effectiveness, and an educational AI should focus on clarity and pedagogical value.
+
+Custom evaluators bridge this gap by allowing you to define evaluation criteria that align with your specific domain, business objectives, and user expectations.
+
+## Getting Started
+
+Creating custom evaluators in Handit is straightforward and follows a clear pattern:
+
+1. **Define your criteria** - Specify what quality means for your use case
+2. **Configure evaluation logic** - Set up the assessment rules and scoring
+3. **Test and refine** - Validate your evaluator with sample data
+4. **Deploy and monitor** - Integrate into your AI pipeline
+
+## Basic Custom Evaluator Structure
+
+Here's a simple example of a custom evaluator:
+
+```python
+from handit import CustomEvaluator
+
+class AccuracyEvaluator(CustomEvaluator):
+    def evaluate(self, response, expected):
+        # Your custom evaluation logic here
+        return {
+            "score": 0.85,
+            "reasoning": "Response is factually accurate and complete"
+        }
+```
+
+This is a simplified version of the custom evaluators documentation.

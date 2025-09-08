@@ -1,7 +1,6 @@
 import type { MetaRecord } from "nextra";
 
 export default {
-  "overview": "Introduction",
-  "quickstart": "Quickstart", 
-  "guide": "Guides",
+  "custom-evaluators": "Custom Evaluators",
+  "llm-as-judges": "LLM as Judges"
 } satisfies MetaRecord; 

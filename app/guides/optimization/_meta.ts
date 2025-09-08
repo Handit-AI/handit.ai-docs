@@ -1,7 +1,7 @@
 import type { MetaRecord } from "nextra";
 
 export default {
-  "overview": "Introduction",
-  "quickstart": "Quickstart", 
-  "guide": "Guides",
+  index: "Overview",
+  "github-setup": "GitHub Setup",
+  "autonomous-fixes": "Autonomous Fixes"
 } satisfies MetaRecord; 

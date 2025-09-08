@@ -1,0 +1,138 @@
+---
+title: Optimization
+description: Your autonomous engineer that detects issues, creates fixes, and ships pull requests automatically.
+sidebarTitle: Optimization
+---
+
+import { Callout } from "nextra/components";
+import { Cards } from 'nextra/components'
+
+# Optimization
+
+> **Your autonomous engineer that works 24/7.** Handit automatically detects quality issues, generates better prompts, tests them, and creates pull requests with proven improvements.
+
+## Stop Being Your AI's On-Call Engineer
+
+Picture this: It's 2 AM and your phone buzzes. Your AI is giving unhelpful responses, and users are complaining. You debug for hours, make changes based on guesswork, and hope they work.
+
+**This ends now.** Your autonomous engineer handles the monitoring, fixing, and improvement while you focus on building features.
+
+<Callout type="info">
+  Your autonomous engineer detects issues automatically, creates proven fixes, and ships them as pull requests—using your existing GitHub workflow.
+</Callout>
+
+## How Your Autonomous Engineer Works
+
+**Continuous Monitoring**: Watches your AI's performance 24/7 through evaluation scores and user feedback patterns.
+
+**Issue Detection**: Identifies when quality drops, what types of interactions fail, and what's causing the problems.
+
+**Fix Generation**: Creates improved system prompts that address the specific issues detected in your AI.
+
+**Validation**: Tests fixes against real production data to ensure they actually improve performance.
+
+**Pull Request Creation**: Opens PRs in your repository with the improved system prompts and detailed performance metrics.
+
+## GitHub-Native Workflow
+
+Your autonomous engineer works through pull requests—just like a human teammate:
+
+**Automatic PR Creation**: When issues are detected and fixes validated, PRs are created automatically in your repository.
+
+**Detailed Metrics**: Each PR includes before/after performance data, statistical confidence, and examples showing the improvement.
+
+**Code Review Process**: You review and merge fixes like any other code change, maintaining full control over what goes to production.
+
+**Seamless Integration**: Works with your existing CI/CD, branch protection, and deployment processes.
+
+## What Your Pull Requests Look Like
+
+When your autonomous engineer detects and fixes an issue:
+
+```markdown
+## 🤖 Autonomous Fix: Customer Service Empathy Issues
+
+### Issue Detected
+Empathy scores dropped from 4.2/5.0 to 3.7/5.0 over the past week.
+
+### Fix Applied
+Updated system prompt to include empathy guidelines and emotional context.
+
+### Results Validated
+- Empathy Score: 3.7/5.0 → 4.6/5.0 (+24% improvement)
+- Statistical Confidence: 95% (tested on 500 interactions)
+
+### Files Changed
+- `src/agents/customer_service/system_prompt.py`
+
+Ready to merge when you approve!
+```
+
+## Quick Setup
+
+**Time required:** Under 5 minutes  
+**Prerequisites**: You need active Handit.ai evaluation running on your LLM nodes
+
+### Connect to GitHub
+
+Run the GitHub integration command in your project directory:
+
+```bash filename="terminal"
+handit-cli github
+```
+
+The CLI will walk you through installing the Handit GitHub app on your repository and configuring the necessary permissions. This allows your autonomous engineer to create pull requests when it finds and validates fixes for quality issues.
+
+<Callout type="tip">
+  **Why GitHub?** Your autonomous engineer works just like a human teammate—when it finds and tests a fix, it creates a pull request for you to review. You maintain complete control over what gets merged into your codebase.
+</Callout>
+
+Once the setup completes, your autonomous engineer is active and monitoring your AI around the clock.
+
+<Callout type="success">
+  **Setup Complete!** Your autonomous engineer is now watching your AI's performance 24/7. When it detects issues, generates fixes, and validates improvements, you'll receive pull requests ready for review.
+</Callout>
+
+## How Your Autonomous Engineer Operates
+
+After setup, your autonomous engineer works continuously in the background without any intervention from you. Here's what happens:
+
+**Continuous Quality Monitoring**: Your autonomous engineer monitors evaluation scores across all your AI interactions. When it notices patterns like declining empathy scores, accuracy drops, or response quality issues, it immediately begins investigating the root cause.
+
+**Intelligent Fix Generation**: Rather than just alerting you to problems, your autonomous engineer analyzes what's different between your successful and failed interactions. It then generates targeted improvements to your system prompts that address the specific issues it identified.
+
+**Thorough Testing**: Before creating any pull requests, your autonomous engineer tests its fixes against real production data. It runs hundreds of actual user interactions through both your current prompt and the improved version, only proceeding when it has statistical confidence that the fix genuinely improves performance.
+
+**Professional Pull Requests**: When a fix is validated, your autonomous engineer creates a detailed pull request that explains what was wrong, how the fix addresses it, and provides concrete evidence of improvement with before/after metrics.
+
+<video 
+  width="100%" 
+  autoPlay 
+  loop 
+  muted 
+  playsInline
+  style={{ borderRadius: '8px' }}
+>
+  <source src="/assets/quickstart/pr-review.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+## What to Expect
+
+Your autonomous engineer typically creates 2-4 pull requests per month for most AI applications, depending on how actively your AI is being used and how much room there is for improvement. Each PR represents a meaningful quality improvement that's been thoroughly tested.
+
+The improvements become more targeted over time as your autonomous engineer learns your AI's specific patterns and challenges. Early fixes might address broad issues like tone or completeness, while later improvements often tackle nuanced problems specific to your use case.
+
+Most teams find that after a few weeks, their AI quality stabilizes at a higher level with fewer issues requiring attention. Your autonomous engineer continues monitoring but focuses on maintaining quality and making incremental improvements rather than fixing major problems.
+
+## Next Steps
+
+**Complete Setup**: For full autonomous engineer setup including monitoring and evaluation, use our [Complete Setup Guide](/setting-up-your-autonomous-engineer).
+
+**Advanced Options**:
+- [GitHub Setup](github-setup) - Detailed GitHub integration configuration
+- [Autonomous Fixes](autonomous-fixes) - Advanced fix generation settings
+
+<Callout type="success">
+  **Set up your autonomous engineer** and start receiving pull requests with proven AI improvements.
+</Callout>

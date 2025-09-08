@@ -1,6 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  "evaluation": "AI Evaluation",
-  "optimization": "Autonomous AI Fixes"
+  "monitoring": "Monitoring",
+  "evaluation": "Evaluation",
+  "optimization": "Optimization"
 } satisfies MetaRecord
