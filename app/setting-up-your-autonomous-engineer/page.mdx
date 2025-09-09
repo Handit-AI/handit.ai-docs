@@ -133,138 +133,35 @@ export const processCustomerRequest = async (userMessage) => {
   Your browser does not support the video tag.
 </video>
 
-**🧠 Connect Evaluation Models**
-- The CLI will ask if you want to set up quality evaluation
-- Connect evaluation models (OpenAI, Together AI, etc.) so your autonomous engineer can assess quality
-- Configure which evaluators to use and how often to run them
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px'}}
->
-  <source src="/assets/quickstart/evaluators-setup.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+## Your Autonomous Engineer is Now Active
 
-**🔗 Connect Your GitHub Repository**  
-- Finally, the CLI will ask you to connect your GitHub repository
-- Install the Handit GitHub app so your autonomous engineer can create pull requests
-- Configure repository permissions for automated fixes
+**✅ Check your dashboard:** Go to [dashboard.handit.ai](https://dashboard.handit.ai) to see your AI's baseline metrics.
 
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px'}}
->
-  <source src="/assets/quickstart/github-setup.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+![Dashboard showing real-time tracing data](/assets/quickstart/dashboard-tracing.png)
 
-<Callout type="success">
-  **Setup Complete!** Your autonomous engineer is now monitoring your AI, evaluating quality, and ready to create pull requests with fixes whenever issues are detected.
-</Callout>
+**🛠️ Automatic fixes:** As soon as Handit detects your first issue, it will automatically create a pull request with the fix.
 
-### Verify Your Setup
+![PR Fix](/assets/quickstart/pr-fix.png)
 
-**✅ Check your dashboard:** Go to [dashboard.handit.ai](https://dashboard.handit.ai) - you should see:
-- **Tracing data** flowing in real-time as your AI processes requests
-- **Quality scores** appearing for evaluated interactions  
-- **Agent Performance** showing your AI's baseline metrics
+**How it works:**
+- **Detects** quality issues in your AI responses
+- **Analyzes** the root cause automatically  
+- **Generates** a fix and tests it against real data
+- **Creates** a pull request with the proven improvement
 
-**✅ Confirm GitHub integration:** Check your repository - you should see:
-- **Handit app installed** in your repository settings
-- **Branch protection** respecting your existing rules
-- **Ready for PRs** - your autonomous engineer can now create pull requests
+**🔍 Continuous monitoring:** Your AI is monitored 24/7 - when issues are detected, fixes are shipped automatically.
 
-## What happens after setup
-
-Once your autonomous engineer is active, it works automatically:
-
-**🔍 Monitors** your AI interactions and detects quality issues
-**🛠️ Generates** fixes and tests them against real data  
-**📝 Creates** pull requests with proven improvements
-
-<video 
-  width="100%" 
-  autoPlay 
-  loop 
-  muted 
-  playsInline
-  style={{ borderRadius: '8px' }}
->
-  <source src="/assets/quickstart/pr-review.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-**Example:** If your AI starts giving incomplete responses, your autonomous engineer detects this, generates a better prompt, tests it, and creates a PR with the fix.
-
-![AI Agent Tracing Dashboard](/assets/overview/tracing.png)
-
-## What happens next
-
-**✅ Your autonomous engineer is now active**
-
-Check your [dashboard](https://dashboard.handit.ai) to see real-time monitoring data and quality scores.
-
-**Within the first week:** If issues are detected, you'll receive pull requests with fixes
-**Ongoing:** Your AI improves automatically while you focus on building features
-
-## Next steps
-
-**Monitor progress**: [Dashboard](https://dashboard.handit.ai) | **Learn more**: [Advanced Guides](/guides) | **Get help**: [Discord](https://discord.gg/wZbW9Bu5), [Support](/more/contact)
-
-<Callout type="success">
-  **Welcome to autonomous AI development!** Your autonomous engineer is now working 24/7 to monitor your AI and create improvements.
-</Callout>
-
-## Advanced: Manual Setup
-
-<Callout type="warning">
-  **Advanced users only.** If you need custom control over your autonomous engineer setup, you can manually add monitoring code instead of using the CLI.
-</Callout>
-
-**When to use manual setup:**
-- Custom deployment environments
-- Complex agent architectures
-- Need granular control over monitoring
-
-**Quick manual setup:**
-- [Manual Setup Guide](/guides/monitoring/guide/manual_setup) - Add decorators yourself
-- [Advanced Setup](/guides/monitoring/guide/advanced) - Node-by-node monitoring
 
 ## Troubleshooting
 
-**❌ CLI command not found?**
-- **Solution**: Install Node.js first: `node --version` (should show v16+)
-- **If still failing**: `npm uninstall -g @handit.ai/cli && npm install -g @handit.ai/cli`
+**❌ CLI command not found?**  
+Install Node.js first: `node --version` (should show v16+)
 
-**❌ "Authentication failed" during setup?**
-- **Solution**: Check your Handit.ai account credentials at [dashboard.handit.ai](https://dashboard.handit.ai)
-- **If still failing**: Try logging out and back in to your Handit account
+**❌ "Authentication failed" during setup?**  
+Check your Handit.ai account credentials at [dashboard.handit.ai](https://dashboard.handit.ai)
 
-**❌ No traces appearing in dashboard?**
-- **Solution**: Run `handit-cli setup` again to regenerate configuration
-- **Check**: Your generated code is actually being executed (not just imported)
-- **Verify**: API key was set correctly: `echo $HANDIT_API_KEY`
+**❌ No traces appearing in dashboard?**  
+Run `handit-cli setup` again and verify your API key: `echo $HANDIT_API_KEY`
 
-**❌ Evaluations not running?**
-- **Solution**: Re-run `handit-cli evaluators-setup` to verify model connections
-- **Check**: Model tokens have sufficient credits in your provider dashboard
-- **Verify**: Your AI is receiving traffic (evaluations only run on active agents)
-
-**❌ GitHub app installation failed?**
-- **Solution**: Ensure you have admin access to the repository
-- **Try**: `handit-cli github` again to reinstall the app
-- **Check**: Repository permissions in GitHub Settings → Applications
-
-**Need Help?**
-- **Community**: [Discord](https://discord.gg/wZbW9Bu5) for real-time help
-- **Support**: [Contact Us](/more/contact) for technical issues
-- **Advanced**: [Manual Setup](/autonomous-engineer/guide/manual_setup) for custom configurations
+**Need more help?** [Discord](https://discord.gg/wZbW9Bu5) | [Support](/more/contact)
